@@ -4,15 +4,10 @@ import {
   LineChart, Line, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
   PieChart, Pie, Cell, Legend, AreaChart, Area, ComposedChart, Scatter, ScatterChart, ZAxis,
 } from "recharts";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, Badge, Button, Tabs, TabsContent, TabsList, TabsTrigger, Separator, Progress } from "shadcn";
+import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "shadcn";
 import { Trophy, Zap, Target, Swords, TrendingUp, Activity, Shield, Eye, Sparkles, AlertTriangle, Crown, Flame, Skull, User, Clock, GitBranch, BarChart3, Wand2, Bomb, Rocket, Brain, Moon, Sun } from "lucide-react";
 
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Separator } from "@/components/ui/separator";
-import { Progress } from "@/components/ui/progress";
-import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 // ============ DATA ============
 
 // Source: murlok.io top 50 Shadow Priests M+ (refresh 16 mai 2026 — 2h ago)
