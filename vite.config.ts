@@ -5,7 +5,7 @@ import path from "path";
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
-  base: "/malenia-dashboard/", // <-- CHANGE if your repo has a different name
+  base: "/malenia.github.io/", // <-- CHANGE if your repo has a different name
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
