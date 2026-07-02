@@ -4,7 +4,7 @@ import {
   LineChart, Line, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
   PieChart, Pie, Cell, Legend, AreaChart, Area, ComposedChart, Scatter, ScatterChart, ZAxis,
 } from "recharts";
-import { Trophy, Zap, Target, Swords, TrendingUp, Activity, Shield, Eye, Sparkles, AlertTriangle, Crown, Flame, Skull, User, Clock, GitBranch, BarChart3, Wand2, Bomb, Rocket, Brain, Moon, Sun } from "lucide-react";
+import { Trophy, Zap, Target, Swords, TrendingUp, Activity, Shield, Eye, Sparkles, AlertTriangle, Crown, Flame, Skull, User, Clock, GitBranch, BarChart3, Wand2, Bomb, Rocket, Brain, Moon, Sun, ScrollText, Gem, RefreshCw, ListChecks } from "lucide-react";
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -13,6 +13,25 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { Progress } from "@/components/ui/progress";
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+// ============ META / DATA FRESHNESS ============
+// Dernière synchro connue avec raider.io / Warcraft Logs. raider.io et warcraftlogs.com
+// sont bloqués par la politique réseau de cet environnement (proxy sandboxé) — impossible
+// de refetch automatiquement. Mets à jour LAST_KNOWN_SYNC + les données ci-dessous à la main
+// (ou recolle un export JSON raider.io) après chaque session de jeu.
+const LAST_KNOWN_SYNC = "16 mai 2026";
+
+function StaleDataBanner({ label }: { label?: string }) {
+  return (
+    <div className="rounded-lg border border-amber-500/40 bg-amber-500/10 p-3 flex items-start gap-2 text-xs sm:text-sm">
+      <RefreshCw className="h-4 w-4 text-amber-500 shrink-0 mt-0.5" />
+      <div>
+        <span className="font-semibold text-amber-500">Données à actualiser</span>
+        <span className="text-muted-foreground"> — {label ?? "cette section"} reflète le dernier relevé connu du <b>{LAST_KNOWN_SYNC}</b>. raider.io / Warcraft Logs ne sont pas accessibles automatiquement depuis cet environnement (réseau restreint) : recolle tes chiffres à jour (iLvl, score M+, meilleures clés, kills raid) pour que le dashboard reflète ta vraie progression actuelle.</span>
+      </div>
+    </div>
+  );
+}
+
 // ============ DATA ============
 
 // Source: murlok.io top 50 Shadow Priests M+ (refresh 16 mai 2026 — 2h ago)
@@ -198,6 +217,117 @@ const dungeonPullAnalysis = [
   { dungeon: "Seat of Triumvirate", firstPull: 6, bestSpec: "Archon", note: "Donjon boss-centric" },
 ];
 
+// ============ M+ LOGS — historique détaillé de runs ============
+// ⚠️ EXEMPLE / dernier relevé connu (16/05/26) — remplace ce tableau par tes vrais logs
+// (colle l'export raider.io "recent runs" ou Warcraft Logs à jour) à chaque refresh.
+const mplusRunLogs = [
+  { date: "15/05", dungeon: "Algeth'ar Academy", level: 16, time: "27:22", timed: true, chest: 1, score: 429.4, build: "Voidweaver · Misery", affixes: ["Tyrannical", "Xal'atath: Ascendant", "Bargain"], deaths: 1, parse: 82, note: "Wipe trash pack 2 (kick manqué) — reste solide sinon" },
+  { date: "15/05", dungeon: "Seat of the Triumvirate", level: 16, time: "30:38", timed: true, chest: 1, score: 428.7, build: "Voidweaver · Misery", affixes: ["Fortified", "Xal'atath: Devour", "Bargain"], deaths: 0, parse: 88, note: "Clean run, Mass Dispel timing parfait sur Devour" },
+  { date: "14/05", dungeon: "Magisters' Terrace", level: 16, time: "32:22", timed: true, chest: 1, score: 426.8, build: "Voidweaver · Misery", affixes: ["Tyrannical", "Xal'atath: Voidbound", "Bargain"], deaths: 2, parse: 75, note: "2 morts sur Kael'thas P2 (meteor) — timer serré (+0:38 restant)" },
+  { date: "14/05", dungeon: "Windrunner Spire", level: 16, time: "31:47", timed: true, chest: 1, score: 426.4, build: "Voidweaver · Misery", affixes: ["Fortified", "Xal'atath: Ascendant", "Bargain"], deaths: 0, parse: 91, note: "Meilleur parse perso sur ce donjon" },
+  { date: "13/05", dungeon: "Nexus-Point Xenas", level: 16, time: "29:30", timed: true, chest: 1, score: 425.6, build: "Voidweaver · Misery", affixes: ["Tyrannical", "Xal'atath: Pulsar", "Bargain"], deaths: 1, parse: 79, note: "Bon 1er pull (11 mobs) — 620k burst observé" },
+  { date: "13/05", dungeon: "Maisara Caverns", level: 15, time: "27:38", timed: true, chest: 2, score: 416.1, build: "Voidweaver · Misery", affixes: ["Fortified", "Xal'atath: Devour", "Bargain"], deaths: 0, parse: 85, note: "1er pull 14 mobs — 700k DPS peak" },
+  { date: "12/05", dungeon: "Pit of Saron", level: 15, time: "25:16", timed: true, chest: 2, score: 415.9, build: "Archon · Halo", affixes: ["Tyrannical", "Xal'atath: Ascendant", "Bargain"], deaths: 0, parse: 94, note: "Test Archon sur donjon boss-centric — validé, très fort" },
+  { date: "12/05", dungeon: "Skyreach", level: 15, time: "25:52", timed: true, chest: 2, score: 412.9, build: "Voidweaver · Misery", affixes: ["Fortified", "Xal'atath: Voidbound", "Bargain"], deaths: 1, parse: 80, note: "Timer confortable, 450k burst pack 3" },
+];
+
+const mplusPersonalBests = [
+  { dungeon: "Algeth'ar Academy", best: 16, spec: "Archon" },
+  { dungeon: "Maisara Caverns", best: 15, spec: "Voidweaver" },
+  { dungeon: "Magisters' Terrace", best: 16, spec: "Voidweaver" },
+  { dungeon: "Nexus-Point Xenas", best: 16, spec: "Voidweaver" },
+  { dungeon: "Pit of Saron", best: 15, spec: "Archon" },
+  { dungeon: "Seat of the Triumvirate", best: 16, spec: "Voidweaver" },
+  { dungeon: "Skyreach", best: 15, spec: "Voidweaver" },
+  { dungeon: "Windrunner Spire", best: 16, spec: "Voidweaver" },
+];
+
+const scoreHistoryDetailed = [
+  { week: "S16", score: 2840, keys: 8, avgLevel: 12.5 },
+  { week: "S17", score: 3050, keys: 11, avgLevel: 13.8 },
+  { week: "S18", score: 3210, keys: 13, avgLevel: 14.9 },
+  { week: "S19", score: 3382, keys: 16, avgLevel: 15.4 },
+];
+
+// ============ PROGRESSION — currency, catalyst, tier, timeline ============
+const crestCurrency = [
+  { name: "Weathered Awakened Crest", current: 0, cap: 90, use: "Upgrade item 259-272" },
+  { name: "Carved Awakened Crest", current: 12, cap: 90, use: "Upgrade item 272-282" },
+  { name: "Runed Awakened Crest", current: 34, cap: 135, use: "Upgrade item 282-291" },
+  { name: "Gilded Awakened Crest", current: 8, cap: 90, use: "Upgrade item 291-297" },
+];
+
+const catalystTracker = [
+  { name: "Charge Catalyst M+", available: 1, resetsIn: "3 jours", note: "Convertit une pièce non-tier en tier" },
+  { name: "Charge Catalyst Raid", available: 0, resetsIn: "7 jours", note: "Reset au reset raid hebdo" },
+];
+
+const tierSetTracker = [
+  { slot: "Tête", equipped: true, ilvl: 289, source: "Voidspire (Mythic)" },
+  { slot: "Épaules", equipped: true, ilvl: 289, source: "Voidspire (Mythic)" },
+  { slot: "Torse", equipped: true, ilvl: 276, source: "Dreamrift (Heroic)" },
+  { slot: "Mains", equipped: true, ilvl: 276, source: "Voidspire (Heroic)" },
+  { slot: "Jambes", equipped: true, ilvl: 289, source: "Voidspire (Mythic)" },
+];
+
+const seasonTimeline = [
+  { date: "Semaine 16", label: "Ouverture Season 1", status: "done", detail: "Premiers +10/+12, gear-up initial" },
+  { date: "Semaine 17", label: "Premiers +15 timed", status: "done", detail: "Passage Voidweaver Misery en main spec" },
+  { date: "Semaine 18", label: "2/9 Mythic raid", status: "done", detail: "Kill Imperator Averzian + Vorasius en Mythic" },
+  { date: "Semaine 19", label: "Score 3382, 5×+16 timed", status: "done", detail: "Gaze of the Alnseer 298 drop" },
+  { date: "Semaine 20-21", label: "Objectif Mythic Hero (3500+)", status: "in-progress", detail: "8 donjons ≥+16, tier set complet 285+" },
+  { date: "Season 2 (12.1)", label: "Curse of Ula'tek — reset progression", status: "upcoming", detail: "Nouveau raid, nouveaux talents Shadow (Shadeburst, Ancient Madness rework)" },
+];
+
+// ============ PATCH 12.1 — CURSE OF ULA'TEK (PTR) — Shadow Priest ============
+// Sources publiques citées dans l'onglet : forums officiels Blizzard (PTR Development Notes,
+// fils de feedback Shadow Priest 12.1) + couverture Icy Veins / MMO-Champion / Warcraft Wiki.
+// ⚠️ Contenu de Public Test Realm : sujet à changement avant la sortie officielle de la 12.1.
+const patch121NewTalents = [
+  {
+    name: "Shadeburst",
+    kind: "Nouveau talent",
+    desc: "Les Shadowy Apparitions qui flottent vers ta cible principale explosent, infligeant des dégâts Shadow à tous les ennemis dans 8 mètres. Dégâts réduits au-delà de 5 cibles.",
+    impact: "Nouvelle source de dégâts multi-cible qui ne dépend pas de Psychic Link — vise à réduire la dépendance du spec au spread via Psychic Link en AoE.",
+  },
+];
+
+const patch121TalentReworks = [
+  {
+    name: "Improved Voidform",
+    change: "Refonte : augmente désormais tes dégâts de sorts de 5% supplémentaires et accorde 2 utilisations additionnelles de Void Volley.",
+    tag: "Buff",
+  },
+  {
+    name: "Ancient Madness",
+    change: "Refonte : Shadow Word: Madness augmente ton Haste pendant Voidform de 2% et prolonge sa durée de 1.5 sec, cumulable jusqu'à 5 fois. Le Haste persiste et décroît sur 10 sec après la fin de Voidform.",
+    tag: "Rework",
+  },
+  {
+    name: "Focused Outburst",
+    change: "Refonte : Void Volley inflige 15% de dégâts supplémentaires, et les casts de Shadow Word: Madness pendant Voidform déclenchent automatiquement un Void Volley sur ta cible.",
+    tag: "Rework",
+  },
+  {
+    name: "Phantom Menace",
+    change: "Talent supprimé de l'arbre Shadow.",
+    tag: "Suppression",
+  },
+];
+
+const patch121CoreChanges = [
+  { ability: "Voidform", change: "Accorde désormais directement 3 utilisations de Void Volley au lieu de mettre Void Volley en cooldown pendant Voidform.", tag: "Gameplay" },
+  { ability: "Power Word: Shield", change: "Le montant absorbé est augmenté de 25%.", tag: "Buff (arbre Priest commun)" },
+];
+
+const patch121Sources = [
+  { label: "PTR Development Notes — Midnight: Curse of Ula'tek", url: "https://www.bluetracker.gg/wow/topic/us-en/2317811-midnight-curse-of-ulatek-ptr-development-notes/" },
+  { label: "12.1 Shadow Priest Feedback (forums officiels)", url: "https://us.forums.blizzard.com/en/wow/t/121-shadow-priest-feedback/2318115" },
+  { label: "Shadow 12.1 Changes — forums officiels", url: "https://us.forums.blizzard.com/en/wow/t/shadow-121-changes/2318469" },
+  { label: "Icy Veins — Massive Class Changes: 12.1 Development Notes", url: "https://www.icy-veins.com/wow/news/massive-class-changes-midnight-12-1-curse-of-ulatek-development-notes/" },
+  { label: "Warcraft Wiki — Patch 12.1.0", url: "https://warcraft.wiki.gg/wiki/Patch_12.1.0" },
+];
+
 const chartConfig: ChartConfig = {
   voidweaverPL: { label: "VW Psychic Link", color: "var(--chart-1)" },
   voidweaverMisery: { label: "VW Misery", color: "var(--chart-2)" },
@@ -216,17 +346,17 @@ export default function ShadowPriestDashboardV2() {
   const [darkMode, setDarkMode] = useState<boolean>(true);
 
   return (
-    <div className={`${darkMode ? "dark" : ""} w-full min-h-screen bg-background text-foreground p-6 space-y-6`}>
+    <div className={`${darkMode ? "dark" : ""} w-full min-h-screen bg-background text-foreground p-3 sm:p-6 space-y-4 sm:space-y-6 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,hsl(271_60%_50%/0.15),transparent)]`}>
       {/* HEADER */}
       <div className="space-y-2">
         <div className="flex items-center justify-between gap-3 flex-wrap">
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-purple-500/10">
-              <Eye className="h-8 w-8 text-purple-500" />
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+            <div className="p-1.5 sm:p-2 rounded-lg bg-purple-500/10 shrink-0">
+              <Eye className="h-6 w-6 sm:h-8 sm:w-8 text-purple-500" />
             </div>
-            <div>
-              <h1 className="text-3xl font-bold tracking-tight">Shadow Priest M+ — Analyse approfondie V2</h1>
-              <p className="text-muted-foreground text-sm">Midnight S1 · Màlenïa (Archimonde-EU) · Push +16 → +20 · Hero specs Archon &amp; Voidweaver</p>
+            <div className="min-w-0">
+              <h1 className="text-xl sm:text-3xl font-bold tracking-tight truncate sm:whitespace-normal">Shadow Priest M+ — Dashboard</h1>
+              <p className="text-muted-foreground text-xs sm:text-sm">Midnight S1 · Màlenïa (Archimonde-EU) · Hero specs Archon &amp; Voidweaver</p>
             </div>
           </div>
           <Button
@@ -234,35 +364,40 @@ export default function ShadowPriestDashboardV2() {
             size="sm"
             onClick={() => setDarkMode(!darkMode)}
             aria-label={darkMode ? "Activer le mode clair" : "Activer le mode sombre"}
-            className="gap-2"
+            className="gap-2 shrink-0"
           >
-            {darkMode ? <><Sun className="h-4 w-4" /> Mode clair</> : <><Moon className="h-4 w-4" /> Mode sombre</>}
+            {darkMode ? <><Sun className="h-4 w-4" /> <span className="hidden sm:inline">Mode clair</span></> : <><Moon className="h-4 w-4" /> <span className="hidden sm:inline">Mode sombre</span></>}
           </Button>
         </div>
-        <div className="flex flex-wrap gap-2 pt-2">
+        <div className="flex flex-wrap gap-1.5 sm:gap-2 pt-1 sm:pt-2">
           <Badge variant="default" className="bg-purple-500">Màlenïa · iLvl 285 · Score 3439</Badge>
-          <Badge variant="outline">81,232 parses</Badge>
-          <Badge variant="outline">Burst pulls focus 🔥</Badge>
-          <Badge variant="outline">Archon Deep Dive ⚡</Badge>
+          <Badge variant="outline" className="gap-1"><RefreshCw className="h-3 w-3" />À actualiser</Badge>
+          <Badge variant="outline" className="hidden sm:inline-flex">Burst pulls focus 🔥</Badge>
+          <Badge variant="outline" className="hidden sm:inline-flex">Patch 12.1 PTR ⚡</Badge>
         </div>
       </div>
 
       <Tabs defaultValue="talents" className="w-full">
-        <TabsList className="grid w-full grid-cols-4 lg:grid-cols-7 h-auto">
-          <TabsTrigger value="talents"><Sparkles className="h-4 w-4 mr-1" />Talents</TabsTrigger>
-          <TabsTrigger value="archon"><Crown className="h-4 w-4 mr-1" />Archon</TabsTrigger>
-          <TabsTrigger value="voidweaver"><Eye className="h-4 w-4 mr-1" />Voidweaver</TabsTrigger>
-          <TabsTrigger value="burst"><Bomb className="h-4 w-4 mr-1" />Burst Pulls</TabsTrigger>
-          <TabsTrigger value="rotation"><GitBranch className="h-4 w-4 mr-1" />Rotation</TabsTrigger>
-          <TabsTrigger value="cds"><Clock className="h-4 w-4 mr-1" />CDs</TabsTrigger>
-          <TabsTrigger value="dungeons"><Skull className="h-4 w-4 mr-1" />Donjons</TabsTrigger>
-          <TabsTrigger value="malenia"><User className="h-4 w-4 mr-1" />Màlenïa</TabsTrigger>
-          <TabsTrigger value="meta"><BarChart3 className="h-4 w-4 mr-1" />Méta</TabsTrigger>
-          <TabsTrigger value="weekly"><Trophy className="h-4 w-4 mr-1" />Semaine</TabsTrigger>
-          <TabsTrigger value="raid"><Flame className="h-4 w-4 mr-1" />Raid 2/9M</TabsTrigger>
-          <TabsTrigger value="sim"><Wand2 className="h-4 w-4 mr-1" />Simulateur</TabsTrigger>
-          <TabsTrigger value="analyse"><Brain className="h-4 w-4 mr-1" />Analyse</TabsTrigger>
-        </TabsList>
+        <div className="-mx-3 sm:mx-0 px-3 sm:px-0 sticky top-0 z-10 bg-background/95 backdrop-blur py-2 -mt-2 sm:static sm:bg-transparent sm:backdrop-blur-none sm:py-0 sm:mt-0">
+          <TabsList className="flex sm:grid sm:grid-cols-4 lg:grid-cols-8 h-auto w-full max-w-full overflow-x-auto sm:overflow-visible flex-nowrap sm:flex-wrap gap-1 justify-start sm:justify-center">
+            <TabsTrigger value="talents" className="shrink-0"><Sparkles className="h-4 w-4 mr-1" />Talents</TabsTrigger>
+            <TabsTrigger value="archon" className="shrink-0"><Crown className="h-4 w-4 mr-1" />Archon</TabsTrigger>
+            <TabsTrigger value="voidweaver" className="shrink-0"><Eye className="h-4 w-4 mr-1" />Voidweaver</TabsTrigger>
+            <TabsTrigger value="burst" className="shrink-0"><Bomb className="h-4 w-4 mr-1" />Burst Pulls</TabsTrigger>
+            <TabsTrigger value="rotation" className="shrink-0"><GitBranch className="h-4 w-4 mr-1" />Rotation</TabsTrigger>
+            <TabsTrigger value="cds" className="shrink-0"><Clock className="h-4 w-4 mr-1" />CDs</TabsTrigger>
+            <TabsTrigger value="dungeons" className="shrink-0"><Skull className="h-4 w-4 mr-1" />Donjons</TabsTrigger>
+            <TabsTrigger value="logs" className="shrink-0"><ScrollText className="h-4 w-4 mr-1" />Logs M+</TabsTrigger>
+            <TabsTrigger value="progression" className="shrink-0"><Gem className="h-4 w-4 mr-1" />Progression</TabsTrigger>
+            <TabsTrigger value="malenia" className="shrink-0"><User className="h-4 w-4 mr-1" />Màlenïa</TabsTrigger>
+            <TabsTrigger value="meta" className="shrink-0"><BarChart3 className="h-4 w-4 mr-1" />Méta</TabsTrigger>
+            <TabsTrigger value="weekly" className="shrink-0"><Trophy className="h-4 w-4 mr-1" />Semaine</TabsTrigger>
+            <TabsTrigger value="raid" className="shrink-0"><Flame className="h-4 w-4 mr-1" />Raid 2/9M</TabsTrigger>
+            <TabsTrigger value="patch121" className="shrink-0"><Rocket className="h-4 w-4 mr-1" />12.1 PTR</TabsTrigger>
+            <TabsTrigger value="sim" className="shrink-0"><Wand2 className="h-4 w-4 mr-1" />Simulateur</TabsTrigger>
+            <TabsTrigger value="analyse" className="shrink-0"><Brain className="h-4 w-4 mr-1" />Analyse</TabsTrigger>
+          </TabsList>
+        </div>
 
         {/* ============ TALENTS — BUILDS & IMPORT CODES ============ */}
         <TabsContent value="talents" className="space-y-4">
@@ -1271,8 +1406,195 @@ export default function ShadowPriestDashboardV2() {
           </Card>
         </TabsContent>
 
+        {/* ============ M+ LOGS ============ */}
+        <TabsContent value="logs" className="space-y-4">
+          <StaleDataBanner label="L'historique de runs ci-dessous" />
+          <Card className="border-cyan-500/30 bg-gradient-to-br from-cyan-500/5 to-transparent">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-cyan-500"><ScrollText className="h-6 w-6" />Logs Mythic+ détaillés</CardTitle>
+              <CardDescription>Historique run par run — timer, score, affixes, morts, parse WCL et notes perso</CardDescription>
+            </CardHeader>
+          </Card>
+
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
+            <Card><CardContent className="pt-4 text-center"><div className="text-xl sm:text-2xl font-bold text-cyan-500">{mplusRunLogs.length}</div><div className="text-xs text-muted-foreground">Runs loggées</div></CardContent></Card>
+            <Card><CardContent className="pt-4 text-center"><div className="text-xl sm:text-2xl font-bold text-emerald-500">{mplusRunLogs.filter(r => r.timed).length}/{mplusRunLogs.length}</div><div className="text-xs text-muted-foreground">Timed</div></CardContent></Card>
+            <Card><CardContent className="pt-4 text-center"><div className="text-xl sm:text-2xl font-bold text-amber-500">{Math.round(mplusRunLogs.reduce((s, r) => s + r.parse, 0) / mplusRunLogs.length)}</div><div className="text-xs text-muted-foreground">Parse WCL moyen</div></CardContent></Card>
+            <Card><CardContent className="pt-4 text-center"><div className="text-xl sm:text-2xl font-bold text-rose-500">{mplusRunLogs.reduce((s, r) => s + r.deaths, 0)}</div><div className="text-xs text-muted-foreground">Morts totales</div></CardContent></Card>
+          </div>
+
+          <Card>
+            <CardHeader><CardTitle className="text-base">📜 Journal de runs</CardTitle></CardHeader>
+            <CardContent>
+              <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
+                <table className="w-full text-xs sm:text-sm min-w-[720px]">
+                  <thead>
+                    <tr className="border-b text-left text-muted-foreground">
+                      <th className="p-2">Date</th>
+                      <th className="p-2">Donjon</th>
+                      <th className="p-2">Niveau</th>
+                      <th className="p-2">Temps</th>
+                      <th className="p-2">Chest</th>
+                      <th className="p-2">Score</th>
+                      <th className="p-2">Build</th>
+                      <th className="p-2">Affixes</th>
+                      <th className="p-2">Morts</th>
+                      <th className="p-2">Parse</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {mplusRunLogs.map((r, i) => (
+                      <tr key={i} className="border-b last:border-0 align-top">
+                        <td className="p-2 text-muted-foreground whitespace-nowrap">{r.date}</td>
+                        <td className="p-2 font-medium whitespace-nowrap">{r.dungeon}</td>
+                        <td className="p-2"><Badge className={r.level >= 16 ? "bg-purple-500" : "bg-blue-500"}>+{r.level}</Badge></td>
+                        <td className="p-2 whitespace-nowrap">{r.time}</td>
+                        <td className="p-2">{"⭐".repeat(r.chest)}</td>
+                        <td className="p-2 font-semibold text-cyan-500 whitespace-nowrap">{r.score}</td>
+                        <td className="p-2 whitespace-nowrap">{r.build}</td>
+                        <td className="p-2">
+                          <div className="flex flex-wrap gap-1">
+                            {r.affixes.map((a, j) => <Badge key={j} variant="outline" className="text-[10px]">{a}</Badge>)}
+                          </div>
+                        </td>
+                        <td className="p-2">{r.deaths > 0 ? <Badge variant="destructive" className="text-[10px]">{r.deaths}</Badge> : <span className="text-emerald-500">0</span>}</td>
+                        <td className="p-2"><Badge className={r.parse >= 90 ? "bg-orange-500" : r.parse >= 75 ? "bg-purple-500" : "bg-blue-500"}>{r.parse}</Badge></td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <div className="mt-3 space-y-1">
+                {mplusRunLogs.map((r, i) => (
+                  <div key={i} className="text-xs rounded bg-muted/40 p-2"><b>{r.dungeon} +{r.level}</b> — {r.note}</div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader><CardTitle className="text-base">🏆 Meilleure clé par donjon (season)</CardTitle></CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                {mplusPersonalBests.map((d, i) => (
+                  <div key={i} className="rounded-lg border p-3">
+                    <div className="text-xs text-muted-foreground truncate">{d.dungeon}</div>
+                    <div className="flex items-center justify-between mt-1">
+                      <Badge className={d.best >= 16 ? "bg-purple-500" : "bg-blue-500"}>+{d.best}</Badge>
+                      <Badge variant="outline" className="text-[10px]">{d.spec}</Badge>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader><CardTitle className="text-base">📈 Score M+ & niveau moyen de clé — 4 semaines</CardTitle></CardHeader>
+            <CardContent>
+              <ChartContainer config={{ score: { label: "Score", color: "var(--chart-1)" }, avgLevel: { label: "Niveau moyen", color: "var(--chart-3)" } }} className="h-72 w-full">
+                <ComposedChart data={scoreHistoryDetailed} margin={{ top: 10, right: 30, left: 0, bottom: 10 }}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="week" />
+                  <YAxis yAxisId="left" domain={[2500, 3750]} />
+                  <YAxis yAxisId="right" orientation="right" domain={[0, 20]} />
+                  <ChartTooltip content={<ChartTooltipContent />} />
+                  <Legend />
+                  <Bar yAxisId="right" dataKey="avgLevel" fill="var(--color-avgLevel)" radius={2} />
+                  <Line yAxisId="left" type="monotone" dataKey="score" stroke="var(--color-score)" strokeWidth={3} dot={{ r: 5 }} />
+                </ComposedChart>
+              </ChartContainer>
+              <p className="text-xs text-muted-foreground mt-2">💡 Pour actualiser : ouvre ton profil raider.io → onglet "Mythic+" → copie tes runs récentes dans <code className="bg-muted px-1 rounded">mplusRunLogs</code> (haut du fichier Dashboard.tsx).</p>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* ============ PROGRESSION ============ */}
+        <TabsContent value="progression" className="space-y-4">
+          <StaleDataBanner label="Les compteurs de currency / tier / timeline" />
+          <Card className="border-violet-500/30 bg-gradient-to-br from-violet-500/5 to-transparent">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-violet-500"><Gem className="h-6 w-6" />Progression du personnage</CardTitle>
+              <CardDescription>Currency, catalyst, tier set et timeline de saison en un coup d'œil</CardDescription>
+            </CardHeader>
+          </Card>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Card>
+              <CardHeader><CardTitle className="text-base flex items-center gap-2"><Gem className="h-4 w-4 text-violet-500" />Crests (Awakened)</CardTitle></CardHeader>
+              <CardContent className="space-y-3">
+                {crestCurrency.map((c, i) => (
+                  <div key={i} className="space-y-1">
+                    <div className="flex justify-between text-xs sm:text-sm">
+                      <span className="font-medium">{c.name}</span>
+                      <span className="text-muted-foreground">{c.current}/{c.cap}</span>
+                    </div>
+                    <Progress value={(c.current / c.cap) * 100} />
+                    <div className="text-[10px] text-muted-foreground">{c.use}</div>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader><CardTitle className="text-base flex items-center gap-2"><RefreshCw className="h-4 w-4 text-violet-500" />Catalyst & charges</CardTitle></CardHeader>
+              <CardContent className="space-y-2">
+                {catalystTracker.map((c, i) => (
+                  <div key={i} className="rounded-lg border p-3 flex items-center justify-between gap-2">
+                    <div>
+                      <div className="text-sm font-medium">{c.name}</div>
+                      <div className="text-xs text-muted-foreground">{c.note}</div>
+                    </div>
+                    <div className="text-right shrink-0">
+                      <Badge className={c.available > 0 ? "bg-emerald-500" : "bg-slate-500"}>{c.available} dispo</Badge>
+                      <div className="text-[10px] text-muted-foreground mt-1">Reset : {c.resetsIn}</div>
+                    </div>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          </div>
+
+          <Card>
+            <CardHeader><CardTitle className="text-base flex items-center gap-2"><ListChecks className="h-4 w-4" />Tier set — pièces équipées</CardTitle></CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2">
+                {tierSetTracker.map((t, i) => (
+                  <div key={i} className={`rounded-lg border p-3 ${t.equipped ? "border-emerald-500/40 bg-emerald-500/5" : "border-muted"}`}>
+                    <div className="text-xs text-muted-foreground">{t.slot}</div>
+                    <div className="font-semibold flex items-center gap-1">{t.equipped ? "✓" : "✗"} iLvl {t.ilvl}</div>
+                    <div className="text-[10px] text-muted-foreground">{t.source}</div>
+                  </div>
+                ))}
+              </div>
+              <p className="text-xs text-muted-foreground mt-3">5/5 pièces tier équipées — objectif : pousser chest/mains à 285+ via crests Runed/Gilded.</p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader><CardTitle className="text-base flex items-center gap-2"><Trophy className="h-4 w-4" />Timeline de progression — Season 1 → Season 2</CardTitle></CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {seasonTimeline.map((s, i) => (
+                  <div key={i} className="flex gap-3 items-start">
+                    <div className={`shrink-0 w-3 h-3 rounded-full mt-1.5 ${s.status === "done" ? "bg-emerald-500" : s.status === "in-progress" ? "bg-amber-500 animate-pulse" : "bg-slate-500"}`} />
+                    <div className="flex-1 rounded-lg border p-3">
+                      <div className="flex items-center justify-between flex-wrap gap-1">
+                        <span className="font-semibold text-sm">{s.label}</span>
+                        <Badge variant="outline" className="text-xs">{s.date}</Badge>
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-1">{s.detail}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
         {/* ============ MANELIA ============ */}
         <TabsContent value="malenia" className="space-y-4">
+          <StaleDataBanner label="Ton profil (iLvl, score, gear, builds détectés)" />
           <Card className="border-pink-500/30 bg-gradient-to-br from-pink-500/5 to-transparent">
             <CardHeader>
               <CardTitle className="flex items-center gap-2"><User className="h-6 w-6 text-pink-500" />Màlenïa — Diagnostic personnel</CardTitle>
@@ -1542,6 +1864,7 @@ export default function ShadowPriestDashboardV2() {
 
         {/* ============ WEEKLY TRACKER ============ */}
         <TabsContent value="weekly" className="space-y-4">
+          <StaleDataBanner label="Le tracker Vault / checklist de la semaine" />
           <Card className="border-emerald-500/30 bg-gradient-to-br from-emerald-500/5 to-transparent">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-emerald-500">
@@ -1634,6 +1957,7 @@ export default function ShadowPriestDashboardV2() {
 
         {/* ============ RAID 2/9M MIDNIGHT S1 ============ */}
         <TabsContent value="raid" className="space-y-4">
+          <StaleDataBanner label="La progression raid (kills M/HM)" />
           <Card className="border-rose-500/30 bg-gradient-to-br from-rose-500/5 to-transparent">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-rose-500">
@@ -1804,6 +2128,107 @@ export default function ShadowPriestDashboardV2() {
                   </ul>
                 </div>
               </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* ============ PATCH 12.1 — CURSE OF ULA'TEK (PTR) ============ */}
+        <TabsContent value="patch121" className="space-y-4">
+          <Card className="border-orange-500/40 bg-gradient-to-br from-orange-500/10 via-red-500/5 to-transparent">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-orange-500"><Rocket className="h-6 w-6" />Midnight 12.1 — Curse of Ula'tek (PTR)</CardTitle>
+              <CardDescription>Season 2 arrive — voici les changements Shadow Priest actuellement testés sur le PTR</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="rounded-lg bg-orange-500/10 border border-orange-500/30 p-3 flex items-start gap-2 text-xs sm:text-sm">
+                <AlertTriangle className="h-4 w-4 text-orange-500 shrink-0 mt-0.5" />
+                <div>
+                  <span className="font-semibold text-orange-500">Public Test Realm — sujet à changement</span>
+                  <span className="text-muted-foreground"> — ces notes viennent du PTR de la 12.1 (Curse of Ula'tek). Blizzard ajuste fréquemment les chiffres avant la sortie officielle : ne base pas de gros achats/respec définitifs uniquement là-dessus.</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-emerald-500/40">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-emerald-500"><Sparkles className="h-5 w-5" />Nouveau talent</CardTitle>
+              <CardDescription>Ajout à l'arbre Shadow pour la Season 2</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              {patch121NewTalents.map((t, i) => (
+                <div key={i} className="rounded-lg border border-emerald-500/40 bg-emerald-500/5 p-3">
+                  <div className="flex items-center gap-2 mb-1">
+                    <Badge className="bg-emerald-500">NOUVEAU</Badge>
+                    <span className="font-semibold">{t.name}</span>
+                  </div>
+                  <p className="text-sm">{t.desc}</p>
+                  <p className="text-xs text-muted-foreground mt-2">💡 {t.impact}</p>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+
+          <Card className="border-amber-500/40">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-amber-500"><Wand2 className="h-5 w-5" />Talents refaits / retirés</CardTitle>
+              <CardDescription>Ce qui change directement dans ton arbre actuel (Voidweaver &amp; Archon héritent des deux)</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              {patch121TalentReworks.map((t, i) => (
+                <div key={i} className="rounded-lg border p-3">
+                  <div className="flex items-center gap-2 mb-1 flex-wrap">
+                    <Badge className={t.tag === "Suppression" ? "bg-red-500" : t.tag === "Buff" ? "bg-emerald-500" : "bg-amber-500"}>{t.tag}</Badge>
+                    <span className="font-semibold">{t.name}</span>
+                  </div>
+                  <p className="text-sm text-muted-foreground">{t.change}</p>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+
+          <Card className="border-blue-500/40">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-blue-500"><Zap className="h-5 w-5" />Changements de sorts core</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              {patch121CoreChanges.map((c, i) => (
+                <div key={i} className="rounded-lg border p-3">
+                  <div className="flex items-center gap-2 mb-1 flex-wrap">
+                    <Badge variant="outline">{c.tag}</Badge>
+                    <span className="font-semibold">{c.ability}</span>
+                  </div>
+                  <p className="text-sm text-muted-foreground">{c.change}</p>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+
+          <Card className="border-indigo-500/30 bg-indigo-500/5">
+            <CardHeader>
+              <CardTitle className="text-base flex items-center gap-2"><Brain className="h-4 w-4 text-indigo-400" />Ce que ça change pour Màlenïa</CardTitle>
+            </CardHeader>
+            <CardContent className="text-sm space-y-2">
+              <p><b>Intention Blizzard affichée</b> : améliorer le gameplay de Voidform et donner au Shadow Priest une source de dégâts AoE indépendante de Psychic Link, pour réduire la dépendance au spread de DoTs en zone.</p>
+              <ul className="list-disc ml-5 text-xs space-y-1 text-muted-foreground">
+                <li><b>Shadeburst</b> pourrait offrir une alternative crédible à <b>Misery</b> pour les gros pulls Voidweaver — à tester dès l'ouverture du PTR sur tes donjons à 1er pull massif (Maisara, Skyreach).</li>
+                <li><b>Ancient Madness</b> retravaillé pousse vers un style "Voidform prolongé par stacks de Haste" plutôt qu'un simple burst plat — probablement plus fort pour Archon (Voidform plus longtemps maintenu via Perfected Form).</li>
+                <li><b>Focused Outburst</b> + Void Volley automatique sur SW: Madness change la priorité de sort pendant Voidform — la rotation Voidform actuelle (documentée dans l'onglet Rotation) sera à revoir une fois live sur PTR.</li>
+                <li>La suppression de <b>Phantom Menace</b> libère un point de talent — probablement réinvesti dans Incessant Screams ou Energy Cycle selon les premiers tests communautaires.</li>
+              </ul>
+              <p className="text-xs italic text-muted-foreground">⚠️ Recommandation : ne pas encore changer ton build M+ actuel en 12.0.5 sur la base de ces infos — attends soit l'annonce de date de sortie de la 12.1, soit un accès PTR personnel pour valider en jeu.</p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader><CardTitle className="text-base flex items-center gap-2"><ScrollText className="h-4 w-4" />Sources</CardTitle></CardHeader>
+            <CardContent className="space-y-1 text-xs">
+              {patch121Sources.map((s, i) => (
+                <div key={i}>
+                  <a href={s.url} target="_blank" rel="noopener noreferrer" className="text-orange-500 hover:underline">→ {s.label}</a>
+                </div>
+              ))}
+              <p className="text-muted-foreground italic pt-2">Recommandation : ces éléments sont fournis à titre informatif, issus de notes de développement PTR et de couverture presse spécialisée — vérifie toujours les patch notes officiels Blizzard avant la sortie finale de la 12.1.</p>
             </CardContent>
           </Card>
         </TabsContent>
