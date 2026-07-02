@@ -328,6 +328,27 @@ const patch121Sources = [
   { label: "Warcraft Wiki — Patch 12.1.0", url: "https://warcraft.wiki.gg/wiki/Patch_12.1.0" },
 ];
 
+// ============ BENCHMARK EXTERNE — vérifié via recherche web (pas de fetch API perso) ============
+// Contrairement aux données murlok.io/Archon.gg "top 50" ci-dessus (fabriquées côté dashboard,
+// impossibles à revalider depuis cet environnement réseau restreint), ces éléments viennent de
+// recherches web réelles sur des guides publics actuels. Toujours vérifier la date de mise à jour
+// de la source avant de t'y fier à 100% — les tier lists bougent vite en cours de saison.
+const externalStatPriority = [
+  { context: "Mythic+ (multi-cibles)", order: "Haste > Mastery > Critical Strike > Versatility", source: "Wowhead" },
+  { context: "Raid — mono-cible", order: "Crit ≈ Mastery > Haste ≈ Vers (écarts <5%, quasi égalité)", source: "Wowhead" },
+];
+
+const externalTierRanking = [
+  { label: "Rang global Mythic+", verdict: "A-tier — spec solide, tuning global correct et burst fiable", source: "WoWVendor tier list" },
+  { label: "Points forts cités", verdict: "Excelle sur les clés avec des kill times longs (les DoT scalent avec la durée du combat) ; Vampiric Embrace plus précieux depuis la hausse de +25% des dégâts subis en Midnight", source: "Icy Veins / WoWVendor" },
+  { label: "Patch 12.1 (à venir)", verdict: "Changements qui renforcent à la fois l'AoE et le single-target — meilleur scaling et meilleure utilité raid annoncés", source: "Couverture PTR 12.1 (voir onglet 12.1 PTR)" },
+];
+
+const externalGearNotes = [
+  { label: "Trinkets BiS", note: "La majorité des meilleurs trinkets Shadow viennent du raid ; peu d'options correctes en donjon. Upgrader un Gaze of the Alnseer / Vaelgor's Final Stare en version Hero-track reste rentable.", source: "Maxroll" },
+  { label: "Embellishments", note: "Meilleurs choix : Darkmoon Sigil: Hunt (armes uniquement) et Arcanoweave Lining (emplacements d'armure). Craft prioritaire : arme 2M avec Darkmoon Sigil: Hunt, puis Arcanoweave Lining sur ton slot le plus faible.", source: "Maxroll" },
+];
+
 const chartConfig: ChartConfig = {
   voidweaverPL: { label: "VW Psychic Link", color: "var(--chart-1)" },
   voidweaverMisery: { label: "VW Misery", color: "var(--chart-2)" },
@@ -1571,6 +1592,27 @@ export default function ShadowPriestDashboardV2() {
             </CardContent>
           </Card>
 
+          <Card className="border-teal-500/30">
+            <CardHeader>
+              <CardTitle className="text-base flex items-center gap-2"><Gem className="h-4 w-4 text-teal-500" />Embellishments & Enchants recommandés</CardTitle>
+              <CardDescription>Vérifié via recherche web (Maxroll) — pas fabriqué, à recouper avec ton propre sim</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              {externalGearNotes.map((g, i) => (
+                <div key={i} className="rounded-lg border p-3 text-xs sm:text-sm">
+                  <div className="flex items-center justify-between flex-wrap gap-1 mb-1">
+                    <span className="font-semibold">{g.label}</span>
+                    <Badge variant="outline" className="text-xs">{g.source}</Badge>
+                  </div>
+                  <p className="text-muted-foreground">{g.note}</p>
+                </div>
+              ))}
+              <div className="rounded-lg bg-teal-500/10 border border-teal-500/30 p-2 text-xs text-muted-foreground">
+                💡 Checklist rapide : 1 arme 2M avec <b>Darkmoon Sigil: Hunt</b>, puis <b>Arcanoweave Lining</b> sur ton emplacement d'armure le plus faible. Vérifie ensuite si tu as bien tes runes/enchants d'armure et de bijoux à jour (souvent oubliés après un upgrade de pièce).
+              </div>
+            </CardContent>
+          </Card>
+
           <Card>
             <CardHeader><CardTitle className="text-base flex items-center gap-2"><Trophy className="h-4 w-4" />Timeline de progression — Season 1 → Season 2</CardTitle></CardHeader>
             <CardContent>
@@ -1853,10 +1895,10 @@ export default function ShadowPriestDashboardV2() {
               <CardTitle className="flex items-center gap-2"><AlertTriangle className="h-5 w-5 text-amber-500" />Notes méthodologiques</CardTitle>
             </CardHeader>
             <CardContent className="text-xs text-muted-foreground space-y-1">
-              <p>📊 Données : Archon.gg (81 232 parses, 14j), Warcraft Logs (271 765 parses), 80th percentile</p>
-              <p>📅 Patch 12.0.5 — données au 11 mai 2026</p>
-              <p>🎯 Burst DPS courbes : extrapolées de tes valeurs observées (450k Archon / 700k VW) + courbes Archon.gg</p>
-              <p>👤 Stats Màlenïa : raider.io API + Blizzard armory (loadout extrait)</p>
+              <p>📊 Données Archon.gg/WarcraftLogs "80th percentile" ci-dessus : contenu de départ non revalidé (réseau bloqué dans cet environnement) — à retraiter avec un vrai export.</p>
+              <p>✅ Positionnement réel vérifié via recherche web : Shadow Priest classé <b>A-tier</b> en Mythic+ (WoWVendor / Icy Veins), voir carte détaillée dans l'onglet <b>Analyse</b>.</p>
+              <p>🎯 Burst DPS courbes : extrapolées de tes valeurs observées (450k Archon / 700k VW) — indicatif, non simé.</p>
+              <p>👤 Stats Màlenïa : dernier relevé manuel du {LAST_KNOWN_SYNC} — raider.io/Blizzard armory non accessibles automatiquement ici.</p>
               <p>⚠️ Tier list officielle ≠ ton skill personnel. Le gameplay propre fait gagner 15-20% DPS sur la moyenne.</p>
             </CardContent>
           </Card>
@@ -2310,6 +2352,68 @@ export default function ShadowPriestDashboardV2() {
             </CardContent>
           </Card>
 
+          <Card className="border-sky-500/40 bg-sky-500/5">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-sky-400"><TrendingUp className="h-5 w-5" />Comparaison avec la méta externe (guides publics, recherche web)</CardTitle>
+              <CardDescription>Ce bloc est distinct du reste de l'onglet : il vient de vraies recherches web (Wowhead, Icy Veins, Maxroll, WoWVendor) et non des données internes murlok.io/Archon.gg fabriquées côté dashboard. C'est une recommandation à vérifier, pas une vérité absolue — les tier lists évoluent vite.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <div className="text-sm font-semibold mb-2">📐 Priorité de stats (externe)</div>
+                <div className="space-y-2">
+                  {externalStatPriority.map((s, i) => (
+                    <div key={i} className="rounded-lg border p-3 flex items-center justify-between gap-2 flex-wrap text-xs sm:text-sm">
+                      <div>
+                        <Badge variant="outline" className="mb-1">{s.context}</Badge>
+                        <div className="font-medium">{s.order}</div>
+                      </div>
+                      <span className="text-muted-foreground text-xs shrink-0">Source : {s.source}</span>
+                    </div>
+                  ))}
+                </div>
+                <p className="text-xs text-muted-foreground mt-2">💡 Ton profil actuel (Haste 26 &gt; Mastery 12 &gt; Crit 18 &gt; Vers 1) est aligné avec la priorité M+ externe. Cohérent avec les valeurs internes du dashboard.</p>
+              </div>
+
+              <Separator />
+
+              <div>
+                <div className="text-sm font-semibold mb-2">🏆 Positionnement du spec</div>
+                <div className="space-y-2">
+                  {externalTierRanking.map((t, i) => (
+                    <div key={i} className="rounded-lg border p-3 text-xs sm:text-sm">
+                      <div className="flex items-center justify-between flex-wrap gap-1 mb-1">
+                        <span className="font-semibold">{t.label}</span>
+                        <Badge variant="outline" className="text-xs">{t.source}</Badge>
+                      </div>
+                      <p className="text-muted-foreground">{t.verdict}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <Separator />
+
+              <div>
+                <div className="text-sm font-semibold mb-2">💎 Gear — notes externes</div>
+                <div className="space-y-2">
+                  {externalGearNotes.map((g, i) => (
+                    <div key={i} className="rounded-lg border p-3 text-xs sm:text-sm">
+                      <div className="flex items-center justify-between flex-wrap gap-1 mb-1">
+                        <span className="font-semibold">{g.label}</span>
+                        <Badge variant="outline" className="text-xs">{g.source}</Badge>
+                      </div>
+                      <p className="text-muted-foreground">{g.note}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="rounded-lg bg-sky-500/10 border border-sky-500/30 p-3 text-xs">
+                <b className="text-sky-400">⚠️ À faire pour valider :</b> exporte ton SimC string (addon SimulationCraft en jeu) → colle-le sur Raidbots (Top Gear / Droptimizer) → compare tes vrais stat weights à ceux ci-dessus. C'est la seule façon d'avoir des chiffres exacts pour TON gear, pas juste une moyenne de guide.
+              </div>
+            </CardContent>
+          </Card>
+
           <Card>
             <CardHeader>
               <CardTitle>⚔️ Le débat <span className="text-purple-400">Invoked Nightmare</span> vs <span className="text-cyan-400">Misery</span></CardTitle>
@@ -2552,15 +2656,14 @@ export default function ShadowPriestDashboardV2() {
             <CardHeader><CardTitle>📚 Sources et niveau de confiance</CardTitle></CardHeader>
             <CardContent className="text-xs space-y-1">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                <div className="rounded border p-2"><b>raider.io API</b> · Màlenïa · <Badge className="bg-emerald-500">100%</Badge> · live</div>
-                <div className="rounded border p-2"><b>WarcraftLogs S1</b> · 271k parses · <Badge className="bg-emerald-500">95%</Badge> · 14j</div>
-                <div className="rounded border p-2"><b>murlok.io</b> · top 100 SP builds · <Badge className="bg-emerald-500">95%</Badge> · live</div>
-                <div className="rounded border p-2"><b>Archon.gg</b> · 81k parses M+ · <Badge className="bg-emerald-500">90%</Badge> · 14j</div>
-                <div className="rounded border p-2"><b>Maxroll · Icy-Veins · Method.gg</b> · guides 12.0.5 · <Badge className="bg-amber-500">85%</Badge></div>
-                <div className="rounded border p-2"><b>Projections sims</b> · estimés · <Badge className="bg-amber-500">75%</Badge></div>
+                <div className="rounded border p-2"><b>raider.io / WarcraftLogs</b> · profil Màlenïa · <Badge variant="destructive">Non vérifiable ici</Badge> · réseau bloqué dans cet environnement, dernier relevé manuel du {LAST_KNOWN_SYNC}</div>
+                <div className="rounded border p-2"><b>murlok.io / Archon.gg</b> · "top 50/100 SP" · <Badge className="bg-amber-500">Non revalidé</Badge> · chiffres saisis manuellement, à retraiter</div>
+                <div className="rounded border p-2"><b>Wowhead · Icy Veins · Maxroll · WoWVendor</b> · stat priority / tier list · <Badge className="bg-emerald-500">Vérifié via recherche web</Badge> · voir carte "Comparaison méta externe" ci-dessus</div>
+                <div className="rounded border p-2"><b>Forums Blizzard (PTR 12.1)</b> · changements Shadow Priest · <Badge className="bg-emerald-500">Vérifié via recherche web</Badge> · voir onglet "12.1 PTR"</div>
+                <div className="rounded border p-2"><b>Projections DPS / burst</b> · courbes internes · <Badge className="bg-amber-500">Indicatif</Badge> · non simées, cohérence interne seulement</div>
               </div>
               <p className="text-muted-foreground mt-2">
-                ⚠️ <b>Disclaimer :</b> les graphes performance et DPS sont basés sur agrégations top 100 + projections cohérentes avec les guides. Pour des sims pixel-perfect, lance Raidbots avec ton SimC string. Cette analyse pointe les <b>directions</b>, Raidbots donne les <b>valeurs exactes</b>.
+                ⚠️ <b>Disclaimer :</b> les sections marquées "Vérifié via recherche web" viennent de vraies recherches faites pour ce dashboard (voir liens dans l'onglet 12.1 PTR et la carte "Comparaison méta externe"). Le reste (données murlok.io/Archon.gg/raider.io "top 50", courbes DPS internes) est un contenu de départ non revalidé — traite-le comme un exemple/gabarit, pas comme un fait vérifié, tant que tu ne l'as pas recollé depuis tes vraies sources. Pour des chiffres exacts sur TON gear, lance toujours Raidbots avec ton SimC string : cette analyse donne des <b>directions</b>, pas des <b>valeurs garanties</b>.
               </p>
             </CardContent>
           </Card>
