@@ -320,12 +320,63 @@ const patch121CoreChanges = [
   { ability: "Power Word: Shield", change: "Le montant absorbé est augmenté de 25%.", tag: "Buff (arbre Priest commun)" },
 ];
 
+// Débat communautaire (forums officiels) — nuancé, pas un fait figé. À suivre pendant le PTR.
+const patch121HeroBalanceDebate = [
+  { point: "Historique", detail: "Depuis l'introduction des deux hero specs, Archon a régulièrement devancé Voidweaver en performance pure — écart présenté comme non-extrême mais persistant selon les retours joueurs.", tone: "context" },
+  { point: "Inquiétude PTR initiale", detail: "Les premières notes de dev 12.1 ne listaient que des buffs côté Archon, ce qui a fait craindre un creusement de l'écart avec Voidweaver dans les fils de feedback officiels.", tone: "warning" },
+  { point: "Ajustements en cours de PTR", detail: "Voidweaver a ensuite reçu plusieurs vagues de buffs sur son kit ; avec un build optimisé et du bon gear, certaines analyses communautaires le placent désormais jusqu'à ~1% devant Archon selon le contexte.", tone: "good" },
+];
+
+// ============ SEASON 2 — CURSE OF ULA'TEK — vue d'ensemble (vérifié via recherche web) ============
+const season2Timeline = [
+  { date: "7 juillet 2026", label: "Lead-in narratif", detail: "Ouverture de la quête d'introduction — patch sous-jacent 12.1 déployé.", status: "imminent" },
+  { date: "14 juillet 2026", label: "Systèmes Season 2 actifs", detail: "Vault, affixes et progression Season 2 démarrent (une semaine après le patch).", status: "upcoming" },
+  { date: "~11 août 2026 (estimation)", label: "Contenu complet (raid, M+ pool final)", detail: "Date non confirmée officiellement — projection basée sur le cadence habituel de Blizzard (~8 semaines). À vérifier au fil des annonces.", status: "estimate" },
+];
+
+const season2Raid = {
+  name: "The Venomous Abyss",
+  bosses: 8,
+  final: "Ula'tek — créature ancienne liée à la haine, la corruption et le venin",
+  note: "Chaque classe reçoit un tout nouveau tier set pour la Season 2 (le tien sera à récupérer dès l'ouverture du raid).",
+};
+
+const season2MplusPool = [
+  { name: "Altar of Fangs", type: "Nouveau (Midnight)", bosses: 3 },
+  { name: "Murder Row", type: "Midnight S1", bosses: null },
+  { name: "Den of Nalorakk", type: "Midnight S1", bosses: null },
+  { name: "The Blinding Vale", type: "Midnight S1", bosses: null },
+  { name: "Voidscar Arena", type: "Midnight S1", bosses: null },
+  { name: "King's Rest", type: "Retour (Battle for Azeroth)", bosses: null },
+  { name: "Ruby Life Pools", type: "Retour (Dragonflight)", bosses: null },
+  { name: "Temple of Sethraliss", type: "Retour (Battle for Azeroth)", bosses: null },
+];
+
+const season2Delves = [
+  { name: "The Ring of Glory", note: "Nouveau delve Season 2" },
+  { name: "Gnarldor Isle", note: "Nouveau delve Season 2" },
+  { name: "Venomfall Deeps", note: "Nouveau delve — sert de Nemesis Delve de la saison" },
+];
+
+const season2QoL = [
+  "Donjons M+ : télégraphes de cônes/lignes plus lisibles, meilleur pacing, moins de temps mort roleplay, refontes de boss, cohérence d'encounter design sur toute la rotation",
+  "Nouvelles affixes M+ annoncées (détails précis non publiés au moment de la rédaction — à confirmer sur le PTR)",
+  "Delves : retour des Bountiful Delves à l'ouverture de la saison, possibilité de pousser au-delà du Tier 7",
+  "Housing : Blueprints (sauvegarde/partage de plans inter-région hors Chine), placement d'animaux de compagnie, amélioration de logement niveau 12, nouvelles catégories de décoration",
+  "Outils PvP onboarding, intégration Discord, pings étendus, meilleur suivi des cooldowns, améliorations d'UI générales",
+];
+
 const patch121Sources = [
   { label: "PTR Development Notes — Midnight: Curse of Ula'tek", url: "https://www.bluetracker.gg/wow/topic/us-en/2317811-midnight-curse-of-ulatek-ptr-development-notes/" },
   { label: "12.1 Shadow Priest Feedback (forums officiels)", url: "https://us.forums.blizzard.com/en/wow/t/121-shadow-priest-feedback/2318115" },
   { label: "Shadow 12.1 Changes — forums officiels", url: "https://us.forums.blizzard.com/en/wow/t/shadow-121-changes/2318469" },
   { label: "Icy Veins — Massive Class Changes: 12.1 Development Notes", url: "https://www.icy-veins.com/wow/news/massive-class-changes-midnight-12-1-curse-of-ulatek-development-notes/" },
   { label: "Warcraft Wiki — Patch 12.1.0", url: "https://warcraft.wiki.gg/wiki/Patch_12.1.0" },
+  { label: "Wowhead News — Full Patch 12.1 Curse of Ula'tek PTR Development Notes", url: "https://www.wowhead.com/news/full-patch-12-1-curse-of-ulatek-ptr-development-notes-381914" },
+  { label: "Blizzard — Watch the Latest WoWCast and Learn About The Curse of Ula'tek", url: "https://news.blizzard.com/en-us/article/24280285/watch-the-latest-wowcast-and-learn-about-the-curse-of-ulatek" },
+  { label: "Blizzard — Quality-of-Life Improvements Coming in Curse of Ula'tek", url: "https://news.blizzard.com/en-us/article/24288418/quality-of-life-improvements-coming-in-curse-of-ula-tek" },
+  { label: "BuyBoost — Midnight Season 2 Mythic+ Dungeon Rotation Revealed", url: "https://buyboost.com/news/wow/midnight-season2-rotation" },
+  { label: "Blizzard Watch — Everything you need to know about WoW Midnight Season 2", url: "https://blizzardwatch.com/2026/06/18/everything-need-know-wow-midnight-patch-12-1-season-2/" },
 ];
 
 // ============ BENCHMARK EXTERNE — vérifié via recherche web (pas de fetch API perso) ============
@@ -2179,7 +2230,7 @@ export default function ShadowPriestDashboardV2() {
           <Card className="border-orange-500/40 bg-gradient-to-br from-orange-500/10 via-red-500/5 to-transparent">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-orange-500"><Rocket className="h-6 w-6" />Midnight 12.1 — Curse of Ula'tek (PTR)</CardTitle>
-              <CardDescription>Season 2 arrive — voici les changements Shadow Priest actuellement testés sur le PTR</CardDescription>
+              <CardDescription>Season 2 arrive vite : lead-in le 7 juillet, systèmes de saison le 14 juillet 2026 — nouveau raid, nouveau donjon, nouveaux delves et changements Shadow Priest actuellement testés sur le PTR</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="rounded-lg bg-orange-500/10 border border-orange-500/30 p-3 flex items-start gap-2 text-xs sm:text-sm">
@@ -2192,9 +2243,90 @@ export default function ShadowPriestDashboardV2() {
             </CardContent>
           </Card>
 
+          <Card className="border-red-500/30 bg-red-500/5">
+            <CardHeader>
+              <CardTitle className="text-base flex items-center gap-2"><Clock className="h-5 w-5 text-red-400" />Timeline Season 2 — c'est pour très bientôt</CardTitle>
+              <CardDescription>Nous sommes le 3 juillet 2026 — le lead-in narratif démarre dans 4 jours</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                {season2Timeline.map((t, i) => (
+                  <div key={i} className="flex gap-3 items-start">
+                    <div className={`shrink-0 w-3 h-3 rounded-full mt-1.5 ${t.status === "imminent" ? "bg-red-500 animate-pulse" : t.status === "upcoming" ? "bg-amber-500" : "bg-slate-500"}`} />
+                    <div className="flex-1 rounded-lg border p-3">
+                      <div className="flex items-center justify-between flex-wrap gap-1">
+                        <span className="font-semibold text-sm">{t.label}</span>
+                        <Badge variant="outline" className="text-xs">{t.date}</Badge>
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-1">{t.detail}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <Card className="border-rose-500/40">
+              <CardHeader>
+                <CardTitle className="text-base flex items-center gap-2"><Flame className="h-5 w-5 text-rose-500" />Nouveau raid — {season2Raid.name}</CardTitle>
+                <CardDescription>{season2Raid.bosses} bosses</CardDescription>
+              </CardHeader>
+              <CardContent className="text-sm space-y-2">
+                <p><b>Boss final :</b> {season2Raid.final}</p>
+                <p className="text-xs text-muted-foreground">{season2Raid.note}</p>
+              </CardContent>
+            </Card>
+
+            <Card className="border-cyan-500/40">
+              <CardHeader>
+                <CardTitle className="text-base flex items-center gap-2"><Skull className="h-5 w-5 text-cyan-500" />Pool Mythic+ Season 2 (8 donjons)</CardTitle>
+                <CardDescription>Altar of Fangs rejoint la rotation, 3 donjons legacy reviennent</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 text-xs">
+                  {season2MplusPool.map((d, i) => (
+                    <div key={i} className="rounded border p-2 flex items-center justify-between gap-2">
+                      <span className="font-medium">{d.name}</span>
+                      <Badge variant="outline" className="text-[10px] shrink-0">{d.type}</Badge>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <Card className="border-emerald-500/30">
+              <CardHeader>
+                <CardTitle className="text-base flex items-center gap-2"><Gem className="h-5 w-5 text-emerald-500" />Nouveaux Delves</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                {season2Delves.map((d, i) => (
+                  <div key={i} className="rounded-lg border p-2 text-xs sm:text-sm">
+                    <span className="font-semibold">{d.name}</span>
+                    <p className="text-muted-foreground">{d.note}</p>
+                  </div>
+                ))}
+                <p className="text-xs text-muted-foreground pt-1">Bountiful Delves de retour à l'ouverture de saison, push possible au-delà du Tier 7.</p>
+              </CardContent>
+            </Card>
+
+            <Card className="border-indigo-500/30">
+              <CardHeader>
+                <CardTitle className="text-base flex items-center gap-2"><ListChecks className="h-5 w-5 text-indigo-400" />Quality of Life & systèmes</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ul className="text-xs space-y-1.5 list-disc ml-4 text-muted-foreground">
+                  {season2QoL.map((q, i) => <li key={i}>{q}</li>)}
+                </ul>
+              </CardContent>
+            </Card>
+          </div>
+
           <Card className="border-emerald-500/40">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-emerald-500"><Sparkles className="h-5 w-5" />Nouveau talent</CardTitle>
+              <CardTitle className="flex items-center gap-2 text-emerald-500"><Sparkles className="h-5 w-5" />Nouveau talent Shadow</CardTitle>
               <CardDescription>Ajout à l'arbre Shadow pour la Season 2</CardDescription>
             </CardHeader>
             <CardContent className="space-y-2">
@@ -2226,6 +2358,22 @@ export default function ShadowPriestDashboardV2() {
                   <p className="text-sm text-muted-foreground">{t.change}</p>
                 </div>
               ))}
+            </CardContent>
+          </Card>
+
+          <Card className="border-fuchsia-500/30 bg-fuchsia-500/5">
+            <CardHeader>
+              <CardTitle className="text-base flex items-center gap-2"><Swords className="h-5 w-5 text-fuchsia-400" />Débat communautaire : Archon vs Voidweaver en 12.1</CardTitle>
+              <CardDescription>Toi tu joues Voidweaver — ce point mérite un vrai suivi pendant le PTR</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              {patch121HeroBalanceDebate.map((d, i) => (
+                <div key={i} className={`rounded-lg border p-3 text-xs sm:text-sm ${d.tone === "warning" ? "border-amber-500/40 bg-amber-500/5" : d.tone === "good" ? "border-emerald-500/40 bg-emerald-500/5" : ""}`}>
+                  <div className="font-semibold mb-1">{d.point}</div>
+                  <p className="text-muted-foreground">{d.detail}</p>
+                </div>
+              ))}
+              <p className="text-xs italic text-muted-foreground pt-1">💡 Pour toi concrètement : garde un œil sur les patch notes 12.1 au fil des builds PTR avant de décider si tu restes Voidweaver ou si tu testes Archon en Season 2 — la balance a déjà bougé plusieurs fois pendant ce cycle de test.</p>
             </CardContent>
           </Card>
 
