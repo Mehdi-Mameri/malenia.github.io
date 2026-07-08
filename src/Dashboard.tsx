@@ -418,17 +418,31 @@ export default function ShadowPriestDashboardV2() {
   const [darkMode, setDarkMode] = useState<boolean>(true);
 
   return (
-    <div className={`${darkMode ? "dark" : ""} w-full min-h-screen bg-background text-foreground p-3 sm:p-6 space-y-4 sm:space-y-6 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,hsl(271_60%_50%/0.15),transparent)]`}>
-      {/* HEADER */}
-      <div className="space-y-2">
-        <div className="flex items-center justify-between gap-3 flex-wrap">
-          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-            <div className="p-1.5 sm:p-2 rounded-lg bg-purple-500/10 shrink-0">
-              <Eye className="h-6 w-6 sm:h-8 sm:w-8 text-purple-500" />
+    <div className={`${darkMode ? "dark" : ""} relative w-full min-h-screen bg-background text-foreground`}>
+      {/* Ambient background glow layers */}
+      <div className="pointer-events-none fixed inset-0 overflow-hidden">
+        <div className="absolute -top-40 left-1/2 -translate-x-1/2 h-[38rem] w-[38rem] rounded-full bg-purple-600/20 blur-[120px]" />
+        <div className="absolute top-1/3 -right-32 h-[28rem] w-[28rem] rounded-full bg-fuchsia-600/10 blur-[120px]" />
+        <div className="absolute bottom-0 -left-32 h-[26rem] w-[26rem] rounded-full bg-sky-600/10 blur-[120px]" />
+      </div>
+
+      <div className="relative p-3 sm:p-6 space-y-4 sm:space-y-6 max-w-[1600px] mx-auto">
+      {/* HERO HEADER */}
+      <div className="glass glow-soft rounded-2xl p-4 sm:p-6 animate-fade-in-up">
+        <div className="flex items-start justify-between gap-3 flex-wrap">
+          <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+            <div className="relative shrink-0">
+              <div className="absolute inset-0 rounded-2xl bg-purple-500/30 blur-md" />
+              <div className="relative p-2.5 sm:p-3 rounded-2xl bg-gradient-to-br from-purple-500/30 to-fuchsia-500/10 border border-purple-500/40">
+                <Eye className="h-7 w-7 sm:h-9 sm:w-9 text-purple-300" />
+              </div>
             </div>
             <div className="min-w-0">
-              <h1 className="text-xl sm:text-3xl font-bold tracking-tight truncate sm:whitespace-normal">Shadow Priest M+ — Dashboard</h1>
-              <p className="text-muted-foreground text-xs sm:text-sm">Midnight S1 · Màlenïa (Archimonde-EU) · Hero specs Archon &amp; Voidweaver</p>
+              <div className="flex items-center gap-2 flex-wrap">
+                <h1 className="font-display text-2xl sm:text-4xl font-extrabold text-gradient leading-tight">Màlenïa</h1>
+                <Badge className="bg-purple-500/90 hover:bg-purple-500">Shadow Priest</Badge>
+              </div>
+              <p className="text-muted-foreground text-xs sm:text-sm mt-0.5">Midnight Season 1 · Archimonde-EU · Hero specs Archon &amp; Voidweaver</p>
             </div>
           </div>
           <Button
@@ -436,22 +450,40 @@ export default function ShadowPriestDashboardV2() {
             size="sm"
             onClick={() => setDarkMode(!darkMode)}
             aria-label={darkMode ? "Activer le mode clair" : "Activer le mode sombre"}
-            className="gap-2 shrink-0"
+            className="gap-2 shrink-0 glass"
           >
-            {darkMode ? <><Sun className="h-4 w-4" /> <span className="hidden sm:inline">Mode clair</span></> : <><Moon className="h-4 w-4" /> <span className="hidden sm:inline">Mode sombre</span></>}
+            {darkMode ? <><Sun className="h-4 w-4" /> <span className="hidden sm:inline">Clair</span></> : <><Moon className="h-4 w-4" /> <span className="hidden sm:inline">Sombre</span></>}
           </Button>
         </div>
-        <div className="flex flex-wrap gap-1.5 sm:gap-2 pt-1 sm:pt-2">
-          <Badge variant="default" className="bg-purple-500">Màlenïa · iLvl 285 · Score 3439</Badge>
-          <Badge variant="outline" className="gap-1"><RefreshCw className="h-3 w-3" />À actualiser</Badge>
+
+        {/* Stat pills */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 mt-4">
+          {[
+            { icon: <Shield className="h-4 w-4" />, label: "Item Level", value: "285", accent: "text-sky-300" },
+            { icon: <Trophy className="h-4 w-4" />, label: "Score M+", value: "3439", accent: "text-amber-300" },
+            { icon: <Skull className="h-4 w-4" />, label: "Meilleure clé", value: "+16", accent: "text-purple-300" },
+            { icon: <Flame className="h-4 w-4" />, label: "Raid Mythic", value: "2/9", accent: "text-rose-300" },
+          ].map((s, i) => (
+            <div key={i} className="glass rounded-xl px-3 py-2.5 flex items-center gap-3 card-hover">
+              <div className={`${s.accent} shrink-0`}>{s.icon}</div>
+              <div className="min-w-0">
+                <div className="text-[10px] uppercase tracking-wider text-muted-foreground truncate">{s.label}</div>
+                <div className={`text-lg sm:text-xl font-bold font-display ${s.accent}`}>{s.value}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="flex flex-wrap gap-1.5 sm:gap-2 mt-3">
+          <Badge variant="outline" className="gap-1 border-amber-500/40 text-amber-300"><RefreshCw className="h-3 w-3" />Données à actualiser</Badge>
           <Badge variant="outline" className="hidden sm:inline-flex">Burst pulls focus 🔥</Badge>
-          <Badge variant="outline" className="hidden sm:inline-flex">Patch 12.1 PTR ⚡</Badge>
+          <Badge variant="outline" className="border-orange-500/40 text-orange-300">Patch 12.1 PTR ⚡</Badge>
         </div>
       </div>
 
       <Tabs defaultValue="talents" className="w-full">
-        <div className="-mx-3 sm:mx-0 px-3 sm:px-0 sticky top-0 z-10 bg-background/95 backdrop-blur py-2 -mt-2 sm:static sm:bg-transparent sm:backdrop-blur-none sm:py-0 sm:mt-0">
-          <TabsList className="flex sm:grid sm:grid-cols-4 lg:grid-cols-8 h-auto w-full max-w-full overflow-x-auto sm:overflow-visible flex-nowrap sm:flex-wrap gap-1 justify-start sm:justify-center">
+        <div className="sticky top-2 z-20">
+          <TabsList className="glass-strong glow-soft flex sm:grid sm:grid-cols-4 lg:grid-cols-8 h-auto w-full max-w-full overflow-x-auto sm:overflow-visible flex-nowrap sm:flex-wrap gap-1 justify-start sm:justify-center rounded-2xl p-1.5">
             <TabsTrigger value="talents" className="shrink-0"><Sparkles className="h-4 w-4 mr-1" />Talents</TabsTrigger>
             <TabsTrigger value="archon" className="shrink-0"><Crown className="h-4 w-4 mr-1" />Archon</TabsTrigger>
             <TabsTrigger value="voidweaver" className="shrink-0"><Eye className="h-4 w-4 mr-1" />Voidweaver</TabsTrigger>
@@ -2839,6 +2871,7 @@ export default function ShadowPriestDashboardV2() {
           </Card>
         </TabsContent>
       </Tabs>
+      </div>
     </div>
   );
 }
