@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid,
   LineChart, Line, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
@@ -20,13 +20,131 @@ import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "
 // (ou recolle un export JSON raider.io) après chaque session de jeu.
 const LAST_KNOWN_SYNC = "16 mai 2026";
 
-function StaleDataBanner({ label }: { label?: string }) {
+// ============ LIVE DATA — raider.io (fetch côté navigateur) ============
+// L'environnement de build de Claude ne peut PAS joindre raider.io (bloqué par la
+// politique réseau). Mais TON navigateur, lui, le peut : l'API raider.io est publique
+// et CORS-friendly. Ce hook récupère donc tes données EN DIRECT à chaque ouverture de
+// la page GitHub Pages — plus besoin de recoller les chiffres à la main.
+// 👉 Change ces 3 valeurs si tu renommes/transferts le perso :
+const RIO_CONFIG = { region: "eu", realm: "archimonde", name: "Màlenïa" };
+
+type RioStatus = "loading" | "ok" | "error";
+interface RioState {
+  status: RioStatus;
+  data: any | null;
+  error?: string;
+  fetchedAt?: Date;
+}
+
+function useRaiderIO(): RioState {
+  const [state, setState] = useState<RioState>({ status: "loading", data: null });
+  useEffect(() => {
+    const fields = [
+      "gear",
+      "mythic_plus_scores_by_season:current",
+      "mythic_plus_best_runs",
+      "mythic_plus_recent_runs",
+      "raid_progression",
+      "talents",
+    ].join(",");
+    const url =
+      `https://raider.io/api/v1/characters/profile?region=${RIO_CONFIG.region}` +
+      `&realm=${encodeURIComponent(RIO_CONFIG.realm)}` +
+      `&name=${encodeURIComponent(RIO_CONFIG.name)}` +
+      `&fields=${encodeURIComponent(fields)}`;
+    let cancelled = false;
+    fetch(url)
+      .then((r) => {
+        if (!r.ok) throw new Error(`raider.io HTTP ${r.status}`);
+        return r.json();
+      })
+      .then((d) => {
+        if (!cancelled) setState({ status: "ok", data: d, fetchedAt: new Date() });
+      })
+      .catch((e) => {
+        if (!cancelled) setState({ status: "error", data: null, error: String(e?.message || e) });
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+  return state;
+}
+
+// Formate une durée (ms) en m:ss
+function fmtMs(ms: number): string {
+  const total = Math.floor(ms / 1000);
+  const m = Math.floor(total / 60);
+  const s = total % 60;
+  return `${m}:${String(s).padStart(2, "0")}`;
+}
+
+// Chest = nombre d'upgrades du keystone (+1/+2/+3)
+function chestStars(upgrades: number): string {
+  return upgrades > 0 ? "⭐".repeat(upgrades) : "—";
+}
+
+// Sélectionne l'entrée raid la plus avancée (priorité kills Mythic, puis Heroic)
+function pickBestRaid(raidProgression: any): { slug: string; p: any } | null {
+  if (!raidProgression || typeof raidProgression !== "object") return null;
+  const entries = Object.entries(raidProgression) as [string, any][];
+  if (!entries.length) return null;
+  let best: { slug: string; p: any; rank: number } | null = null;
+  for (const [slug, p] of entries) {
+    const rank = (p?.mythic_bosses_killed ?? 0) * 100 + (p?.heroic_bosses_killed ?? 0);
+    if (!best || rank > best.rank) best = { slug, p, rank };
+  }
+  return best ? { slug: best.slug, p: best.p } : null;
+}
+
+function bestRaidSummary(raidProgression: any): { summary: string; name: string } | null {
+  const best = pickBestRaid(raidProgression);
+  if (!best) return null;
+  const niceName = best.slug.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+  return { summary: best.p?.summary ?? "—", name: niceName };
+}
+
+// Kills sur la difficulté la plus haute atteinte (Mythic si >0, sinon Heroic, sinon Normal)
+function bestRaidKills(raidProgression: any): number {
+  const best = pickBestRaid(raidProgression);
+  if (!best) return 0;
+  return best.p?.mythic_bosses_killed || best.p?.heroic_bosses_killed || best.p?.normal_bosses_killed || 0;
+}
+
+function bestRaidTotal(raidProgression: any): number {
+  const best = pickBestRaid(raidProgression);
+  return best?.p?.total_bosses || 9;
+}
+
+// Bannière d'état des données. Si `rio` est fourni et que la synchro live a réussi,
+// on affiche un état "en direct". Sinon (ou si `manualOnly`, pour les infos non
+// couvertes par l'API comme le Vault), on affiche le rappel "dernier relevé manuel".
+function StaleDataBanner({ label, rio, manualOnly }: { label?: string; rio?: RioState; manualOnly?: boolean }) {
+  if (rio && rio.status === "ok" && !manualOnly) {
+    return (
+      <div className="rounded-lg border border-emerald-500/40 bg-emerald-500/10 p-3 flex items-start gap-2 text-xs sm:text-sm">
+        <span className="relative flex h-3 w-3 mt-0.5 shrink-0">
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-60" />
+          <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500" />
+        </span>
+        <div>
+          <span className="font-semibold text-emerald-400">En direct depuis raider.io</span>
+          <span className="text-muted-foreground"> — {label ?? "cette section"} affiche tes données live, récupérées à l'instant depuis ton profil ({RIO_CONFIG.name}-{RIO_CONFIG.realm}). Rafraîchis la page pour resynchroniser.</span>
+        </div>
+      </div>
+    );
+  }
+  const loading = rio && rio.status === "loading" && !manualOnly;
   return (
     <div className="rounded-lg border border-amber-500/40 bg-amber-500/10 p-3 flex items-start gap-2 text-xs sm:text-sm">
-      <RefreshCw className="h-4 w-4 text-amber-500 shrink-0 mt-0.5" />
+      <RefreshCw className={`h-4 w-4 text-amber-500 shrink-0 mt-0.5 ${loading ? "animate-spin" : ""}`} />
       <div>
-        <span className="font-semibold text-amber-500">Données à actualiser</span>
-        <span className="text-muted-foreground"> — {label ?? "cette section"} reflète le dernier relevé connu du <b>{LAST_KNOWN_SYNC}</b>. raider.io / Warcraft Logs ne sont pas accessibles automatiquement depuis cet environnement (réseau restreint) : recolle tes chiffres à jour (iLvl, score M+, meilleures clés, kills raid) pour que le dashboard reflète ta vraie progression actuelle.</span>
+        <span className="font-semibold text-amber-500">{loading ? "Synchronisation…" : "Données à actualiser"}</span>
+        <span className="text-muted-foreground"> — {label ?? "cette section"} {manualOnly
+          ? <>n'est pas exposé par l'API raider.io (Vault, checklist perso…) : ces valeurs restent à tenir à jour à la main (dernier relevé du <b>{LAST_KNOWN_SYNC}</b>).</>
+          : loading
+            ? <>tente de se synchroniser en direct avec raider.io depuis ton navigateur…</>
+            : <>n'a pas pu se synchroniser en direct (raider.io injoignable / profil privé / hors-ligne) : affichage du dernier relevé manuel du <b>{LAST_KNOWN_SYNC}</b>.</>}</span>
       </div>
     </div>
   );
@@ -416,6 +534,19 @@ const chartConfig: ChartConfig = {
 export default function ShadowPriestDashboardV2() {
   const [selectedHero, setSelectedHero] = useState<"archon" | "voidweaver">("archon");
   const [darkMode, setDarkMode] = useState<boolean>(true);
+  const rio = useRaiderIO();
+
+  // Valeurs live (avec repli sur les dernières valeurs connues si la synchro échoue)
+  const live = rio.data;
+  const liveIlvl = live?.gear?.item_level_equipped ?? 285;
+  const liveScore = Math.round(live?.mythic_plus_scores_by_season?.[0]?.scores?.all ?? 3439);
+  const liveBestKey = live?.mythic_plus_best_runs?.length
+    ? Math.max(...live.mythic_plus_best_runs.map((r: any) => r.mythic_level))
+    : 16;
+  const liveRaid = bestRaidSummary(live?.raid_progression);
+  const liveSpec = live?.active_spec_name as string | undefined;
+  const liveRecentRuns = (live?.mythic_plus_recent_runs ?? []) as any[];
+  const liveBestRuns = (live?.mythic_plus_best_runs ?? []) as any[];
 
   return (
     <div className={`${darkMode ? "dark" : ""} relative w-full min-h-screen bg-background text-foreground`}>
@@ -440,7 +571,7 @@ export default function ShadowPriestDashboardV2() {
             <div className="min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
                 <h1 className="font-display text-2xl sm:text-4xl font-extrabold text-gradient leading-tight">Màlenïa</h1>
-                <Badge className="bg-purple-500/90 hover:bg-purple-500">Shadow Priest</Badge>
+                <Badge className="bg-purple-500/90 hover:bg-purple-500">{liveSpec ? `${liveSpec} Priest` : "Shadow Priest"}</Badge>
               </div>
               <p className="text-muted-foreground text-xs sm:text-sm mt-0.5">Midnight Season 1 · Archimonde-EU · Hero specs Archon &amp; Voidweaver</p>
             </div>
@@ -456,13 +587,13 @@ export default function ShadowPriestDashboardV2() {
           </Button>
         </div>
 
-        {/* Stat pills */}
+        {/* Stat pills (live raider.io avec repli) */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 mt-4">
           {[
-            { icon: <Shield className="h-4 w-4" />, label: "Item Level", value: "285", accent: "text-sky-300" },
-            { icon: <Trophy className="h-4 w-4" />, label: "Score M+", value: "3439", accent: "text-amber-300" },
-            { icon: <Skull className="h-4 w-4" />, label: "Meilleure clé", value: "+16", accent: "text-purple-300" },
-            { icon: <Flame className="h-4 w-4" />, label: "Raid Mythic", value: "2/9", accent: "text-rose-300" },
+            { icon: <Shield className="h-4 w-4" />, label: "Item Level", value: String(liveIlvl), accent: "text-sky-300" },
+            { icon: <Trophy className="h-4 w-4" />, label: "Score M+", value: String(liveScore), accent: "text-amber-300" },
+            { icon: <Skull className="h-4 w-4" />, label: "Meilleure clé", value: `+${liveBestKey}`, accent: "text-purple-300" },
+            { icon: <Flame className="h-4 w-4" />, label: liveRaid ? "Raid (top)" : "Raid Mythic", value: liveRaid ? liveRaid.summary : "2/9", accent: "text-rose-300" },
           ].map((s, i) => (
             <div key={i} className="glass rounded-xl px-3 py-2.5 flex items-center gap-3 card-hover">
               <div className={`${s.accent} shrink-0`}>{s.icon}</div>
@@ -474,8 +605,20 @@ export default function ShadowPriestDashboardV2() {
           ))}
         </div>
 
-        <div className="flex flex-wrap gap-1.5 sm:gap-2 mt-3">
-          <Badge variant="outline" className="gap-1 border-amber-500/40 text-amber-300"><RefreshCw className="h-3 w-3" />Données à actualiser</Badge>
+        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mt-3">
+          {rio.status === "ok" ? (
+            <Badge variant="outline" className="gap-1.5 border-emerald-500/50 text-emerald-300">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-60" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+              </span>
+              raider.io en direct{rio.fetchedAt ? ` · ${rio.fetchedAt.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}` : ""}
+            </Badge>
+          ) : rio.status === "loading" ? (
+            <Badge variant="outline" className="gap-1 border-sky-500/40 text-sky-300"><RefreshCw className="h-3 w-3 animate-spin" />Synchronisation raider.io…</Badge>
+          ) : (
+            <Badge variant="outline" className="gap-1 border-amber-500/40 text-amber-300"><RefreshCw className="h-3 w-3" />Hors-ligne · dernier relevé {LAST_KNOWN_SYNC}</Badge>
+          )}
           <Badge variant="outline" className="hidden sm:inline-flex">Burst pulls focus 🔥</Badge>
           <Badge variant="outline" className="border-orange-500/40 text-orange-300">Patch 12.1 PTR ⚡</Badge>
         </div>
@@ -1512,13 +1655,66 @@ export default function ShadowPriestDashboardV2() {
 
         {/* ============ M+ LOGS ============ */}
         <TabsContent value="logs" className="space-y-4">
-          <StaleDataBanner label="L'historique de runs ci-dessous" />
+          <StaleDataBanner label="L'historique de runs ci-dessous" rio={rio} />
           <Card className="border-cyan-500/30 bg-gradient-to-br from-cyan-500/5 to-transparent">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-cyan-500"><ScrollText className="h-6 w-6" />Logs Mythic+ détaillés</CardTitle>
               <CardDescription>Historique run par run — timer, score, affixes, morts, parse WCL et notes perso</CardDescription>
             </CardHeader>
           </Card>
+
+          {/* LIVE — runs récupérées en direct depuis raider.io (le navigateur, pas le build) */}
+          {rio.status === "ok" && (liveRecentRuns.length > 0 || liveBestRuns.length > 0) && (
+            <Card className="border-emerald-500/40">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base flex items-center gap-2 text-emerald-400">
+                  <span className="relative flex h-2.5 w-2.5">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-60" />
+                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500" />
+                  </span>
+                  Runs en direct — raider.io
+                </CardTitle>
+                <CardDescription>
+                  {liveRecentRuns.length ? `${liveRecentRuns.length} runs récentes` : `${liveBestRuns.length} meilleures runs`} · saison en cours, synchronisées à l'ouverture de la page
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
+                  <table className="w-full text-xs sm:text-sm min-w-[560px]">
+                    <thead>
+                      <tr className="border-b text-left text-muted-foreground">
+                        <th className="p-2">Donjon</th>
+                        <th className="p-2">Niveau</th>
+                        <th className="p-2">Temps</th>
+                        <th className="p-2">Chest</th>
+                        <th className="p-2">Score</th>
+                        <th className="p-2">Affixes</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {(liveRecentRuns.length ? liveRecentRuns : liveBestRuns).map((r: any, i: number) => (
+                        <tr key={i} className="border-b last:border-0 align-top">
+                          <td className="p-2 font-medium whitespace-nowrap">{r.dungeon}</td>
+                          <td className="p-2"><Badge className={r.mythic_level >= 16 ? "bg-purple-500" : "bg-blue-500"}>+{r.mythic_level}</Badge></td>
+                          <td className="p-2 whitespace-nowrap">{typeof r.clear_time_ms === "number" ? fmtMs(r.clear_time_ms) : "—"}</td>
+                          <td className="p-2 whitespace-nowrap">{chestStars(r.num_keystone_upgrades ?? 0)}</td>
+                          <td className="p-2 font-semibold text-cyan-500 whitespace-nowrap">{r.score ? Math.round(r.score * 10) / 10 : "—"}</td>
+                          <td className="p-2">
+                            <div className="flex flex-wrap gap-1">
+                              {(r.affixes ?? []).map((a: any, j: number) => (
+                                <Badge key={j} variant="outline" className="text-[10px]">{a.name}</Badge>
+                              ))}
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                <p className="text-[10px] text-muted-foreground mt-2 italic">✅ Ces lignes viennent de l'API raider.io en temps réel. Le journal annoté ci-dessous (morts, notes perso, parse WCL) reste un exemple à enrichir à la main — l'API ne fournit pas ces détails.</p>
+              </CardContent>
+            </Card>
+          )}
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
             <Card><CardContent className="pt-4 text-center"><div className="text-xl sm:text-2xl font-bold text-cyan-500">{mplusRunLogs.length}</div><div className="text-xs text-muted-foreground">Runs loggées</div></CardContent></Card>
@@ -1528,7 +1724,10 @@ export default function ShadowPriestDashboardV2() {
           </div>
 
           <Card>
-            <CardHeader><CardTitle className="text-base">📜 Journal de runs</CardTitle></CardHeader>
+            <CardHeader>
+              <CardTitle className="text-base">📜 Journal annoté {rio.status === "ok" ? "(manuel — morts, notes, parse WCL)" : ""}</CardTitle>
+              <CardDescription className="text-xs">Détails que l'API ne fournit pas (morts, notes perso, parse WCL) — à enrichir à la main. Exemple basé sur le relevé du {LAST_KNOWN_SYNC}.</CardDescription>
+            </CardHeader>
             <CardContent>
               <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
                 <table className="w-full text-xs sm:text-sm min-w-[720px]">
@@ -1615,7 +1814,7 @@ export default function ShadowPriestDashboardV2() {
 
         {/* ============ PROGRESSION ============ */}
         <TabsContent value="progression" className="space-y-4">
-          <StaleDataBanner label="Les compteurs de currency / tier / timeline" />
+          <StaleDataBanner label="Les compteurs de currency / tier / timeline" rio={rio} manualOnly />
           <Card className="border-violet-500/30 bg-gradient-to-br from-violet-500/5 to-transparent">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-violet-500"><Gem className="h-6 w-6" />Progression du personnage</CardTitle>
@@ -1719,23 +1918,31 @@ export default function ShadowPriestDashboardV2() {
 
         {/* ============ MANELIA ============ */}
         <TabsContent value="malenia" className="space-y-4">
-          <StaleDataBanner label="Ton profil (iLvl, score, gear, builds détectés)" />
+          <StaleDataBanner label="Ton profil (iLvl, score, gear, builds détectés)" rio={rio} />
           <Card className="border-pink-500/30 bg-gradient-to-br from-pink-500/5 to-transparent">
             <CardHeader>
               <CardTitle className="flex items-center gap-2"><User className="h-6 w-6 text-pink-500" />Màlenïa — Diagnostic personnel</CardTitle>
-              <CardDescription>Nightborne Priest · Archimonde-EU · iLvl 285 · M+ Score 3439 · MAJ 16/05/26</CardDescription>
+              <CardDescription>
+                {liveSpec ? `${liveSpec} Priest` : "Nightborne Priest"} · Archimonde-EU · iLvl {liveIlvl} · M+ Score {liveScore}
+                {rio.status === "ok" ? " · synchro live raider.io ✓" : ` · dernier relevé ${LAST_KNOWN_SYNC}`}
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
-                {maleliaProgress.map((p, i) => (
+                {[
+                  { metric: "Item Level", value: liveIlvl, max: 300, label: String(liveIlvl) },
+                  { metric: "M+ Score", value: liveScore, max: 3750, label: String(liveScore) },
+                  { metric: "Meilleure clé", value: liveBestKey, max: 20, label: `+${liveBestKey}` },
+                  { metric: liveRaid ? `Raid (${liveRaid.name})` : "Mythic Raid", value: liveRaid ? (live?.raid_progression ? bestRaidKills(live.raid_progression) : 2) : 2, max: liveRaid ? bestRaidTotal(live?.raid_progression) : 9, label: liveRaid ? liveRaid.summary : "2/9 M" },
+                ].map((p, i) => (
                   <Card key={i}>
                     <CardHeader className="pb-2">
                       <CardDescription className="text-xs">{p.metric}</CardDescription>
                       <CardTitle className="text-xl">{p.label}</CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <Progress value={(p.value / p.max) * 100} />
-                      <div className="text-xs text-muted-foreground mt-1">{Math.round((p.value / p.max) * 100)}% de l'objectif</div>
+                      <Progress value={Math.min(100, (p.value / p.max) * 100)} />
+                      <div className="text-xs text-muted-foreground mt-1">{Math.round(Math.min(100, (p.value / p.max) * 100))}% de l'objectif</div>
                     </CardContent>
                   </Card>
                 ))}
@@ -1989,7 +2196,7 @@ export default function ShadowPriestDashboardV2() {
 
         {/* ============ WEEKLY TRACKER ============ */}
         <TabsContent value="weekly" className="space-y-4">
-          <StaleDataBanner label="Le tracker Vault / checklist de la semaine" />
+          <StaleDataBanner label="Le tracker Vault / checklist de la semaine" rio={rio} manualOnly />
           <Card className="border-emerald-500/30 bg-gradient-to-br from-emerald-500/5 to-transparent">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-emerald-500">
@@ -2082,7 +2289,7 @@ export default function ShadowPriestDashboardV2() {
 
         {/* ============ RAID 2/9M MIDNIGHT S1 ============ */}
         <TabsContent value="raid" className="space-y-4">
-          <StaleDataBanner label="La progression raid (kills M/HM)" />
+          <StaleDataBanner label="La progression raid (kills M/HM)" rio={rio} />
           <Card className="border-rose-500/30 bg-gradient-to-br from-rose-500/5 to-transparent">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-rose-500">
