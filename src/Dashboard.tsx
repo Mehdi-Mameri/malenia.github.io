@@ -1,10 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid,
   LineChart, Line, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
   PieChart, Pie, Cell, Legend, AreaChart, Area, ComposedChart, Scatter, ScatterChart, ZAxis,
 } from "recharts";
-import { Trophy, Zap, Target, Swords, TrendingUp, Activity, Shield, Eye, Sparkles, AlertTriangle, Crown, Flame, Skull, User, Clock, GitBranch, BarChart3, Wand2, Bomb, Rocket, Brain, Moon, Sun } from "lucide-react";
+import { Trophy, Zap, Target, Swords, TrendingUp, Activity, Shield, Eye, Sparkles, AlertTriangle, Crown, Flame, Skull, User, Clock, GitBranch, BarChart3, Wand2, Bomb, Rocket, Brain, Moon, Sun, ScrollText, Gem, RefreshCw, ListChecks } from "lucide-react";
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -13,6 +13,293 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { Progress } from "@/components/ui/progress";
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+// ============ META / DATA FRESHNESS ============
+// Dernière synchro connue avec raider.io / Warcraft Logs. raider.io et warcraftlogs.com
+// sont bloqués par la politique réseau de cet environnement (proxy sandboxé) — impossible
+// de refetch automatiquement. Mets à jour LAST_KNOWN_SYNC + les données ci-dessous à la main
+// (ou recolle un export JSON raider.io) après chaque session de jeu.
+const LAST_KNOWN_SYNC = "16 mai 2026";
+
+// ============ LIVE DATA — raider.io (fetch côté navigateur) ============
+// L'environnement de build de Claude ne peut PAS joindre raider.io (bloqué par la
+// politique réseau). Mais TON navigateur, lui, le peut : l'API raider.io est publique
+// et CORS-friendly. Ce hook récupère donc tes données EN DIRECT à chaque ouverture de
+// la page GitHub Pages — plus besoin de recoller les chiffres à la main.
+// 👉 Change ces 3 valeurs si tu renommes/transferts le perso :
+const RIO_CONFIG = { region: "eu", realm: "archimonde", name: "Màlenïa" };
+
+type RioStatus = "loading" | "ok" | "error";
+interface RioState {
+  status: RioStatus;
+  data: any | null;
+  error?: string;
+  fetchedAt?: Date;
+}
+
+function useRaiderIO(): RioState {
+  const [state, setState] = useState<RioState>({ status: "loading", data: null });
+  useEffect(() => {
+    const fields = [
+      "gear",
+      "mythic_plus_scores_by_season:current",
+      "mythic_plus_best_runs",
+      "mythic_plus_recent_runs",
+      "raid_progression",
+      "talents",
+    ].join(",");
+    const url =
+      `https://raider.io/api/v1/characters/profile?region=${RIO_CONFIG.region}` +
+      `&realm=${encodeURIComponent(RIO_CONFIG.realm)}` +
+      `&name=${encodeURIComponent(RIO_CONFIG.name)}` +
+      `&fields=${encodeURIComponent(fields)}`;
+    let cancelled = false;
+    fetch(url)
+      .then((r) => {
+        if (!r.ok) throw new Error(`raider.io HTTP ${r.status}`);
+        return r.json();
+      })
+      .then((d) => {
+        if (!cancelled) setState({ status: "ok", data: d, fetchedAt: new Date() });
+      })
+      .catch((e) => {
+        if (!cancelled) setState({ status: "error", data: null, error: String(e?.message || e) });
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+  return state;
+}
+
+// Formate une durée (ms) en m:ss
+function fmtMs(ms: number): string {
+  const total = Math.floor(ms / 1000);
+  const m = Math.floor(total / 60);
+  const s = total % 60;
+  return `${m}:${String(s).padStart(2, "0")}`;
+}
+
+// Chest = nombre d'upgrades du keystone (+1/+2/+3)
+function chestStars(upgrades: number): string {
+  return upgrades > 0 ? "⭐".repeat(upgrades) : "—";
+}
+
+// Sélectionne l'entrée raid la plus avancée (priorité kills Mythic, puis Heroic)
+function pickBestRaid(raidProgression: any): { slug: string; p: any } | null {
+  if (!raidProgression || typeof raidProgression !== "object") return null;
+  const entries = Object.entries(raidProgression) as [string, any][];
+  if (!entries.length) return null;
+  let best: { slug: string; p: any; rank: number } | null = null;
+  for (const [slug, p] of entries) {
+    const rank = (p?.mythic_bosses_killed ?? 0) * 100 + (p?.heroic_bosses_killed ?? 0);
+    if (!best || rank > best.rank) best = { slug, p, rank };
+  }
+  return best ? { slug: best.slug, p: best.p } : null;
+}
+
+function bestRaidSummary(raidProgression: any): { summary: string; name: string } | null {
+  const best = pickBestRaid(raidProgression);
+  if (!best) return null;
+  const niceName = best.slug.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+  return { summary: best.p?.summary ?? "—", name: niceName };
+}
+
+// Kills sur la difficulté la plus haute atteinte (Mythic si >0, sinon Heroic, sinon Normal)
+function bestRaidKills(raidProgression: any): number {
+  const best = pickBestRaid(raidProgression);
+  if (!best) return 0;
+  return best.p?.mythic_bosses_killed || best.p?.heroic_bosses_killed || best.p?.normal_bosses_killed || 0;
+}
+
+function bestRaidTotal(raidProgression: any): number {
+  const best = pickBestRaid(raidProgression);
+  return best?.p?.total_bosses || 9;
+}
+
+// ---- Extraction gear depuis raider.io gear.items ----
+const GEAR_SLOTS: { key: string; label: string; enchantable: boolean }[] = [
+  { key: "head", label: "Tête", enchantable: false },
+  { key: "neck", label: "Cou", enchantable: false },
+  { key: "shoulder", label: "Épaules", enchantable: false },
+  { key: "back", label: "Cape", enchantable: true },
+  { key: "chest", label: "Torse", enchantable: true },
+  { key: "wrist", label: "Poignets", enchantable: true },
+  { key: "hands", label: "Mains", enchantable: false },
+  { key: "waist", label: "Ceinture", enchantable: false },
+  { key: "legs", label: "Jambes", enchantable: true },
+  { key: "feet", label: "Pieds", enchantable: true },
+  { key: "finger1", label: "Anneau 1", enchantable: true },
+  { key: "finger2", label: "Anneau 2", enchantable: true },
+  { key: "trinket1", label: "Bijou 1", enchantable: false },
+  { key: "trinket2", label: "Bijou 2", enchantable: false },
+  { key: "mainhand", label: "Arme", enchantable: true },
+  { key: "offhand", label: "Off-main", enchantable: false },
+];
+
+function extractGear(gear: any) {
+  if (!gear?.items) return [];
+  return GEAR_SLOTS.map((slot) => {
+    const it = gear.items[slot.key];
+    if (!it) return null;
+    const gemCount = Array.isArray(it.gems) ? it.gems.length : 0;
+    const hasEnchant = Array.isArray(it.enchants) ? it.enchants.length > 0 : !!it.enchant;
+    return {
+      key: slot.key,
+      label: slot.label,
+      enchantable: slot.enchantable,
+      ilvl: it.item_level as number,
+      name: (it.name as string) || null,
+      isTier: !!it.tier || !!it.is_tier_piece,
+      gemCount,
+      hasEnchant,
+    };
+  }).filter(Boolean) as {
+    key: string; label: string; enchantable: boolean; ilvl: number;
+    name: string | null; isTier: boolean; gemCount: number; hasEnchant: boolean;
+  }[];
+}
+
+// Loadout de talents (chaîne importable) — tolère plusieurs formes de réponse API
+function extractLoadoutText(live: any): string | null {
+  return (
+    live?.talentLoadout?.loadout_text ||
+    live?.talents?.loadout_text ||
+    live?.talentLoadout?.loadoutText ||
+    null
+  );
+}
+
+// ============ MOTEUR D'ANALYSE DYNAMIQUE ============
+// Recalcule les recommandations à partir des valeurs LIVE (côte, meilleure clé, iLvl).
+// Le raisonnement s'adapte donc automatiquement à ta progression réelle.
+interface ProgressInsight {
+  tier: string;
+  tierColor: string;
+  tierBlurb: string;
+  nextKey: number;
+  stretchKey: number;
+  scoreTarget: number;
+  ilvlTarget: number;
+  focus: { tag: string; text: string; tone: "crit" | "high" | "tech" | "info" }[];
+  headline: string;
+}
+
+function deriveInsight(ilvl: number, score: number, bestKey: number): ProgressInsight {
+  const nextKey = bestKey + 1;
+  const stretchKey = bestKey + 2;
+  const scoreTarget = Math.ceil((score + 80) / 50) * 50; // prochain palier réaliste
+  const ilvlTarget = Math.min(300, Math.max(ilvl + 3, ilvl));
+
+  // Bandes basées sur la meilleure clé (le levier le plus actionnable)
+  let tier: string, tierColor: string, tierBlurb: string, headline: string;
+  let focus: ProgressInsight["focus"];
+
+  if (bestKey <= 12) {
+    tier = "Fondations"; tierColor = "slate";
+    tierBlurb = "Phase de mise en place : timer proprement chaque donjon et sécuriser le gear via le Vault.";
+    headline = `Objectif immédiat : timer du +${nextKey} sur tous les donjons pour lancer la boule de neige de score.`;
+    focus = [
+      { tag: "PRIORITÉ", text: `Timer 8 donjons en +${bestKey}/+${nextKey} pour un Vault plein et un socle de score.`, tone: "high" },
+      { tag: "GEAR", text: "Remplir tous les slots, viser le tier set 4 pièces avant de pousser plus haut.", tone: "crit" },
+      { tag: "TECHNIQUE", text: "Apprendre les kicks/CC prioritaires par donjon (voir onglet Donjons).", tone: "tech" },
+    ];
+  } else if (bestKey <= 15) {
+    tier = "Montée en puissance"; tierColor = "blue";
+    tierBlurb = "Tu enchaînes les clés moyennes : c'est le moment de convertir le gear en niveaux de clé.";
+    headline = `Vise le +${nextKey} timed partout, puis tente le +${stretchKey} sur tes 2-3 meilleurs donjons.`;
+    focus = [
+      { tag: "PRIORITÉ", text: `Passer tes +${bestKey} en +${nextKey} timed ; garder une marge de temps pour le +${stretchKey}.`, tone: "high" },
+      { tag: "GEAR", text: "Compléter le tier set 4p et pousser les pièces basses via crests.", tone: "crit" },
+      { tag: "ROUTE", text: "Adopter des routes optimisées (MDT) plutôt que d'improviser les pulls.", tone: "tech" },
+    ];
+  } else if (bestKey <= 17) {
+    tier = "Confirmé"; tierColor = "purple";
+    tierBlurb = "Niveau solide. Les mobs vivent plus longtemps : le sustain et la propreté d'exécution priment.";
+    headline = `Push +${nextKey}/+${stretchKey} : chaque mort coûte cher, la mécanique passe avant le DPS brut.`;
+    focus = [
+      { tag: "PUSH", text: `Cibler +${nextKey} sur les donjons que tu timies le plus large, puis +${stretchKey} en stretch.`, tone: "high" },
+      { tag: "SURVIE", text: "Réduire les morts : positionnement, défensifs (Fade/PW:Shield/Dispersion), interrupts.", tone: "crit" },
+      { tag: "BUILD", text: "Comparer Voidweaver vs Archon selon le TTK des mobs (voir onglet Analyse).", tone: "info" },
+    ];
+  } else if (bestKey <= 19) {
+    tier = "Avancé"; tierColor = "amber";
+    tierBlurb = "Tu joues dans le haut du panier. Les gains viennent de l'optimisation fine, plus du gear brut.";
+    headline = `Push +${nextKey}/+${stretchKey} : optimisation des CD par pull, zéro mort, gestion parfaite des affixes.`;
+    focus = [
+      { tag: "PUSH", text: `Convertir tes +${bestKey} en +${nextKey}, viser +${stretchKey} sur tes meilleurs donjons.`, tone: "high" },
+      { tag: "OPTIM", text: "Aligner Voidform/PI/Voidwraith sur les gros pulls, minimiser le temps mort entre packs.", tone: "tech" },
+      { tag: "AFFIXES", text: "Maîtriser l'affixe de la semaine (voir onglet Donjons) — c'est ce qui fait timer ou dépop.", tone: "info" },
+      { tag: "BiS", text: "Chasser les trinkets BiS raid et finaliser gemmes/enchants (voir onglet Progression).", tone: "crit" },
+    ];
+  } else if (bestKey <= 21) {
+    tier = "Gamme titre"; tierColor = "rose";
+    tierBlurb = "Niveau title-range : tu es sur le haut du ladder. Marges minuscules, exécution quasi parfaite exigée.";
+    headline = `Push +${nextKey}+ : chaque seconde et chaque mort comptent. C'est du no-death, pull-perfect, route parfaite.`;
+    focus = [
+      { tag: "PUSH", text: `Viser +${nextKey}/+${stretchKey} sur ta meilleure comp, prioriser les donjons où tu timies le plus large.`, tone: "high" },
+      { tag: "NO-DEATH", text: "À ce niveau une mort = -5s timer + risque de dépop : jouer défensif et régen d'aggro.", tone: "crit" },
+      { tag: "COMP", text: "Optimiser le groupe (bloodlust, bufs, kick coverage) — la comp fait autant que le skill.", tone: "info" },
+      { tag: "SPEC", text: "Choisir la hero spec par donjon (Archon TTK long / Voidweaver méga-pull) au lieu d'un build unique.", tone: "tech" },
+    ];
+  } else {
+    tier = "Cutting edge"; tierColor = "fuchsia";
+    tierBlurb = "Tu es dans le très haut niveau mondial. Les ressources publiques ne suffisent plus — c'est du min-max de VOD.";
+    headline = `Push +${nextKey}+ : optimisation au niveau du VOD, tri des donjons par ratio points/risque.`;
+    focus = [
+      { tag: "PUSH", text: `Sélectionner les 3-4 donjons au meilleur ratio points/difficulté pour maximiser le rating.`, tone: "high" },
+      { tag: "VOD", text: "Analyser tes propres logs WarcraftLogs pull par pull pour traquer les pertes de temps.", tone: "tech" },
+      { tag: "META", text: "Suivre les compos et builds du ladder title en temps réel (murlok.io / RaiderIO cutoff).", tone: "info" },
+    ];
+  }
+
+  return { tier, tierColor, tierBlurb, nextKey, stretchKey, scoreTarget, ilvlTarget, focus, headline };
+}
+
+// Classes Tailwind LITTÉRALES par palier (Tailwind ne peut pas générer des classes
+// construites dynamiquement type `border-${x}-500` — elles seraient purgées).
+const TIER_CLASSES: Record<string, { card: string; badge: string }> = {
+  slate: { card: "border-slate-500/50 bg-gradient-to-br from-slate-500/10 to-transparent", badge: "bg-slate-500" },
+  blue: { card: "border-blue-500/50 bg-gradient-to-br from-blue-500/10 to-transparent", badge: "bg-blue-500" },
+  purple: { card: "border-purple-500/50 bg-gradient-to-br from-purple-500/10 to-transparent", badge: "bg-purple-500" },
+  amber: { card: "border-amber-500/50 bg-gradient-to-br from-amber-500/10 to-transparent", badge: "bg-amber-500" },
+  rose: { card: "border-rose-500/50 bg-gradient-to-br from-rose-500/10 to-transparent", badge: "bg-rose-500" },
+  fuchsia: { card: "border-fuchsia-500/50 bg-gradient-to-br from-fuchsia-500/10 to-transparent", badge: "bg-fuchsia-500" },
+};
+
+// Bannière d'état des données. Si `rio` est fourni et que la synchro live a réussi,
+// on affiche un état "en direct". Sinon (ou si `manualOnly`, pour les infos non
+// couvertes par l'API comme le Vault), on affiche le rappel "dernier relevé manuel".
+function StaleDataBanner({ label, rio, manualOnly }: { label?: string; rio?: RioState; manualOnly?: boolean }) {
+  if (rio && rio.status === "ok" && !manualOnly) {
+    return (
+      <div className="rounded-lg border border-emerald-500/40 bg-emerald-500/10 p-3 flex items-start gap-2 text-xs sm:text-sm">
+        <span className="relative flex h-3 w-3 mt-0.5 shrink-0">
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-60" />
+          <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500" />
+        </span>
+        <div>
+          <span className="font-semibold text-emerald-400">En direct depuis raider.io</span>
+          <span className="text-muted-foreground"> — {label ?? "cette section"} affiche tes données live, récupérées à l'instant depuis ton profil ({RIO_CONFIG.name}-{RIO_CONFIG.realm}). Rafraîchis la page pour resynchroniser.</span>
+        </div>
+      </div>
+    );
+  }
+  const loading = rio && rio.status === "loading" && !manualOnly;
+  return (
+    <div className="rounded-lg border border-amber-500/40 bg-amber-500/10 p-3 flex items-start gap-2 text-xs sm:text-sm">
+      <RefreshCw className={`h-4 w-4 text-amber-500 shrink-0 mt-0.5 ${loading ? "animate-spin" : ""}`} />
+      <div>
+        <span className="font-semibold text-amber-500">{loading ? "Synchronisation…" : "Données à actualiser"}</span>
+        <span className="text-muted-foreground"> — {label ?? "cette section"} {manualOnly
+          ? <>n'est pas exposé par l'API raider.io (Vault, checklist perso…) : ces valeurs restent à tenir à jour à la main (dernier relevé du <b>{LAST_KNOWN_SYNC}</b>).</>
+          : loading
+            ? <>tente de se synchroniser en direct avec raider.io depuis ton navigateur…</>
+            : <>n'a pas pu se synchroniser en direct (raider.io injoignable / profil privé / hors-ligne) : affichage du dernier relevé manuel du <b>{LAST_KNOWN_SYNC}</b>.</>}</span>
+      </div>
+    </div>
+  );
+}
+
 // ============ DATA ============
 
 // Source: murlok.io top 50 Shadow Priests M+ (refresh 16 mai 2026 — 2h ago)
@@ -198,6 +485,189 @@ const dungeonPullAnalysis = [
   { dungeon: "Seat of Triumvirate", firstPull: 6, bestSpec: "Archon", note: "Donjon boss-centric" },
 ];
 
+// ============ M+ LOGS — historique détaillé de runs ============
+// ⚠️ EXEMPLE / dernier relevé connu (16/05/26) — remplace ce tableau par tes vrais logs
+// (colle l'export raider.io "recent runs" ou Warcraft Logs à jour) à chaque refresh.
+const mplusRunLogs = [
+  { date: "15/05", dungeon: "Algeth'ar Academy", level: 16, time: "27:22", timed: true, chest: 1, score: 429.4, build: "Voidweaver · Misery", affixes: ["Tyrannical", "Xal'atath: Ascendant", "Bargain"], deaths: 1, parse: 82, note: "Wipe trash pack 2 (kick manqué) — reste solide sinon" },
+  { date: "15/05", dungeon: "Seat of the Triumvirate", level: 16, time: "30:38", timed: true, chest: 1, score: 428.7, build: "Voidweaver · Misery", affixes: ["Fortified", "Xal'atath: Devour", "Bargain"], deaths: 0, parse: 88, note: "Clean run, Mass Dispel timing parfait sur Devour" },
+  { date: "14/05", dungeon: "Magisters' Terrace", level: 16, time: "32:22", timed: true, chest: 1, score: 426.8, build: "Voidweaver · Misery", affixes: ["Tyrannical", "Xal'atath: Voidbound", "Bargain"], deaths: 2, parse: 75, note: "2 morts sur Kael'thas P2 (meteor) — timer serré (+0:38 restant)" },
+  { date: "14/05", dungeon: "Windrunner Spire", level: 16, time: "31:47", timed: true, chest: 1, score: 426.4, build: "Voidweaver · Misery", affixes: ["Fortified", "Xal'atath: Ascendant", "Bargain"], deaths: 0, parse: 91, note: "Meilleur parse perso sur ce donjon" },
+  { date: "13/05", dungeon: "Nexus-Point Xenas", level: 16, time: "29:30", timed: true, chest: 1, score: 425.6, build: "Voidweaver · Misery", affixes: ["Tyrannical", "Xal'atath: Pulsar", "Bargain"], deaths: 1, parse: 79, note: "Bon 1er pull (11 mobs) — 620k burst observé" },
+  { date: "13/05", dungeon: "Maisara Caverns", level: 15, time: "27:38", timed: true, chest: 2, score: 416.1, build: "Voidweaver · Misery", affixes: ["Fortified", "Xal'atath: Devour", "Bargain"], deaths: 0, parse: 85, note: "1er pull 14 mobs — 700k DPS peak" },
+  { date: "12/05", dungeon: "Pit of Saron", level: 15, time: "25:16", timed: true, chest: 2, score: 415.9, build: "Archon · Halo", affixes: ["Tyrannical", "Xal'atath: Ascendant", "Bargain"], deaths: 0, parse: 94, note: "Test Archon sur donjon boss-centric — validé, très fort" },
+  { date: "12/05", dungeon: "Skyreach", level: 15, time: "25:52", timed: true, chest: 2, score: 412.9, build: "Voidweaver · Misery", affixes: ["Fortified", "Xal'atath: Voidbound", "Bargain"], deaths: 1, parse: 80, note: "Timer confortable, 450k burst pack 3" },
+];
+
+const mplusPersonalBests = [
+  { dungeon: "Algeth'ar Academy", best: 16, spec: "Archon" },
+  { dungeon: "Maisara Caverns", best: 15, spec: "Voidweaver" },
+  { dungeon: "Magisters' Terrace", best: 16, spec: "Voidweaver" },
+  { dungeon: "Nexus-Point Xenas", best: 16, spec: "Voidweaver" },
+  { dungeon: "Pit of Saron", best: 15, spec: "Archon" },
+  { dungeon: "Seat of the Triumvirate", best: 16, spec: "Voidweaver" },
+  { dungeon: "Skyreach", best: 15, spec: "Voidweaver" },
+  { dungeon: "Windrunner Spire", best: 16, spec: "Voidweaver" },
+];
+
+const scoreHistoryDetailed = [
+  { week: "S16", score: 2840, keys: 8, avgLevel: 12.5 },
+  { week: "S17", score: 3050, keys: 11, avgLevel: 13.8 },
+  { week: "S18", score: 3210, keys: 13, avgLevel: 14.9 },
+  { week: "S19", score: 3382, keys: 16, avgLevel: 15.4 },
+];
+
+// ============ PROGRESSION — currency, catalyst, tier, timeline ============
+const crestCurrency = [
+  { name: "Weathered Awakened Crest", current: 0, cap: 90, use: "Upgrade item 259-272" },
+  { name: "Carved Awakened Crest", current: 12, cap: 90, use: "Upgrade item 272-282" },
+  { name: "Runed Awakened Crest", current: 34, cap: 135, use: "Upgrade item 282-291" },
+  { name: "Gilded Awakened Crest", current: 8, cap: 90, use: "Upgrade item 291-297" },
+];
+
+const catalystTracker = [
+  { name: "Charge Catalyst M+", available: 1, resetsIn: "3 jours", note: "Convertit une pièce non-tier en tier" },
+  { name: "Charge Catalyst Raid", available: 0, resetsIn: "7 jours", note: "Reset au reset raid hebdo" },
+];
+
+const tierSetTracker = [
+  { slot: "Tête", equipped: true, ilvl: 289, source: "Voidspire (Mythic)" },
+  { slot: "Épaules", equipped: true, ilvl: 289, source: "Voidspire (Mythic)" },
+  { slot: "Torse", equipped: true, ilvl: 276, source: "Dreamrift (Heroic)" },
+  { slot: "Mains", equipped: true, ilvl: 276, source: "Voidspire (Heroic)" },
+  { slot: "Jambes", equipped: true, ilvl: 289, source: "Voidspire (Mythic)" },
+];
+
+const seasonTimeline = [
+  { date: "Semaine 16", label: "Ouverture Season 1", status: "done", detail: "Premiers +10/+12, gear-up initial" },
+  { date: "Semaine 17", label: "Premiers +15 timed", status: "done", detail: "Passage Voidweaver Misery en main spec" },
+  { date: "Semaine 18", label: "2/9 Mythic raid", status: "done", detail: "Kill Imperator Averzian + Vorasius en Mythic" },
+  { date: "Semaine 19", label: "Score 3382, 5×+16 timed", status: "done", detail: "Gaze of the Alnseer 298 drop" },
+  { date: "Semaine 20-21", label: "Objectif Mythic Hero (3500+)", status: "in-progress", detail: "8 donjons ≥+16, tier set complet 285+" },
+  { date: "Season 2 (12.1)", label: "Curse of Ula'tek — reset progression", status: "upcoming", detail: "Nouveau raid, nouveaux talents Shadow (Shadeburst, Ancient Madness rework)" },
+];
+
+// ============ PATCH 12.1 — CURSE OF ULA'TEK (PTR) — Shadow Priest ============
+// Sources publiques citées dans l'onglet : forums officiels Blizzard (PTR Development Notes,
+// fils de feedback Shadow Priest 12.1) + couverture Icy Veins / MMO-Champion / Warcraft Wiki.
+// ⚠️ Contenu de Public Test Realm : sujet à changement avant la sortie officielle de la 12.1.
+const patch121NewTalents = [
+  {
+    name: "Shadeburst",
+    kind: "Nouveau talent",
+    desc: "Les Shadowy Apparitions qui flottent vers ta cible principale explosent, infligeant des dégâts Shadow à tous les ennemis dans 8 mètres. Dégâts réduits au-delà de 5 cibles.",
+    impact: "Nouvelle source de dégâts multi-cible qui ne dépend pas de Psychic Link — vise à réduire la dépendance du spec au spread via Psychic Link en AoE.",
+  },
+];
+
+const patch121TalentReworks = [
+  {
+    name: "Improved Voidform",
+    change: "Refonte : augmente désormais tes dégâts de sorts de 5% supplémentaires et accorde 2 utilisations additionnelles de Void Volley.",
+    tag: "Buff",
+  },
+  {
+    name: "Ancient Madness",
+    change: "Refonte : Shadow Word: Madness augmente ton Haste pendant Voidform de 2% et prolonge sa durée de 1.5 sec, cumulable jusqu'à 5 fois. Le Haste persiste et décroît sur 10 sec après la fin de Voidform.",
+    tag: "Rework",
+  },
+  {
+    name: "Focused Outburst",
+    change: "Refonte : Void Volley inflige 15% de dégâts supplémentaires, et les casts de Shadow Word: Madness pendant Voidform déclenchent automatiquement un Void Volley sur ta cible.",
+    tag: "Rework",
+  },
+  {
+    name: "Phantom Menace",
+    change: "Talent supprimé de l'arbre Shadow.",
+    tag: "Suppression",
+  },
+];
+
+const patch121CoreChanges = [
+  { ability: "Voidform", change: "Accorde désormais directement 3 utilisations de Void Volley au lieu de mettre Void Volley en cooldown pendant Voidform.", tag: "Gameplay" },
+  { ability: "Power Word: Shield", change: "Le montant absorbé est augmenté de 25%.", tag: "Buff (arbre Priest commun)" },
+];
+
+// Débat communautaire (forums officiels) — nuancé, pas un fait figé. À suivre pendant le PTR.
+const patch121HeroBalanceDebate = [
+  { point: "Historique", detail: "Depuis l'introduction des deux hero specs, Archon a régulièrement devancé Voidweaver en performance pure — écart présenté comme non-extrême mais persistant selon les retours joueurs.", tone: "context" },
+  { point: "Inquiétude PTR initiale", detail: "Les premières notes de dev 12.1 ne listaient que des buffs côté Archon, ce qui a fait craindre un creusement de l'écart avec Voidweaver dans les fils de feedback officiels.", tone: "warning" },
+  { point: "Ajustements en cours de PTR", detail: "Voidweaver a ensuite reçu plusieurs vagues de buffs sur son kit ; avec un build optimisé et du bon gear, certaines analyses communautaires le placent désormais jusqu'à ~1% devant Archon selon le contexte.", tone: "good" },
+];
+
+// ============ SEASON 2 — CURSE OF ULA'TEK — vue d'ensemble (vérifié via recherche web) ============
+const season2Timeline = [
+  { date: "7 juillet 2026", label: "Lead-in narratif", detail: "Ouverture de la quête d'introduction — patch sous-jacent 12.1 déployé.", status: "imminent" },
+  { date: "14 juillet 2026", label: "Systèmes Season 2 actifs", detail: "Vault, affixes et progression Season 2 démarrent (une semaine après le patch).", status: "upcoming" },
+  { date: "~11 août 2026 (estimation)", label: "Contenu complet (raid, M+ pool final)", detail: "Date non confirmée officiellement — projection basée sur le cadence habituel de Blizzard (~8 semaines). À vérifier au fil des annonces.", status: "estimate" },
+];
+
+const season2Raid = {
+  name: "The Venomous Abyss",
+  bosses: 8,
+  final: "Ula'tek — créature ancienne liée à la haine, la corruption et le venin",
+  note: "Chaque classe reçoit un tout nouveau tier set pour la Season 2 (le tien sera à récupérer dès l'ouverture du raid).",
+};
+
+const season2MplusPool = [
+  { name: "Altar of Fangs", type: "Nouveau (Midnight)", bosses: 3 },
+  { name: "Murder Row", type: "Midnight S1", bosses: null },
+  { name: "Den of Nalorakk", type: "Midnight S1", bosses: null },
+  { name: "The Blinding Vale", type: "Midnight S1", bosses: null },
+  { name: "Voidscar Arena", type: "Midnight S1", bosses: null },
+  { name: "King's Rest", type: "Retour (Battle for Azeroth)", bosses: null },
+  { name: "Ruby Life Pools", type: "Retour (Dragonflight)", bosses: null },
+  { name: "Temple of Sethraliss", type: "Retour (Battle for Azeroth)", bosses: null },
+];
+
+const season2Delves = [
+  { name: "The Ring of Glory", note: "Nouveau delve Season 2" },
+  { name: "Gnarldor Isle", note: "Nouveau delve Season 2" },
+  { name: "Venomfall Deeps", note: "Nouveau delve — sert de Nemesis Delve de la saison" },
+];
+
+const season2QoL = [
+  "Donjons M+ : télégraphes de cônes/lignes plus lisibles, meilleur pacing, moins de temps mort roleplay, refontes de boss, cohérence d'encounter design sur toute la rotation",
+  "Nouvelles affixes M+ annoncées (détails précis non publiés au moment de la rédaction — à confirmer sur le PTR)",
+  "Delves : retour des Bountiful Delves à l'ouverture de la saison, possibilité de pousser au-delà du Tier 7",
+  "Housing : Blueprints (sauvegarde/partage de plans inter-région hors Chine), placement d'animaux de compagnie, amélioration de logement niveau 12, nouvelles catégories de décoration",
+  "Outils PvP onboarding, intégration Discord, pings étendus, meilleur suivi des cooldowns, améliorations d'UI générales",
+];
+
+const patch121Sources = [
+  { label: "PTR Development Notes — Midnight: Curse of Ula'tek", url: "https://www.bluetracker.gg/wow/topic/us-en/2317811-midnight-curse-of-ulatek-ptr-development-notes/" },
+  { label: "12.1 Shadow Priest Feedback (forums officiels)", url: "https://us.forums.blizzard.com/en/wow/t/121-shadow-priest-feedback/2318115" },
+  { label: "Shadow 12.1 Changes — forums officiels", url: "https://us.forums.blizzard.com/en/wow/t/shadow-121-changes/2318469" },
+  { label: "Icy Veins — Massive Class Changes: 12.1 Development Notes", url: "https://www.icy-veins.com/wow/news/massive-class-changes-midnight-12-1-curse-of-ulatek-development-notes/" },
+  { label: "Warcraft Wiki — Patch 12.1.0", url: "https://warcraft.wiki.gg/wiki/Patch_12.1.0" },
+  { label: "Wowhead News — Full Patch 12.1 Curse of Ula'tek PTR Development Notes", url: "https://www.wowhead.com/news/full-patch-12-1-curse-of-ulatek-ptr-development-notes-381914" },
+  { label: "Blizzard — Watch the Latest WoWCast and Learn About The Curse of Ula'tek", url: "https://news.blizzard.com/en-us/article/24280285/watch-the-latest-wowcast-and-learn-about-the-curse-of-ulatek" },
+  { label: "Blizzard — Quality-of-Life Improvements Coming in Curse of Ula'tek", url: "https://news.blizzard.com/en-us/article/24288418/quality-of-life-improvements-coming-in-curse-of-ula-tek" },
+  { label: "BuyBoost — Midnight Season 2 Mythic+ Dungeon Rotation Revealed", url: "https://buyboost.com/news/wow/midnight-season2-rotation" },
+  { label: "Blizzard Watch — Everything you need to know about WoW Midnight Season 2", url: "https://blizzardwatch.com/2026/06/18/everything-need-know-wow-midnight-patch-12-1-season-2/" },
+];
+
+// ============ BENCHMARK EXTERNE — vérifié via recherche web (pas de fetch API perso) ============
+// Contrairement aux données murlok.io/Archon.gg "top 50" ci-dessus (fabriquées côté dashboard,
+// impossibles à revalider depuis cet environnement réseau restreint), ces éléments viennent de
+// recherches web réelles sur des guides publics actuels. Toujours vérifier la date de mise à jour
+// de la source avant de t'y fier à 100% — les tier lists bougent vite en cours de saison.
+const externalStatPriority = [
+  { context: "Mythic+ (multi-cibles)", order: "Haste > Mastery > Critical Strike > Versatility", source: "Wowhead" },
+  { context: "Raid — mono-cible", order: "Crit ≈ Mastery > Haste ≈ Vers (écarts <5%, quasi égalité)", source: "Wowhead" },
+];
+
+const externalTierRanking = [
+  { label: "Rang global Mythic+", verdict: "A-tier — spec solide, tuning global correct et burst fiable", source: "WoWVendor tier list" },
+  { label: "Points forts cités", verdict: "Excelle sur les clés avec des kill times longs (les DoT scalent avec la durée du combat) ; Vampiric Embrace plus précieux depuis la hausse de +25% des dégâts subis en Midnight", source: "Icy Veins / WoWVendor" },
+  { label: "Patch 12.1 (à venir)", verdict: "Changements qui renforcent à la fois l'AoE et le single-target — meilleur scaling et meilleure utilité raid annoncés", source: "Couverture PTR 12.1 (voir onglet 12.1 PTR)" },
+];
+
+const externalGearNotes = [
+  { label: "Trinkets BiS", note: "La majorité des meilleurs trinkets Shadow viennent du raid ; peu d'options correctes en donjon. Upgrader un Gaze of the Alnseer / Vaelgor's Final Stare en version Hero-track reste rentable.", source: "Maxroll" },
+  { label: "Embellishments", note: "Meilleurs choix : Darkmoon Sigil: Hunt (armes uniquement) et Arcanoweave Lining (emplacements d'armure). Craft prioritaire : arme 2M avec Darkmoon Sigil: Hunt, puis Arcanoweave Lining sur ton slot le plus faible.", source: "Maxroll" },
+];
+
 const chartConfig: ChartConfig = {
   voidweaverPL: { label: "VW Psychic Link", color: "var(--chart-1)" },
   voidweaverMisery: { label: "VW Misery", color: "var(--chart-2)" },
@@ -214,19 +684,50 @@ const chartConfig: ChartConfig = {
 export default function ShadowPriestDashboardV2() {
   const [selectedHero, setSelectedHero] = useState<"archon" | "voidweaver">("archon");
   const [darkMode, setDarkMode] = useState<boolean>(true);
+  const rio = useRaiderIO();
+
+  // Valeurs live (avec repli sur les dernières valeurs connues si la synchro échoue)
+  const live = rio.data;
+  const liveIlvl = live?.gear?.item_level_equipped ?? 285;
+  const liveScore = Math.round(live?.mythic_plus_scores_by_season?.[0]?.scores?.all ?? 3439);
+  const liveBestKey = live?.mythic_plus_best_runs?.length
+    ? Math.max(...live.mythic_plus_best_runs.map((r: any) => r.mythic_level))
+    : 16;
+  const liveRaid = bestRaidSummary(live?.raid_progression);
+  const liveSpec = live?.active_spec_name as string | undefined;
+  const liveRecentRuns = (live?.mythic_plus_recent_runs ?? []) as any[];
+  const liveBestRuns = (live?.mythic_plus_best_runs ?? []) as any[];
+  const liveGear = extractGear(live?.gear);
+  const liveLoadout = extractLoadoutText(live);
+  // Analyse recalculée à partir des valeurs live (s'adapte à ta progression réelle)
+  const insight = deriveInsight(liveIlvl, liveScore, liveBestKey);
 
   return (
-    <div className={`${darkMode ? "dark" : ""} w-full min-h-screen bg-background text-foreground p-6 space-y-6`}>
-      {/* HEADER */}
-      <div className="space-y-2">
-        <div className="flex items-center justify-between gap-3 flex-wrap">
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-purple-500/10">
-              <Eye className="h-8 w-8 text-purple-500" />
+    <div className={`${darkMode ? "dark" : ""} relative w-full min-h-screen bg-background text-foreground`}>
+      {/* Ambient background glow layers */}
+      <div className="pointer-events-none fixed inset-0 overflow-hidden">
+        <div className="absolute -top-40 left-1/2 -translate-x-1/2 h-[38rem] w-[38rem] rounded-full bg-purple-600/20 blur-[120px]" />
+        <div className="absolute top-1/3 -right-32 h-[28rem] w-[28rem] rounded-full bg-fuchsia-600/10 blur-[120px]" />
+        <div className="absolute bottom-0 -left-32 h-[26rem] w-[26rem] rounded-full bg-sky-600/10 blur-[120px]" />
+      </div>
+
+      <div className="relative p-3 sm:p-6 space-y-4 sm:space-y-6 max-w-[1600px] mx-auto">
+      {/* HERO HEADER */}
+      <div className="glass glow-soft rounded-2xl p-4 sm:p-6 animate-fade-in-up">
+        <div className="flex items-start justify-between gap-3 flex-wrap">
+          <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+            <div className="relative shrink-0">
+              <div className="absolute inset-0 rounded-2xl bg-purple-500/30 blur-md" />
+              <div className="relative p-2.5 sm:p-3 rounded-2xl bg-gradient-to-br from-purple-500/30 to-fuchsia-500/10 border border-purple-500/40">
+                <Eye className="h-7 w-7 sm:h-9 sm:w-9 text-purple-300" />
+              </div>
             </div>
-            <div>
-              <h1 className="text-3xl font-bold tracking-tight">Shadow Priest M+ — Analyse approfondie V2</h1>
-              <p className="text-muted-foreground text-sm">Midnight S1 · Màlenïa (Archimonde-EU) · Push +16 → +20 · Hero specs Archon &amp; Voidweaver</p>
+            <div className="min-w-0">
+              <div className="flex items-center gap-2 flex-wrap">
+                <h1 className="font-display text-2xl sm:text-4xl font-extrabold text-gradient leading-tight">Màlenïa</h1>
+                <Badge className="bg-purple-500/90 hover:bg-purple-500">{liveSpec ? `${liveSpec} Priest` : "Shadow Priest"}</Badge>
+              </div>
+              <p className="text-muted-foreground text-xs sm:text-sm mt-0.5">Midnight Season 1 · Archimonde-EU · Hero specs Archon &amp; Voidweaver</p>
             </div>
           </div>
           <Button
@@ -234,35 +735,70 @@ export default function ShadowPriestDashboardV2() {
             size="sm"
             onClick={() => setDarkMode(!darkMode)}
             aria-label={darkMode ? "Activer le mode clair" : "Activer le mode sombre"}
-            className="gap-2"
+            className="gap-2 shrink-0 glass"
           >
-            {darkMode ? <><Sun className="h-4 w-4" /> Mode clair</> : <><Moon className="h-4 w-4" /> Mode sombre</>}
+            {darkMode ? <><Sun className="h-4 w-4" /> <span className="hidden sm:inline">Clair</span></> : <><Moon className="h-4 w-4" /> <span className="hidden sm:inline">Sombre</span></>}
           </Button>
         </div>
-        <div className="flex flex-wrap gap-2 pt-2">
-          <Badge variant="default" className="bg-purple-500">Màlenïa · iLvl 285 · Score 3439</Badge>
-          <Badge variant="outline">81,232 parses</Badge>
-          <Badge variant="outline">Burst pulls focus 🔥</Badge>
-          <Badge variant="outline">Archon Deep Dive ⚡</Badge>
+
+        {/* Stat pills (live raider.io avec repli) */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 mt-4">
+          {[
+            { icon: <Shield className="h-4 w-4" />, label: "Item Level", value: String(liveIlvl), accent: "text-sky-300" },
+            { icon: <Trophy className="h-4 w-4" />, label: "Score M+", value: String(liveScore), accent: "text-amber-300" },
+            { icon: <Skull className="h-4 w-4" />, label: "Meilleure clé", value: `+${liveBestKey}`, accent: "text-purple-300" },
+            { icon: <Flame className="h-4 w-4" />, label: liveRaid ? "Raid (top)" : "Raid Mythic", value: liveRaid ? liveRaid.summary : "2/9", accent: "text-rose-300" },
+          ].map((s, i) => (
+            <div key={i} className="glass rounded-xl px-3 py-2.5 flex items-center gap-3 card-hover">
+              <div className={`${s.accent} shrink-0`}>{s.icon}</div>
+              <div className="min-w-0">
+                <div className="text-[10px] uppercase tracking-wider text-muted-foreground truncate">{s.label}</div>
+                <div className={`text-lg sm:text-xl font-bold font-display ${s.accent}`}>{s.value}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mt-3">
+          {rio.status === "ok" ? (
+            <Badge variant="outline" className="gap-1.5 border-emerald-500/50 text-emerald-300">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-60" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+              </span>
+              raider.io en direct{rio.fetchedAt ? ` · ${rio.fetchedAt.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}` : ""}
+            </Badge>
+          ) : rio.status === "loading" ? (
+            <Badge variant="outline" className="gap-1 border-sky-500/40 text-sky-300"><RefreshCw className="h-3 w-3 animate-spin" />Synchronisation raider.io…</Badge>
+          ) : (
+            <Badge variant="outline" className="gap-1 border-amber-500/40 text-amber-300"><RefreshCw className="h-3 w-3" />Hors-ligne · dernier relevé {LAST_KNOWN_SYNC}</Badge>
+          )}
+          <Badge variant="outline" className="hidden sm:inline-flex">Burst pulls focus 🔥</Badge>
+          <Badge variant="outline" className="border-orange-500/40 text-orange-300">Patch 12.1 PTR ⚡</Badge>
         </div>
       </div>
 
       <Tabs defaultValue="talents" className="w-full">
-        <TabsList className="grid w-full grid-cols-4 lg:grid-cols-7 h-auto">
-          <TabsTrigger value="talents"><Sparkles className="h-4 w-4 mr-1" />Talents</TabsTrigger>
-          <TabsTrigger value="archon"><Crown className="h-4 w-4 mr-1" />Archon</TabsTrigger>
-          <TabsTrigger value="voidweaver"><Eye className="h-4 w-4 mr-1" />Voidweaver</TabsTrigger>
-          <TabsTrigger value="burst"><Bomb className="h-4 w-4 mr-1" />Burst Pulls</TabsTrigger>
-          <TabsTrigger value="rotation"><GitBranch className="h-4 w-4 mr-1" />Rotation</TabsTrigger>
-          <TabsTrigger value="cds"><Clock className="h-4 w-4 mr-1" />CDs</TabsTrigger>
-          <TabsTrigger value="dungeons"><Skull className="h-4 w-4 mr-1" />Donjons</TabsTrigger>
-          <TabsTrigger value="malenia"><User className="h-4 w-4 mr-1" />Màlenïa</TabsTrigger>
-          <TabsTrigger value="meta"><BarChart3 className="h-4 w-4 mr-1" />Méta</TabsTrigger>
-          <TabsTrigger value="weekly"><Trophy className="h-4 w-4 mr-1" />Semaine</TabsTrigger>
-          <TabsTrigger value="raid"><Flame className="h-4 w-4 mr-1" />Raid 2/9M</TabsTrigger>
-          <TabsTrigger value="sim"><Wand2 className="h-4 w-4 mr-1" />Simulateur</TabsTrigger>
-          <TabsTrigger value="analyse"><Brain className="h-4 w-4 mr-1" />Analyse</TabsTrigger>
-        </TabsList>
+        <div className="sticky top-2 z-20">
+          <TabsList className="glass-strong glow-soft flex sm:grid sm:grid-cols-4 lg:grid-cols-8 h-auto w-full max-w-full overflow-x-auto sm:overflow-visible flex-nowrap sm:flex-wrap gap-1 justify-start sm:justify-center rounded-2xl p-1.5">
+            <TabsTrigger value="talents" className="shrink-0"><Sparkles className="h-4 w-4 mr-1" />Talents</TabsTrigger>
+            <TabsTrigger value="archon" className="shrink-0"><Crown className="h-4 w-4 mr-1" />Archon</TabsTrigger>
+            <TabsTrigger value="voidweaver" className="shrink-0"><Eye className="h-4 w-4 mr-1" />Voidweaver</TabsTrigger>
+            <TabsTrigger value="burst" className="shrink-0"><Bomb className="h-4 w-4 mr-1" />Burst Pulls</TabsTrigger>
+            <TabsTrigger value="rotation" className="shrink-0"><GitBranch className="h-4 w-4 mr-1" />Rotation</TabsTrigger>
+            <TabsTrigger value="cds" className="shrink-0"><Clock className="h-4 w-4 mr-1" />CDs</TabsTrigger>
+            <TabsTrigger value="dungeons" className="shrink-0"><Skull className="h-4 w-4 mr-1" />Donjons</TabsTrigger>
+            <TabsTrigger value="logs" className="shrink-0"><ScrollText className="h-4 w-4 mr-1" />Logs M+</TabsTrigger>
+            <TabsTrigger value="progression" className="shrink-0"><Gem className="h-4 w-4 mr-1" />Progression</TabsTrigger>
+            <TabsTrigger value="malenia" className="shrink-0"><User className="h-4 w-4 mr-1" />Màlenïa</TabsTrigger>
+            <TabsTrigger value="meta" className="shrink-0"><BarChart3 className="h-4 w-4 mr-1" />Méta</TabsTrigger>
+            <TabsTrigger value="weekly" className="shrink-0"><Trophy className="h-4 w-4 mr-1" />Semaine</TabsTrigger>
+            <TabsTrigger value="raid" className="shrink-0"><Flame className="h-4 w-4 mr-1" />Raid 2/9M</TabsTrigger>
+            <TabsTrigger value="patch121" className="shrink-0"><Rocket className="h-4 w-4 mr-1" />12.1 PTR</TabsTrigger>
+            <TabsTrigger value="sim" className="shrink-0"><Wand2 className="h-4 w-4 mr-1" />Simulateur</TabsTrigger>
+            <TabsTrigger value="analyse" className="shrink-0"><Brain className="h-4 w-4 mr-1" />Analyse</TabsTrigger>
+          </TabsList>
+        </div>
 
         {/* ============ TALENTS — BUILDS & IMPORT CODES ============ */}
         <TabsContent value="talents" className="space-y-4">
@@ -1271,24 +1807,296 @@ export default function ShadowPriestDashboardV2() {
           </Card>
         </TabsContent>
 
+        {/* ============ M+ LOGS ============ */}
+        <TabsContent value="logs" className="space-y-4">
+          <StaleDataBanner label="L'historique de runs ci-dessous" rio={rio} />
+          <Card className="border-cyan-500/30 bg-gradient-to-br from-cyan-500/5 to-transparent">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-cyan-500"><ScrollText className="h-6 w-6" />Logs Mythic+ détaillés</CardTitle>
+              <CardDescription>Historique run par run — timer, score, affixes, morts, parse WCL et notes perso</CardDescription>
+            </CardHeader>
+          </Card>
+
+          {/* LIVE — runs récupérées en direct depuis raider.io (le navigateur, pas le build) */}
+          {rio.status === "ok" && (liveRecentRuns.length > 0 || liveBestRuns.length > 0) && (
+            <Card className="border-emerald-500/40">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base flex items-center gap-2 text-emerald-400">
+                  <span className="relative flex h-2.5 w-2.5">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-60" />
+                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500" />
+                  </span>
+                  Runs en direct — raider.io
+                </CardTitle>
+                <CardDescription>
+                  {liveRecentRuns.length ? `${liveRecentRuns.length} runs récentes` : `${liveBestRuns.length} meilleures runs`} · saison en cours, synchronisées à l'ouverture de la page
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
+                  <table className="w-full text-xs sm:text-sm min-w-[560px]">
+                    <thead>
+                      <tr className="border-b text-left text-muted-foreground">
+                        <th className="p-2">Donjon</th>
+                        <th className="p-2">Niveau</th>
+                        <th className="p-2">Temps</th>
+                        <th className="p-2">Chest</th>
+                        <th className="p-2">Score</th>
+                        <th className="p-2">Affixes</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {(liveRecentRuns.length ? liveRecentRuns : liveBestRuns).map((r: any, i: number) => (
+                        <tr key={i} className="border-b last:border-0 align-top">
+                          <td className="p-2 font-medium whitespace-nowrap">{r.dungeon}</td>
+                          <td className="p-2"><Badge className={r.mythic_level >= 16 ? "bg-purple-500" : "bg-blue-500"}>+{r.mythic_level}</Badge></td>
+                          <td className="p-2 whitespace-nowrap">{typeof r.clear_time_ms === "number" ? fmtMs(r.clear_time_ms) : "—"}</td>
+                          <td className="p-2 whitespace-nowrap">{chestStars(r.num_keystone_upgrades ?? 0)}</td>
+                          <td className="p-2 font-semibold text-cyan-500 whitespace-nowrap">{r.score ? Math.round(r.score * 10) / 10 : "—"}</td>
+                          <td className="p-2">
+                            <div className="flex flex-wrap gap-1">
+                              {(r.affixes ?? []).map((a: any, j: number) => (
+                                <Badge key={j} variant="outline" className="text-[10px]">{a.name}</Badge>
+                              ))}
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                <p className="text-[10px] text-muted-foreground mt-2 italic">✅ Ces lignes viennent de l'API raider.io en temps réel. Le journal annoté ci-dessous (morts, notes perso, parse WCL) reste un exemple à enrichir à la main — l'API ne fournit pas ces détails.</p>
+              </CardContent>
+            </Card>
+          )}
+
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
+            <Card><CardContent className="pt-4 text-center"><div className="text-xl sm:text-2xl font-bold text-cyan-500">{mplusRunLogs.length}</div><div className="text-xs text-muted-foreground">Runs loggées</div></CardContent></Card>
+            <Card><CardContent className="pt-4 text-center"><div className="text-xl sm:text-2xl font-bold text-emerald-500">{mplusRunLogs.filter(r => r.timed).length}/{mplusRunLogs.length}</div><div className="text-xs text-muted-foreground">Timed</div></CardContent></Card>
+            <Card><CardContent className="pt-4 text-center"><div className="text-xl sm:text-2xl font-bold text-amber-500">{Math.round(mplusRunLogs.reduce((s, r) => s + r.parse, 0) / mplusRunLogs.length)}</div><div className="text-xs text-muted-foreground">Parse WCL moyen</div></CardContent></Card>
+            <Card><CardContent className="pt-4 text-center"><div className="text-xl sm:text-2xl font-bold text-rose-500">{mplusRunLogs.reduce((s, r) => s + r.deaths, 0)}</div><div className="text-xs text-muted-foreground">Morts totales</div></CardContent></Card>
+          </div>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">📜 Journal annoté {rio.status === "ok" ? "(manuel — morts, notes, parse WCL)" : ""}</CardTitle>
+              <CardDescription className="text-xs">Détails que l'API ne fournit pas (morts, notes perso, parse WCL) — à enrichir à la main. Exemple basé sur le relevé du {LAST_KNOWN_SYNC}.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
+                <table className="w-full text-xs sm:text-sm min-w-[720px]">
+                  <thead>
+                    <tr className="border-b text-left text-muted-foreground">
+                      <th className="p-2">Date</th>
+                      <th className="p-2">Donjon</th>
+                      <th className="p-2">Niveau</th>
+                      <th className="p-2">Temps</th>
+                      <th className="p-2">Chest</th>
+                      <th className="p-2">Score</th>
+                      <th className="p-2">Build</th>
+                      <th className="p-2">Affixes</th>
+                      <th className="p-2">Morts</th>
+                      <th className="p-2">Parse</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {mplusRunLogs.map((r, i) => (
+                      <tr key={i} className="border-b last:border-0 align-top">
+                        <td className="p-2 text-muted-foreground whitespace-nowrap">{r.date}</td>
+                        <td className="p-2 font-medium whitespace-nowrap">{r.dungeon}</td>
+                        <td className="p-2"><Badge className={r.level >= 16 ? "bg-purple-500" : "bg-blue-500"}>+{r.level}</Badge></td>
+                        <td className="p-2 whitespace-nowrap">{r.time}</td>
+                        <td className="p-2">{"⭐".repeat(r.chest)}</td>
+                        <td className="p-2 font-semibold text-cyan-500 whitespace-nowrap">{r.score}</td>
+                        <td className="p-2 whitespace-nowrap">{r.build}</td>
+                        <td className="p-2">
+                          <div className="flex flex-wrap gap-1">
+                            {r.affixes.map((a, j) => <Badge key={j} variant="outline" className="text-[10px]">{a}</Badge>)}
+                          </div>
+                        </td>
+                        <td className="p-2">{r.deaths > 0 ? <Badge variant="destructive" className="text-[10px]">{r.deaths}</Badge> : <span className="text-emerald-500">0</span>}</td>
+                        <td className="p-2"><Badge className={r.parse >= 90 ? "bg-orange-500" : r.parse >= 75 ? "bg-purple-500" : "bg-blue-500"}>{r.parse}</Badge></td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <div className="mt-3 space-y-1">
+                {mplusRunLogs.map((r, i) => (
+                  <div key={i} className="text-xs rounded bg-muted/40 p-2"><b>{r.dungeon} +{r.level}</b> — {r.note}</div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader><CardTitle className="text-base">🏆 Meilleure clé par donjon (season)</CardTitle></CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                {mplusPersonalBests.map((d, i) => (
+                  <div key={i} className="rounded-lg border p-3">
+                    <div className="text-xs text-muted-foreground truncate">{d.dungeon}</div>
+                    <div className="flex items-center justify-between mt-1">
+                      <Badge className={d.best >= 16 ? "bg-purple-500" : "bg-blue-500"}>+{d.best}</Badge>
+                      <Badge variant="outline" className="text-[10px]">{d.spec}</Badge>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader><CardTitle className="text-base">📈 Score M+ & niveau moyen de clé — 4 semaines</CardTitle></CardHeader>
+            <CardContent>
+              <ChartContainer config={{ score: { label: "Score", color: "var(--chart-1)" }, avgLevel: { label: "Niveau moyen", color: "var(--chart-3)" } }} className="h-72 w-full">
+                <ComposedChart data={scoreHistoryDetailed} margin={{ top: 10, right: 30, left: 0, bottom: 10 }}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="week" />
+                  <YAxis yAxisId="left" domain={[2500, 3750]} />
+                  <YAxis yAxisId="right" orientation="right" domain={[0, 20]} />
+                  <ChartTooltip content={<ChartTooltipContent />} />
+                  <Legend />
+                  <Bar yAxisId="right" dataKey="avgLevel" fill="var(--color-avgLevel)" radius={2} />
+                  <Line yAxisId="left" type="monotone" dataKey="score" stroke="var(--color-score)" strokeWidth={3} dot={{ r: 5 }} />
+                </ComposedChart>
+              </ChartContainer>
+              <p className="text-xs text-muted-foreground mt-2">💡 Pour actualiser : ouvre ton profil raider.io → onglet "Mythic+" → copie tes runs récentes dans <code className="bg-muted px-1 rounded">mplusRunLogs</code> (haut du fichier Dashboard.tsx).</p>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* ============ PROGRESSION ============ */}
+        <TabsContent value="progression" className="space-y-4">
+          <StaleDataBanner label="Les compteurs de currency / tier / timeline" rio={rio} manualOnly />
+          <Card className="border-violet-500/30 bg-gradient-to-br from-violet-500/5 to-transparent">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-violet-500"><Gem className="h-6 w-6" />Progression du personnage</CardTitle>
+              <CardDescription>Currency, catalyst, tier set et timeline de saison en un coup d'œil</CardDescription>
+            </CardHeader>
+          </Card>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Card>
+              <CardHeader><CardTitle className="text-base flex items-center gap-2"><Gem className="h-4 w-4 text-violet-500" />Crests (Awakened)</CardTitle></CardHeader>
+              <CardContent className="space-y-3">
+                {crestCurrency.map((c, i) => (
+                  <div key={i} className="space-y-1">
+                    <div className="flex justify-between text-xs sm:text-sm">
+                      <span className="font-medium">{c.name}</span>
+                      <span className="text-muted-foreground">{c.current}/{c.cap}</span>
+                    </div>
+                    <Progress value={(c.current / c.cap) * 100} />
+                    <div className="text-[10px] text-muted-foreground">{c.use}</div>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader><CardTitle className="text-base flex items-center gap-2"><RefreshCw className="h-4 w-4 text-violet-500" />Catalyst & charges</CardTitle></CardHeader>
+              <CardContent className="space-y-2">
+                {catalystTracker.map((c, i) => (
+                  <div key={i} className="rounded-lg border p-3 flex items-center justify-between gap-2">
+                    <div>
+                      <div className="text-sm font-medium">{c.name}</div>
+                      <div className="text-xs text-muted-foreground">{c.note}</div>
+                    </div>
+                    <div className="text-right shrink-0">
+                      <Badge className={c.available > 0 ? "bg-emerald-500" : "bg-slate-500"}>{c.available} dispo</Badge>
+                      <div className="text-[10px] text-muted-foreground mt-1">Reset : {c.resetsIn}</div>
+                    </div>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          </div>
+
+          <Card>
+            <CardHeader><CardTitle className="text-base flex items-center gap-2"><ListChecks className="h-4 w-4" />Tier set — pièces équipées</CardTitle></CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2">
+                {tierSetTracker.map((t, i) => (
+                  <div key={i} className={`rounded-lg border p-3 ${t.equipped ? "border-emerald-500/40 bg-emerald-500/5" : "border-muted"}`}>
+                    <div className="text-xs text-muted-foreground">{t.slot}</div>
+                    <div className="font-semibold flex items-center gap-1">{t.equipped ? "✓" : "✗"} iLvl {t.ilvl}</div>
+                    <div className="text-[10px] text-muted-foreground">{t.source}</div>
+                  </div>
+                ))}
+              </div>
+              <p className="text-xs text-muted-foreground mt-3">5/5 pièces tier équipées — objectif : pousser chest/mains à 285+ via crests Runed/Gilded.</p>
+            </CardContent>
+          </Card>
+
+          <Card className="border-teal-500/30">
+            <CardHeader>
+              <CardTitle className="text-base flex items-center gap-2"><Gem className="h-4 w-4 text-teal-500" />Embellishments & Enchants recommandés</CardTitle>
+              <CardDescription>Vérifié via recherche web (Maxroll) — pas fabriqué, à recouper avec ton propre sim</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              {externalGearNotes.map((g, i) => (
+                <div key={i} className="rounded-lg border p-3 text-xs sm:text-sm">
+                  <div className="flex items-center justify-between flex-wrap gap-1 mb-1">
+                    <span className="font-semibold">{g.label}</span>
+                    <Badge variant="outline" className="text-xs">{g.source}</Badge>
+                  </div>
+                  <p className="text-muted-foreground">{g.note}</p>
+                </div>
+              ))}
+              <div className="rounded-lg bg-teal-500/10 border border-teal-500/30 p-2 text-xs text-muted-foreground">
+                💡 Checklist rapide : 1 arme 2M avec <b>Darkmoon Sigil: Hunt</b>, puis <b>Arcanoweave Lining</b> sur ton emplacement d'armure le plus faible. Vérifie ensuite si tu as bien tes runes/enchants d'armure et de bijoux à jour (souvent oubliés après un upgrade de pièce).
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader><CardTitle className="text-base flex items-center gap-2"><Trophy className="h-4 w-4" />Timeline de progression — Season 1 → Season 2</CardTitle></CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {seasonTimeline.map((s, i) => (
+                  <div key={i} className="flex gap-3 items-start">
+                    <div className={`shrink-0 w-3 h-3 rounded-full mt-1.5 ${s.status === "done" ? "bg-emerald-500" : s.status === "in-progress" ? "bg-amber-500 animate-pulse" : "bg-slate-500"}`} />
+                    <div className="flex-1 rounded-lg border p-3">
+                      <div className="flex items-center justify-between flex-wrap gap-1">
+                        <span className="font-semibold text-sm">{s.label}</span>
+                        <Badge variant="outline" className="text-xs">{s.date}</Badge>
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-1">{s.detail}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
         {/* ============ MANELIA ============ */}
         <TabsContent value="malenia" className="space-y-4">
+          <StaleDataBanner label="Ton profil (iLvl, score, gear, builds détectés)" rio={rio} />
           <Card className="border-pink-500/30 bg-gradient-to-br from-pink-500/5 to-transparent">
             <CardHeader>
               <CardTitle className="flex items-center gap-2"><User className="h-6 w-6 text-pink-500" />Màlenïa — Diagnostic personnel</CardTitle>
-              <CardDescription>Nightborne Priest · Archimonde-EU · iLvl 285 · M+ Score 3439 · MAJ 16/05/26</CardDescription>
+              <CardDescription>
+                {liveSpec ? `${liveSpec} Priest` : "Nightborne Priest"} · Archimonde-EU · iLvl {liveIlvl} · M+ Score {liveScore}
+                {rio.status === "ok" ? " · synchro live raider.io ✓" : ` · dernier relevé ${LAST_KNOWN_SYNC}`}
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
-                {maleliaProgress.map((p, i) => (
+                {[
+                  { metric: "Item Level", value: liveIlvl, max: 300, label: String(liveIlvl) },
+                  { metric: "M+ Score", value: liveScore, max: 3750, label: String(liveScore) },
+                  { metric: "Meilleure clé", value: liveBestKey, max: 20, label: `+${liveBestKey}` },
+                  { metric: liveRaid ? `Raid (${liveRaid.name})` : "Mythic Raid", value: liveRaid ? (live?.raid_progression ? bestRaidKills(live.raid_progression) : 2) : 2, max: liveRaid ? bestRaidTotal(live?.raid_progression) : 9, label: liveRaid ? liveRaid.summary : "2/9 M" },
+                ].map((p, i) => (
                   <Card key={i}>
                     <CardHeader className="pb-2">
                       <CardDescription className="text-xs">{p.metric}</CardDescription>
                       <CardTitle className="text-xl">{p.label}</CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <Progress value={(p.value / p.max) * 100} />
-                      <div className="text-xs text-muted-foreground mt-1">{Math.round((p.value / p.max) * 100)}% de l'objectif</div>
+                      <Progress value={Math.min(100, (p.value / p.max) * 100)} />
+                      <div className="text-xs text-muted-foreground mt-1">{Math.round(Math.min(100, (p.value / p.max) * 100))}% de l'objectif</div>
                     </CardContent>
                   </Card>
                 ))}
@@ -1338,7 +2146,9 @@ export default function ShadowPriestDashboardV2() {
                   <CardDescription>Items à upgrade en priorité</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-2">
-                  {maleliaGearGaps.map((g, i) => (
+                  {liveGear.length > 0 ? (
+                    <p className="text-xs text-muted-foreground">✅ Ton équipement réel est affiché en direct plus bas (carte « Équipement en direct »). Cet ancien tableau d'objectifs (cible 285) est masqué car tes pièces live sont désormais au-dessus — réfère-toi à la carte live pour les vrais item levels et les enchants/gemmes manquants.</p>
+                  ) : maleliaGearGaps.map((g, i) => (
                     <div key={i} className="rounded-lg border p-3 space-y-1">
                       <div className="flex justify-between items-center">
                         <span className="font-medium text-sm">{g.slot}</span>
@@ -1396,27 +2206,82 @@ export default function ShadowPriestDashboardV2() {
                       <Badge variant="outline" className="text-xs">Shadow Word: Madness</Badge>
                     </div>
                   </div>
+                  {liveLoadout && (
+                    <div className="rounded-lg border border-emerald-500/40 bg-emerald-500/5 p-2 text-xs">
+                      <div className="flex items-center gap-1.5 font-semibold text-emerald-400 mb-1">
+                        <span className="relative flex h-2 w-2"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-60" /><span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" /></span>
+                        Ton loadout ACTUEL (live raider.io) — importable en jeu
+                      </div>
+                      <div className="rounded bg-muted p-2 font-mono break-all border border-emerald-500/20 select-all">{liveLoadout}</div>
+                      <p className="text-muted-foreground mt-1 italic">Copie ce code → en jeu : N (Talents) → Importer. C'est exactement le build que tu joues en ce moment.</p>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
 
+              {liveGear.length > 0 && (
+                <Card className="border-emerald-500/40">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-base flex items-center gap-2 text-emerald-400">
+                      <span className="relative flex h-2.5 w-2.5"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-60" /><span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500" /></span>
+                      Équipement en direct — {liveIlvl} iLvl
+                    </CardTitle>
+                    <CardDescription>Chaque slot depuis raider.io · 💎 = gemme · ✨ = enchant · ⚠️ = enchant manquant sur slot enchantable</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                      {liveGear.map((g) => {
+                        const missingEnchant = g.enchantable && !g.hasEnchant;
+                        return (
+                          <div key={g.key} className="flex items-center justify-between gap-2 rounded-lg border p-2 text-xs">
+                            <span className="text-muted-foreground shrink-0 w-20">{g.label}</span>
+                            <span className="flex-1 truncate font-medium">{g.name ?? "—"}</span>
+                            <span className="flex items-center gap-1 shrink-0">
+                              {g.gemCount > 0 && <span title={`${g.gemCount} gemme(s)`}>💎{g.gemCount > 1 ? g.gemCount : ""}</span>}
+                              {g.hasEnchant && <span title="Enchanté">✨</span>}
+                              {missingEnchant && <span title="Enchant manquant" className="text-amber-400">⚠️</span>}
+                              <Badge className={g.ilvl >= 285 ? "bg-emerald-500" : g.ilvl >= 278 ? "bg-blue-500" : "bg-amber-500"}>{g.ilvl}</Badge>
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                    {liveGear.some((g) => g.enchantable && !g.hasEnchant) && (
+                      <div className="mt-2 rounded bg-amber-500/10 border border-amber-500/30 p-2 text-xs text-amber-300">
+                        ⚠️ Slots enchantables sans enchant détecté — un enchant gratuit = du DPS gratuit. Vérifie les slots marqués.
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
+
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-base flex items-center gap-2"><Skull className="h-4 w-4" />Tes 8 best runs cette semaine</CardTitle>
+                  <CardTitle className="text-base flex items-center gap-2"><Skull className="h-4 w-4" />{rio.status === "ok" && liveBestRuns.length ? "Tes meilleures clés (live)" : "Tes 8 best runs (dernier relevé)"}</CardTitle>
                 </CardHeader>
                 <CardContent className="text-sm">
                   <div className="space-y-1 text-xs">
-                    {[
-                      { d: "Algeth'ar Academy", lvl: 16, time: "27:22", score: 429.4, up: true },
-                      { d: "Seat of the Triumvirate", lvl: 16, time: "30:38", score: 428.7, up: true },
-                      { d: "Magisters' Terrace", lvl: 16, time: "32:22", score: 426.8, up: true },
-                      { d: "Windrunner Spire", lvl: 16, time: "31:47", score: 426.4, up: true },
-                      { d: "Nexus-Point Xenas", lvl: 16, time: "29:30", score: 425.6, up: true },
-                      { d: "Maisara Caverns", lvl: 15, time: "27:38", score: 416.1, up: true },
-                      { d: "Pit of Saron", lvl: 15, time: "25:16", score: 415.9, up: true },
-                      { d: "Skyreach", lvl: 15, time: "25:52", score: 412.9, up: true },
-                    ].map((r, i) => (
+                    {(rio.status === "ok" && liveBestRuns.length
+                      ? liveBestRuns.map((r: any) => ({
+                          d: r.dungeon,
+                          lvl: r.mythic_level,
+                          time: typeof r.clear_time_ms === "number" ? fmtMs(r.clear_time_ms) : "—",
+                          score: r.score ? Math.round(r.score * 10) / 10 : "—",
+                          up: (r.num_keystone_upgrades ?? 0) > 0,
+                        }))
+                      : [
+                          { d: "Algeth'ar Academy", lvl: 16, time: "27:22", score: 429.4, up: true },
+                          { d: "Seat of the Triumvirate", lvl: 16, time: "30:38", score: 428.7, up: true },
+                          { d: "Magisters' Terrace", lvl: 16, time: "32:22", score: 426.8, up: true },
+                          { d: "Windrunner Spire", lvl: 16, time: "31:47", score: 426.4, up: true },
+                          { d: "Nexus-Point Xenas", lvl: 16, time: "29:30", score: 425.6, up: true },
+                          { d: "Maisara Caverns", lvl: 15, time: "27:38", score: 416.1, up: true },
+                          { d: "Pit of Saron", lvl: 15, time: "25:16", score: 415.9, up: true },
+                          { d: "Skyreach", lvl: 15, time: "25:52", score: 412.9, up: true },
+                        ]
+                    ).map((r: any, i: number) => (
                       <div key={i} className="flex items-center gap-2 p-2 rounded border">
-                        <Badge className={r.lvl >= 16 ? "bg-purple-500" : "bg-blue-500"}>+{r.lvl}</Badge>
+                        <Badge className={r.lvl >= 20 ? "bg-rose-500" : r.lvl >= 18 ? "bg-amber-500" : r.lvl >= 16 ? "bg-purple-500" : "bg-blue-500"}>+{r.lvl}</Badge>
                         <span className="flex-1 font-medium">{r.d}</span>
                         <span className="text-muted-foreground">{r.time}</span>
                         <span className="font-semibold text-pink-500">{r.score}</span>
@@ -1425,7 +2290,11 @@ export default function ShadowPriestDashboardV2() {
                   </div>
                   <div className="mt-3 rounded p-2 bg-amber-500/10 border border-amber-500/30 text-xs">
                     <div className="font-semibold text-amber-500">📌 Observation</div>
-                    <div className="text-muted-foreground mt-1">Tu as 5 donjons en +16 timed (1-chest) et 3 en +15. Il manque <b>2 donjons</b> au moins en +16 pour push score, et les +16 actuels sont chestés à +1 seulement — du temps à récup pour +2/+3.</div>
+                    <div className="text-muted-foreground mt-1">
+                      {rio.status === "ok" && liveBestRuns.length
+                        ? <>Meilleure clé actuelle : <b>+{liveBestKey}</b>. Prochain palier réaliste : <b>+{insight.nextKey}</b> (puis +{insight.stretchKey} en stretch). Priorise les donjons où tu timies le plus large pour convertir en points.</>
+                        : <>Dernier relevé : 5 donjons en +16 timed (1-chest) et 3 en +15. Ouvre la page dans ton navigateur pour la vraie liste live à jour.</>}
+                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -1452,19 +2321,19 @@ export default function ShadowPriestDashboardV2() {
                   </div>
                   <Separator />
                   <div>
-                    <div className="font-semibold mb-1">📈 Objectif réaliste 2 semaines</div>
+                    <div className="font-semibold mb-1">📈 Objectif réaliste 2 semaines {rio.status === "ok" ? <Badge variant="outline" className="ml-1 text-[10px] border-emerald-500/50 text-emerald-300">recalculé live</Badge> : ""}</div>
                     <div className="grid grid-cols-3 gap-2 text-xs">
                       <div className="rounded p-2 bg-muted">
                         <div className="font-semibold">Score</div>
-                        <div className="text-muted-foreground">3382 → 3550</div>
+                        <div className="text-muted-foreground">{liveScore} → {insight.scoreTarget}</div>
                       </div>
                       <div className="rounded p-2 bg-muted">
                         <div className="font-semibold">Meilleure clé</div>
-                        <div className="text-muted-foreground">+16 → +18 (2/3 chests)</div>
+                        <div className="text-muted-foreground">+{liveBestKey} → +{insight.nextKey} (stretch +{insight.stretchKey})</div>
                       </div>
                       <div className="rounded p-2 bg-muted">
                         <div className="font-semibold">iLvl</div>
-                        <div className="text-muted-foreground">282 → 288</div>
+                        <div className="text-muted-foreground">{liveIlvl} → {insight.ilvlTarget}</div>
                       </div>
                     </div>
                   </div>
@@ -1531,10 +2400,10 @@ export default function ShadowPriestDashboardV2() {
               <CardTitle className="flex items-center gap-2"><AlertTriangle className="h-5 w-5 text-amber-500" />Notes méthodologiques</CardTitle>
             </CardHeader>
             <CardContent className="text-xs text-muted-foreground space-y-1">
-              <p>📊 Données : Archon.gg (81 232 parses, 14j), Warcraft Logs (271 765 parses), 80th percentile</p>
-              <p>📅 Patch 12.0.5 — données au 11 mai 2026</p>
-              <p>🎯 Burst DPS courbes : extrapolées de tes valeurs observées (450k Archon / 700k VW) + courbes Archon.gg</p>
-              <p>👤 Stats Màlenïa : raider.io API + Blizzard armory (loadout extrait)</p>
+              <p>📊 Données Archon.gg/WarcraftLogs "80th percentile" ci-dessus : contenu de départ non revalidé (réseau bloqué dans cet environnement) — à retraiter avec un vrai export.</p>
+              <p>✅ Positionnement réel vérifié via recherche web : Shadow Priest classé <b>A-tier</b> en Mythic+ (WoWVendor / Icy Veins), voir carte détaillée dans l'onglet <b>Analyse</b>.</p>
+              <p>🎯 Burst DPS courbes : extrapolées de tes valeurs observées (450k Archon / 700k VW) — indicatif, non simé.</p>
+              <p>👤 Stats Màlenïa : dernier relevé manuel du {LAST_KNOWN_SYNC} — raider.io/Blizzard armory non accessibles automatiquement ici.</p>
               <p>⚠️ Tier list officielle ≠ ton skill personnel. Le gameplay propre fait gagner 15-20% DPS sur la moyenne.</p>
             </CardContent>
           </Card>
@@ -1542,6 +2411,7 @@ export default function ShadowPriestDashboardV2() {
 
         {/* ============ WEEKLY TRACKER ============ */}
         <TabsContent value="weekly" className="space-y-4">
+          <StaleDataBanner label="Le tracker Vault / checklist de la semaine" rio={rio} manualOnly />
           <Card className="border-emerald-500/30 bg-gradient-to-br from-emerald-500/5 to-transparent">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-emerald-500">
@@ -1634,6 +2504,7 @@ export default function ShadowPriestDashboardV2() {
 
         {/* ============ RAID 2/9M MIDNIGHT S1 ============ */}
         <TabsContent value="raid" className="space-y-4">
+          <StaleDataBanner label="La progression raid (kills M/HM)" rio={rio} />
           <Card className="border-rose-500/30 bg-gradient-to-br from-rose-500/5 to-transparent">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-rose-500">
@@ -1808,6 +2679,204 @@ export default function ShadowPriestDashboardV2() {
           </Card>
         </TabsContent>
 
+        {/* ============ PATCH 12.1 — CURSE OF ULA'TEK (PTR) ============ */}
+        <TabsContent value="patch121" className="space-y-4">
+          <Card className="border-orange-500/40 bg-gradient-to-br from-orange-500/10 via-red-500/5 to-transparent">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-orange-500"><Rocket className="h-6 w-6" />Midnight 12.1 — Curse of Ula'tek (PTR)</CardTitle>
+              <CardDescription>Season 2 arrive vite : lead-in le 7 juillet, systèmes de saison le 14 juillet 2026 — nouveau raid, nouveau donjon, nouveaux delves et changements Shadow Priest actuellement testés sur le PTR</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="rounded-lg bg-orange-500/10 border border-orange-500/30 p-3 flex items-start gap-2 text-xs sm:text-sm">
+                <AlertTriangle className="h-4 w-4 text-orange-500 shrink-0 mt-0.5" />
+                <div>
+                  <span className="font-semibold text-orange-500">Public Test Realm — sujet à changement</span>
+                  <span className="text-muted-foreground"> — ces notes viennent du PTR de la 12.1 (Curse of Ula'tek). Blizzard ajuste fréquemment les chiffres avant la sortie officielle : ne base pas de gros achats/respec définitifs uniquement là-dessus.</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-red-500/30 bg-red-500/5">
+            <CardHeader>
+              <CardTitle className="text-base flex items-center gap-2"><Clock className="h-5 w-5 text-red-400" />Timeline Season 2 — c'est pour très bientôt</CardTitle>
+              <CardDescription>Nous sommes le 3 juillet 2026 — le lead-in narratif démarre dans 4 jours</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                {season2Timeline.map((t, i) => (
+                  <div key={i} className="flex gap-3 items-start">
+                    <div className={`shrink-0 w-3 h-3 rounded-full mt-1.5 ${t.status === "imminent" ? "bg-red-500 animate-pulse" : t.status === "upcoming" ? "bg-amber-500" : "bg-slate-500"}`} />
+                    <div className="flex-1 rounded-lg border p-3">
+                      <div className="flex items-center justify-between flex-wrap gap-1">
+                        <span className="font-semibold text-sm">{t.label}</span>
+                        <Badge variant="outline" className="text-xs">{t.date}</Badge>
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-1">{t.detail}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <Card className="border-rose-500/40">
+              <CardHeader>
+                <CardTitle className="text-base flex items-center gap-2"><Flame className="h-5 w-5 text-rose-500" />Nouveau raid — {season2Raid.name}</CardTitle>
+                <CardDescription>{season2Raid.bosses} bosses</CardDescription>
+              </CardHeader>
+              <CardContent className="text-sm space-y-2">
+                <p><b>Boss final :</b> {season2Raid.final}</p>
+                <p className="text-xs text-muted-foreground">{season2Raid.note}</p>
+              </CardContent>
+            </Card>
+
+            <Card className="border-cyan-500/40">
+              <CardHeader>
+                <CardTitle className="text-base flex items-center gap-2"><Skull className="h-5 w-5 text-cyan-500" />Pool Mythic+ Season 2 (8 donjons)</CardTitle>
+                <CardDescription>Altar of Fangs rejoint la rotation, 3 donjons legacy reviennent</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 text-xs">
+                  {season2MplusPool.map((d, i) => (
+                    <div key={i} className="rounded border p-2 flex items-center justify-between gap-2">
+                      <span className="font-medium">{d.name}</span>
+                      <Badge variant="outline" className="text-[10px] shrink-0">{d.type}</Badge>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <Card className="border-emerald-500/30">
+              <CardHeader>
+                <CardTitle className="text-base flex items-center gap-2"><Gem className="h-5 w-5 text-emerald-500" />Nouveaux Delves</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                {season2Delves.map((d, i) => (
+                  <div key={i} className="rounded-lg border p-2 text-xs sm:text-sm">
+                    <span className="font-semibold">{d.name}</span>
+                    <p className="text-muted-foreground">{d.note}</p>
+                  </div>
+                ))}
+                <p className="text-xs text-muted-foreground pt-1">Bountiful Delves de retour à l'ouverture de saison, push possible au-delà du Tier 7.</p>
+              </CardContent>
+            </Card>
+
+            <Card className="border-indigo-500/30">
+              <CardHeader>
+                <CardTitle className="text-base flex items-center gap-2"><ListChecks className="h-5 w-5 text-indigo-400" />Quality of Life & systèmes</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ul className="text-xs space-y-1.5 list-disc ml-4 text-muted-foreground">
+                  {season2QoL.map((q, i) => <li key={i}>{q}</li>)}
+                </ul>
+              </CardContent>
+            </Card>
+          </div>
+
+          <Card className="border-emerald-500/40">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-emerald-500"><Sparkles className="h-5 w-5" />Nouveau talent Shadow</CardTitle>
+              <CardDescription>Ajout à l'arbre Shadow pour la Season 2</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              {patch121NewTalents.map((t, i) => (
+                <div key={i} className="rounded-lg border border-emerald-500/40 bg-emerald-500/5 p-3">
+                  <div className="flex items-center gap-2 mb-1">
+                    <Badge className="bg-emerald-500">NOUVEAU</Badge>
+                    <span className="font-semibold">{t.name}</span>
+                  </div>
+                  <p className="text-sm">{t.desc}</p>
+                  <p className="text-xs text-muted-foreground mt-2">💡 {t.impact}</p>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+
+          <Card className="border-amber-500/40">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-amber-500"><Wand2 className="h-5 w-5" />Talents refaits / retirés</CardTitle>
+              <CardDescription>Ce qui change directement dans ton arbre actuel (Voidweaver &amp; Archon héritent des deux)</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              {patch121TalentReworks.map((t, i) => (
+                <div key={i} className="rounded-lg border p-3">
+                  <div className="flex items-center gap-2 mb-1 flex-wrap">
+                    <Badge className={t.tag === "Suppression" ? "bg-red-500" : t.tag === "Buff" ? "bg-emerald-500" : "bg-amber-500"}>{t.tag}</Badge>
+                    <span className="font-semibold">{t.name}</span>
+                  </div>
+                  <p className="text-sm text-muted-foreground">{t.change}</p>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+
+          <Card className="border-fuchsia-500/30 bg-fuchsia-500/5">
+            <CardHeader>
+              <CardTitle className="text-base flex items-center gap-2"><Swords className="h-5 w-5 text-fuchsia-400" />Débat communautaire : Archon vs Voidweaver en 12.1</CardTitle>
+              <CardDescription>Toi tu joues Voidweaver — ce point mérite un vrai suivi pendant le PTR</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              {patch121HeroBalanceDebate.map((d, i) => (
+                <div key={i} className={`rounded-lg border p-3 text-xs sm:text-sm ${d.tone === "warning" ? "border-amber-500/40 bg-amber-500/5" : d.tone === "good" ? "border-emerald-500/40 bg-emerald-500/5" : ""}`}>
+                  <div className="font-semibold mb-1">{d.point}</div>
+                  <p className="text-muted-foreground">{d.detail}</p>
+                </div>
+              ))}
+              <p className="text-xs italic text-muted-foreground pt-1">💡 Pour toi concrètement : garde un œil sur les patch notes 12.1 au fil des builds PTR avant de décider si tu restes Voidweaver ou si tu testes Archon en Season 2 — la balance a déjà bougé plusieurs fois pendant ce cycle de test.</p>
+            </CardContent>
+          </Card>
+
+          <Card className="border-blue-500/40">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-blue-500"><Zap className="h-5 w-5" />Changements de sorts core</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              {patch121CoreChanges.map((c, i) => (
+                <div key={i} className="rounded-lg border p-3">
+                  <div className="flex items-center gap-2 mb-1 flex-wrap">
+                    <Badge variant="outline">{c.tag}</Badge>
+                    <span className="font-semibold">{c.ability}</span>
+                  </div>
+                  <p className="text-sm text-muted-foreground">{c.change}</p>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+
+          <Card className="border-indigo-500/30 bg-indigo-500/5">
+            <CardHeader>
+              <CardTitle className="text-base flex items-center gap-2"><Brain className="h-4 w-4 text-indigo-400" />Ce que ça change pour Màlenïa</CardTitle>
+            </CardHeader>
+            <CardContent className="text-sm space-y-2">
+              <p><b>Intention Blizzard affichée</b> : améliorer le gameplay de Voidform et donner au Shadow Priest une source de dégâts AoE indépendante de Psychic Link, pour réduire la dépendance au spread de DoTs en zone.</p>
+              <ul className="list-disc ml-5 text-xs space-y-1 text-muted-foreground">
+                <li><b>Shadeburst</b> pourrait offrir une alternative crédible à <b>Misery</b> pour les gros pulls Voidweaver — à tester dès l'ouverture du PTR sur tes donjons à 1er pull massif (Maisara, Skyreach).</li>
+                <li><b>Ancient Madness</b> retravaillé pousse vers un style "Voidform prolongé par stacks de Haste" plutôt qu'un simple burst plat — probablement plus fort pour Archon (Voidform plus longtemps maintenu via Perfected Form).</li>
+                <li><b>Focused Outburst</b> + Void Volley automatique sur SW: Madness change la priorité de sort pendant Voidform — la rotation Voidform actuelle (documentée dans l'onglet Rotation) sera à revoir une fois live sur PTR.</li>
+                <li>La suppression de <b>Phantom Menace</b> libère un point de talent — probablement réinvesti dans Incessant Screams ou Energy Cycle selon les premiers tests communautaires.</li>
+              </ul>
+              <p className="text-xs italic text-muted-foreground">⚠️ Recommandation : ne pas encore changer ton build M+ actuel en 12.0.5 sur la base de ces infos — attends soit l'annonce de date de sortie de la 12.1, soit un accès PTR personnel pour valider en jeu.</p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader><CardTitle className="text-base flex items-center gap-2"><ScrollText className="h-4 w-4" />Sources</CardTitle></CardHeader>
+            <CardContent className="space-y-1 text-xs">
+              {patch121Sources.map((s, i) => (
+                <div key={i}>
+                  <a href={s.url} target="_blank" rel="noopener noreferrer" className="text-orange-500 hover:underline">→ {s.label}</a>
+                </div>
+              ))}
+              <p className="text-muted-foreground italic pt-2">Recommandation : ces éléments sont fournis à titre informatif, issus de notes de développement PTR et de couverture presse spécialisée — vérifie toujours les patch notes officiels Blizzard avant la sortie finale de la 12.1.</p>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
         {/* ============ DPS SIMULATOR ============ */}
         <TabsContent value="sim" className="space-y-4">
           <Card className="border-violet-500/30 bg-gradient-to-br from-violet-500/5 to-transparent">
@@ -1868,9 +2937,74 @@ export default function ShadowPriestDashboardV2() {
                 <Brain className="h-6 w-6" />Mon analyse pure de Màlenïa — verdict honnête
               </CardTitle>
               <CardDescription>
-                Sources croisées : raider.io · WarcraftLogs (271k parses S1) · murlok.io · Archon.gg · Maxroll · Icy-Veins · Method.gg · Wowhead
+                Sources croisées : raider.io (live) · WarcraftLogs · murlok.io · Archon.gg · Maxroll · Icy-Veins · Method.gg · Wowhead
               </CardDescription>
             </CardHeader>
+          </Card>
+
+          {/* ANALYSE DYNAMIQUE — recalculée à partir des valeurs live */}
+          <Card className={`border-2 ${(TIER_CLASSES[insight.tierColor] ?? TIER_CLASSES.purple).card}`}>
+            <CardHeader className="pb-2">
+              <div className="flex items-center justify-between gap-2 flex-wrap">
+                <CardTitle className="flex items-center gap-2">
+                  <Brain className="h-5 w-5" />Analyse dynamique — adaptée à ta progression
+                </CardTitle>
+                {rio.status === "ok"
+                  ? <Badge variant="outline" className="gap-1 border-emerald-500/50 text-emerald-300"><span className="relative flex h-2 w-2"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-60" /><span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" /></span>live</Badge>
+                  : <Badge variant="outline" className="border-amber-500/40 text-amber-300">dernier relevé</Badge>}
+              </div>
+              <CardDescription>Ce bloc se recalcule tout seul à partir de ta côte, ta meilleure clé et ton iLvl actuels — plus besoin de réécrire l'analyse à la main.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="flex items-center gap-3 flex-wrap">
+                <Badge className={`${(TIER_CLASSES[insight.tierColor] ?? TIER_CLASSES.purple).badge} text-sm`}>Palier : {insight.tier}</Badge>
+                <span className="text-xs text-muted-foreground">{insight.tierBlurb}</span>
+              </div>
+
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                <div className="rounded-lg border p-3">
+                  <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Côte M+</div>
+                  <div className="text-xl font-bold font-display text-amber-300">{liveScore}</div>
+                  <div className="text-[10px] text-muted-foreground">cible {insight.scoreTarget}</div>
+                </div>
+                <div className="rounded-lg border p-3">
+                  <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Meilleure clé</div>
+                  <div className="text-xl font-bold font-display text-purple-300">+{liveBestKey}</div>
+                  <div className="text-[10px] text-muted-foreground">prochain +{insight.nextKey}</div>
+                </div>
+                <div className="rounded-lg border p-3">
+                  <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Stretch</div>
+                  <div className="text-xl font-bold font-display text-rose-300">+{insight.stretchKey}</div>
+                  <div className="text-[10px] text-muted-foreground">objectif haut</div>
+                </div>
+                <div className="rounded-lg border p-3">
+                  <div className="text-[10px] uppercase tracking-wider text-muted-foreground">iLvl</div>
+                  <div className="text-xl font-bold font-display text-sky-300">{liveIlvl}</div>
+                  <div className="text-[10px] text-muted-foreground">cible {insight.ilvlTarget}</div>
+                </div>
+              </div>
+
+              <div className="rounded-lg bg-muted/40 border p-3 text-sm">
+                🎯 {insight.headline}
+              </div>
+
+              <div className="space-y-2">
+                {insight.focus.map((f, i) => (
+                  <div key={i} className="flex items-start gap-2 rounded-lg border p-2.5 text-xs sm:text-sm">
+                    <Badge className={
+                      f.tone === "crit" ? "bg-red-500 shrink-0" :
+                      f.tone === "high" ? "bg-amber-500 shrink-0" :
+                      f.tone === "tech" ? "bg-sky-500 shrink-0" : "bg-slate-500 shrink-0"
+                    }>{f.tag}</Badge>
+                    <span className="flex-1">{f.text}</span>
+                  </div>
+                ))}
+              </div>
+
+              {rio.status !== "ok" && (
+                <p className="text-xs text-muted-foreground italic">⚠️ Affichage basé sur le dernier relevé ({LAST_KNOWN_SYNC}). Ouvre la page dans ton navigateur : l'analyse se recalculera sur tes vrais chiffres live.</p>
+              )}
+            </CardContent>
           </Card>
 
           <Card className="border-2 border-violet-500/50">
@@ -1882,6 +3016,68 @@ export default function ShadowPriestDashboardV2() {
               <p><b>3.</b> 🚨 <b>SHIFT MÉTA MAJEUR</b> : Misery 25/50 → <b>18/50</b>, Invoked Nightmare 18/50 → <Badge className="bg-purple-500">32/50</Badge>. La majorité du top 50 a basculé sur Invoked Nightmare cette semaine. Tu joues encore Misery — à tester sérieusement.</p>
               <p><b>4.</b> Voidweaver re-dominant (78% vs 72% sem dernière). Top 1 mondial <Badge className="bg-violet-500">Nhaji 4036 rating</Badge>. Build standard : VW + Mindbender (35/50, +14) + Maddening Touch (43/50) + Inescapable Torment (35/50).</p>
               <p><b>5.</b> Bottlenecks restants : <b>3 pièces tier 276</b> (chest, hands + slippers non-tier) → push crests Awakened.</p>
+            </CardContent>
+          </Card>
+
+          <Card className="border-sky-500/40 bg-sky-500/5">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-sky-400"><TrendingUp className="h-5 w-5" />Comparaison avec la méta externe (guides publics, recherche web)</CardTitle>
+              <CardDescription>Ce bloc est distinct du reste de l'onglet : il vient de vraies recherches web (Wowhead, Icy Veins, Maxroll, WoWVendor) et non des données internes murlok.io/Archon.gg fabriquées côté dashboard. C'est une recommandation à vérifier, pas une vérité absolue — les tier lists évoluent vite.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <div className="text-sm font-semibold mb-2">📐 Priorité de stats (externe)</div>
+                <div className="space-y-2">
+                  {externalStatPriority.map((s, i) => (
+                    <div key={i} className="rounded-lg border p-3 flex items-center justify-between gap-2 flex-wrap text-xs sm:text-sm">
+                      <div>
+                        <Badge variant="outline" className="mb-1">{s.context}</Badge>
+                        <div className="font-medium">{s.order}</div>
+                      </div>
+                      <span className="text-muted-foreground text-xs shrink-0">Source : {s.source}</span>
+                    </div>
+                  ))}
+                </div>
+                <p className="text-xs text-muted-foreground mt-2">💡 Ton profil actuel (Haste 26 &gt; Mastery 12 &gt; Crit 18 &gt; Vers 1) est aligné avec la priorité M+ externe. Cohérent avec les valeurs internes du dashboard.</p>
+              </div>
+
+              <Separator />
+
+              <div>
+                <div className="text-sm font-semibold mb-2">🏆 Positionnement du spec</div>
+                <div className="space-y-2">
+                  {externalTierRanking.map((t, i) => (
+                    <div key={i} className="rounded-lg border p-3 text-xs sm:text-sm">
+                      <div className="flex items-center justify-between flex-wrap gap-1 mb-1">
+                        <span className="font-semibold">{t.label}</span>
+                        <Badge variant="outline" className="text-xs">{t.source}</Badge>
+                      </div>
+                      <p className="text-muted-foreground">{t.verdict}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <Separator />
+
+              <div>
+                <div className="text-sm font-semibold mb-2">💎 Gear — notes externes</div>
+                <div className="space-y-2">
+                  {externalGearNotes.map((g, i) => (
+                    <div key={i} className="rounded-lg border p-3 text-xs sm:text-sm">
+                      <div className="flex items-center justify-between flex-wrap gap-1 mb-1">
+                        <span className="font-semibold">{g.label}</span>
+                        <Badge variant="outline" className="text-xs">{g.source}</Badge>
+                      </div>
+                      <p className="text-muted-foreground">{g.note}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="rounded-lg bg-sky-500/10 border border-sky-500/30 p-3 text-xs">
+                <b className="text-sky-400">⚠️ À faire pour valider :</b> exporte ton SimC string (addon SimulationCraft en jeu) → colle-le sur Raidbots (Top Gear / Droptimizer) → compare tes vrais stat weights à ceux ci-dessus. C'est la seule façon d'avoir des chiffres exacts pour TON gear, pas juste une moyenne de guide.
+              </div>
             </CardContent>
           </Card>
 
@@ -2127,15 +3323,14 @@ export default function ShadowPriestDashboardV2() {
             <CardHeader><CardTitle>📚 Sources et niveau de confiance</CardTitle></CardHeader>
             <CardContent className="text-xs space-y-1">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                <div className="rounded border p-2"><b>raider.io API</b> · Màlenïa · <Badge className="bg-emerald-500">100%</Badge> · live</div>
-                <div className="rounded border p-2"><b>WarcraftLogs S1</b> · 271k parses · <Badge className="bg-emerald-500">95%</Badge> · 14j</div>
-                <div className="rounded border p-2"><b>murlok.io</b> · top 100 SP builds · <Badge className="bg-emerald-500">95%</Badge> · live</div>
-                <div className="rounded border p-2"><b>Archon.gg</b> · 81k parses M+ · <Badge className="bg-emerald-500">90%</Badge> · 14j</div>
-                <div className="rounded border p-2"><b>Maxroll · Icy-Veins · Method.gg</b> · guides 12.0.5 · <Badge className="bg-amber-500">85%</Badge></div>
-                <div className="rounded border p-2"><b>Projections sims</b> · estimés · <Badge className="bg-amber-500">75%</Badge></div>
+                <div className="rounded border p-2"><b>raider.io / WarcraftLogs</b> · profil Màlenïa · <Badge variant="destructive">Non vérifiable ici</Badge> · réseau bloqué dans cet environnement, dernier relevé manuel du {LAST_KNOWN_SYNC}</div>
+                <div className="rounded border p-2"><b>murlok.io / Archon.gg</b> · "top 50/100 SP" · <Badge className="bg-amber-500">Non revalidé</Badge> · chiffres saisis manuellement, à retraiter</div>
+                <div className="rounded border p-2"><b>Wowhead · Icy Veins · Maxroll · WoWVendor</b> · stat priority / tier list · <Badge className="bg-emerald-500">Vérifié via recherche web</Badge> · voir carte "Comparaison méta externe" ci-dessus</div>
+                <div className="rounded border p-2"><b>Forums Blizzard (PTR 12.1)</b> · changements Shadow Priest · <Badge className="bg-emerald-500">Vérifié via recherche web</Badge> · voir onglet "12.1 PTR"</div>
+                <div className="rounded border p-2"><b>Projections DPS / burst</b> · courbes internes · <Badge className="bg-amber-500">Indicatif</Badge> · non simées, cohérence interne seulement</div>
               </div>
               <p className="text-muted-foreground mt-2">
-                ⚠️ <b>Disclaimer :</b> les graphes performance et DPS sont basés sur agrégations top 100 + projections cohérentes avec les guides. Pour des sims pixel-perfect, lance Raidbots avec ton SimC string. Cette analyse pointe les <b>directions</b>, Raidbots donne les <b>valeurs exactes</b>.
+                ⚠️ <b>Disclaimer :</b> les sections marquées "Vérifié via recherche web" viennent de vraies recherches faites pour ce dashboard (voir liens dans l'onglet 12.1 PTR et la carte "Comparaison méta externe"). Le reste (données murlok.io/Archon.gg/raider.io "top 50", courbes DPS internes) est un contenu de départ non revalidé — traite-le comme un exemple/gabarit, pas comme un fait vérifié, tant que tu ne l'as pas recollé depuis tes vraies sources. Pour des chiffres exacts sur TON gear, lance toujours Raidbots avec ton SimC string : cette analyse donne des <b>directions</b>, pas des <b>valeurs garanties</b>.
               </p>
             </CardContent>
           </Card>
@@ -2163,6 +3358,7 @@ export default function ShadowPriestDashboardV2() {
           </Card>
         </TabsContent>
       </Tabs>
+      </div>
     </div>
   );
 }

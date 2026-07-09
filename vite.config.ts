@@ -11,4 +11,18 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  build: {
+    // Split heavy vendors into their own chunks so the browser can fetch them
+    // in parallel and cache them across deploys (recharts is the biggest one).
+    chunkSizeWarningLimit: 900,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          "react-vendor": ["react", "react-dom"],
+          recharts: ["recharts"],
+          icons: ["lucide-react"],
+        },
+      },
+    },
+  },
 });
