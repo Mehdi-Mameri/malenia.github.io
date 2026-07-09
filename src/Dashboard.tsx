@@ -116,6 +116,156 @@ function bestRaidTotal(raidProgression: any): number {
   return best?.p?.total_bosses || 9;
 }
 
+// ---- Extraction gear depuis raider.io gear.items ----
+const GEAR_SLOTS: { key: string; label: string; enchantable: boolean }[] = [
+  { key: "head", label: "Tête", enchantable: false },
+  { key: "neck", label: "Cou", enchantable: false },
+  { key: "shoulder", label: "Épaules", enchantable: false },
+  { key: "back", label: "Cape", enchantable: true },
+  { key: "chest", label: "Torse", enchantable: true },
+  { key: "wrist", label: "Poignets", enchantable: true },
+  { key: "hands", label: "Mains", enchantable: false },
+  { key: "waist", label: "Ceinture", enchantable: false },
+  { key: "legs", label: "Jambes", enchantable: true },
+  { key: "feet", label: "Pieds", enchantable: true },
+  { key: "finger1", label: "Anneau 1", enchantable: true },
+  { key: "finger2", label: "Anneau 2", enchantable: true },
+  { key: "trinket1", label: "Bijou 1", enchantable: false },
+  { key: "trinket2", label: "Bijou 2", enchantable: false },
+  { key: "mainhand", label: "Arme", enchantable: true },
+  { key: "offhand", label: "Off-main", enchantable: false },
+];
+
+function extractGear(gear: any) {
+  if (!gear?.items) return [];
+  return GEAR_SLOTS.map((slot) => {
+    const it = gear.items[slot.key];
+    if (!it) return null;
+    const gemCount = Array.isArray(it.gems) ? it.gems.length : 0;
+    const hasEnchant = Array.isArray(it.enchants) ? it.enchants.length > 0 : !!it.enchant;
+    return {
+      key: slot.key,
+      label: slot.label,
+      enchantable: slot.enchantable,
+      ilvl: it.item_level as number,
+      name: (it.name as string) || null,
+      isTier: !!it.tier || !!it.is_tier_piece,
+      gemCount,
+      hasEnchant,
+    };
+  }).filter(Boolean) as {
+    key: string; label: string; enchantable: boolean; ilvl: number;
+    name: string | null; isTier: boolean; gemCount: number; hasEnchant: boolean;
+  }[];
+}
+
+// Loadout de talents (chaîne importable) — tolère plusieurs formes de réponse API
+function extractLoadoutText(live: any): string | null {
+  return (
+    live?.talentLoadout?.loadout_text ||
+    live?.talents?.loadout_text ||
+    live?.talentLoadout?.loadoutText ||
+    null
+  );
+}
+
+// ============ MOTEUR D'ANALYSE DYNAMIQUE ============
+// Recalcule les recommandations à partir des valeurs LIVE (côte, meilleure clé, iLvl).
+// Le raisonnement s'adapte donc automatiquement à ta progression réelle.
+interface ProgressInsight {
+  tier: string;
+  tierColor: string;
+  tierBlurb: string;
+  nextKey: number;
+  stretchKey: number;
+  scoreTarget: number;
+  ilvlTarget: number;
+  focus: { tag: string; text: string; tone: "crit" | "high" | "tech" | "info" }[];
+  headline: string;
+}
+
+function deriveInsight(ilvl: number, score: number, bestKey: number): ProgressInsight {
+  const nextKey = bestKey + 1;
+  const stretchKey = bestKey + 2;
+  const scoreTarget = Math.ceil((score + 80) / 50) * 50; // prochain palier réaliste
+  const ilvlTarget = Math.min(300, Math.max(ilvl + 3, ilvl));
+
+  // Bandes basées sur la meilleure clé (le levier le plus actionnable)
+  let tier: string, tierColor: string, tierBlurb: string, headline: string;
+  let focus: ProgressInsight["focus"];
+
+  if (bestKey <= 12) {
+    tier = "Fondations"; tierColor = "slate";
+    tierBlurb = "Phase de mise en place : timer proprement chaque donjon et sécuriser le gear via le Vault.";
+    headline = `Objectif immédiat : timer du +${nextKey} sur tous les donjons pour lancer la boule de neige de score.`;
+    focus = [
+      { tag: "PRIORITÉ", text: `Timer 8 donjons en +${bestKey}/+${nextKey} pour un Vault plein et un socle de score.`, tone: "high" },
+      { tag: "GEAR", text: "Remplir tous les slots, viser le tier set 4 pièces avant de pousser plus haut.", tone: "crit" },
+      { tag: "TECHNIQUE", text: "Apprendre les kicks/CC prioritaires par donjon (voir onglet Donjons).", tone: "tech" },
+    ];
+  } else if (bestKey <= 15) {
+    tier = "Montée en puissance"; tierColor = "blue";
+    tierBlurb = "Tu enchaînes les clés moyennes : c'est le moment de convertir le gear en niveaux de clé.";
+    headline = `Vise le +${nextKey} timed partout, puis tente le +${stretchKey} sur tes 2-3 meilleurs donjons.`;
+    focus = [
+      { tag: "PRIORITÉ", text: `Passer tes +${bestKey} en +${nextKey} timed ; garder une marge de temps pour le +${stretchKey}.`, tone: "high" },
+      { tag: "GEAR", text: "Compléter le tier set 4p et pousser les pièces basses via crests.", tone: "crit" },
+      { tag: "ROUTE", text: "Adopter des routes optimisées (MDT) plutôt que d'improviser les pulls.", tone: "tech" },
+    ];
+  } else if (bestKey <= 17) {
+    tier = "Confirmé"; tierColor = "purple";
+    tierBlurb = "Niveau solide. Les mobs vivent plus longtemps : le sustain et la propreté d'exécution priment.";
+    headline = `Push +${nextKey}/+${stretchKey} : chaque mort coûte cher, la mécanique passe avant le DPS brut.`;
+    focus = [
+      { tag: "PUSH", text: `Cibler +${nextKey} sur les donjons que tu timies le plus large, puis +${stretchKey} en stretch.`, tone: "high" },
+      { tag: "SURVIE", text: "Réduire les morts : positionnement, défensifs (Fade/PW:Shield/Dispersion), interrupts.", tone: "crit" },
+      { tag: "BUILD", text: "Comparer Voidweaver vs Archon selon le TTK des mobs (voir onglet Analyse).", tone: "info" },
+    ];
+  } else if (bestKey <= 19) {
+    tier = "Avancé"; tierColor = "amber";
+    tierBlurb = "Tu joues dans le haut du panier. Les gains viennent de l'optimisation fine, plus du gear brut.";
+    headline = `Push +${nextKey}/+${stretchKey} : optimisation des CD par pull, zéro mort, gestion parfaite des affixes.`;
+    focus = [
+      { tag: "PUSH", text: `Convertir tes +${bestKey} en +${nextKey}, viser +${stretchKey} sur tes meilleurs donjons.`, tone: "high" },
+      { tag: "OPTIM", text: "Aligner Voidform/PI/Voidwraith sur les gros pulls, minimiser le temps mort entre packs.", tone: "tech" },
+      { tag: "AFFIXES", text: "Maîtriser l'affixe de la semaine (voir onglet Donjons) — c'est ce qui fait timer ou dépop.", tone: "info" },
+      { tag: "BiS", text: "Chasser les trinkets BiS raid et finaliser gemmes/enchants (voir onglet Progression).", tone: "crit" },
+    ];
+  } else if (bestKey <= 21) {
+    tier = "Gamme titre"; tierColor = "rose";
+    tierBlurb = "Niveau title-range : tu es sur le haut du ladder. Marges minuscules, exécution quasi parfaite exigée.";
+    headline = `Push +${nextKey}+ : chaque seconde et chaque mort comptent. C'est du no-death, pull-perfect, route parfaite.`;
+    focus = [
+      { tag: "PUSH", text: `Viser +${nextKey}/+${stretchKey} sur ta meilleure comp, prioriser les donjons où tu timies le plus large.`, tone: "high" },
+      { tag: "NO-DEATH", text: "À ce niveau une mort = -5s timer + risque de dépop : jouer défensif et régen d'aggro.", tone: "crit" },
+      { tag: "COMP", text: "Optimiser le groupe (bloodlust, bufs, kick coverage) — la comp fait autant que le skill.", tone: "info" },
+      { tag: "SPEC", text: "Choisir la hero spec par donjon (Archon TTK long / Voidweaver méga-pull) au lieu d'un build unique.", tone: "tech" },
+    ];
+  } else {
+    tier = "Cutting edge"; tierColor = "fuchsia";
+    tierBlurb = "Tu es dans le très haut niveau mondial. Les ressources publiques ne suffisent plus — c'est du min-max de VOD.";
+    headline = `Push +${nextKey}+ : optimisation au niveau du VOD, tri des donjons par ratio points/risque.`;
+    focus = [
+      { tag: "PUSH", text: `Sélectionner les 3-4 donjons au meilleur ratio points/difficulté pour maximiser le rating.`, tone: "high" },
+      { tag: "VOD", text: "Analyser tes propres logs WarcraftLogs pull par pull pour traquer les pertes de temps.", tone: "tech" },
+      { tag: "META", text: "Suivre les compos et builds du ladder title en temps réel (murlok.io / RaiderIO cutoff).", tone: "info" },
+    ];
+  }
+
+  return { tier, tierColor, tierBlurb, nextKey, stretchKey, scoreTarget, ilvlTarget, focus, headline };
+}
+
+// Classes Tailwind LITTÉRALES par palier (Tailwind ne peut pas générer des classes
+// construites dynamiquement type `border-${x}-500` — elles seraient purgées).
+const TIER_CLASSES: Record<string, { card: string; badge: string }> = {
+  slate: { card: "border-slate-500/50 bg-gradient-to-br from-slate-500/10 to-transparent", badge: "bg-slate-500" },
+  blue: { card: "border-blue-500/50 bg-gradient-to-br from-blue-500/10 to-transparent", badge: "bg-blue-500" },
+  purple: { card: "border-purple-500/50 bg-gradient-to-br from-purple-500/10 to-transparent", badge: "bg-purple-500" },
+  amber: { card: "border-amber-500/50 bg-gradient-to-br from-amber-500/10 to-transparent", badge: "bg-amber-500" },
+  rose: { card: "border-rose-500/50 bg-gradient-to-br from-rose-500/10 to-transparent", badge: "bg-rose-500" },
+  fuchsia: { card: "border-fuchsia-500/50 bg-gradient-to-br from-fuchsia-500/10 to-transparent", badge: "bg-fuchsia-500" },
+};
+
 // Bannière d'état des données. Si `rio` est fourni et que la synchro live a réussi,
 // on affiche un état "en direct". Sinon (ou si `manualOnly`, pour les infos non
 // couvertes par l'API comme le Vault), on affiche le rappel "dernier relevé manuel".
@@ -547,6 +697,10 @@ export default function ShadowPriestDashboardV2() {
   const liveSpec = live?.active_spec_name as string | undefined;
   const liveRecentRuns = (live?.mythic_plus_recent_runs ?? []) as any[];
   const liveBestRuns = (live?.mythic_plus_best_runs ?? []) as any[];
+  const liveGear = extractGear(live?.gear);
+  const liveLoadout = extractLoadoutText(live);
+  // Analyse recalculée à partir des valeurs live (s'adapte à ta progression réelle)
+  const insight = deriveInsight(liveIlvl, liveScore, liveBestKey);
 
   return (
     <div className={`${darkMode ? "dark" : ""} relative w-full min-h-screen bg-background text-foreground`}>
@@ -1992,7 +2146,9 @@ export default function ShadowPriestDashboardV2() {
                   <CardDescription>Items à upgrade en priorité</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-2">
-                  {maleliaGearGaps.map((g, i) => (
+                  {liveGear.length > 0 ? (
+                    <p className="text-xs text-muted-foreground">✅ Ton équipement réel est affiché en direct plus bas (carte « Équipement en direct »). Cet ancien tableau d'objectifs (cible 285) est masqué car tes pièces live sont désormais au-dessus — réfère-toi à la carte live pour les vrais item levels et les enchants/gemmes manquants.</p>
+                  ) : maleliaGearGaps.map((g, i) => (
                     <div key={i} className="rounded-lg border p-3 space-y-1">
                       <div className="flex justify-between items-center">
                         <span className="font-medium text-sm">{g.slot}</span>
@@ -2050,27 +2206,82 @@ export default function ShadowPriestDashboardV2() {
                       <Badge variant="outline" className="text-xs">Shadow Word: Madness</Badge>
                     </div>
                   </div>
+                  {liveLoadout && (
+                    <div className="rounded-lg border border-emerald-500/40 bg-emerald-500/5 p-2 text-xs">
+                      <div className="flex items-center gap-1.5 font-semibold text-emerald-400 mb-1">
+                        <span className="relative flex h-2 w-2"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-60" /><span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" /></span>
+                        Ton loadout ACTUEL (live raider.io) — importable en jeu
+                      </div>
+                      <div className="rounded bg-muted p-2 font-mono break-all border border-emerald-500/20 select-all">{liveLoadout}</div>
+                      <p className="text-muted-foreground mt-1 italic">Copie ce code → en jeu : N (Talents) → Importer. C'est exactement le build que tu joues en ce moment.</p>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
 
+              {liveGear.length > 0 && (
+                <Card className="border-emerald-500/40">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-base flex items-center gap-2 text-emerald-400">
+                      <span className="relative flex h-2.5 w-2.5"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-60" /><span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500" /></span>
+                      Équipement en direct — {liveIlvl} iLvl
+                    </CardTitle>
+                    <CardDescription>Chaque slot depuis raider.io · 💎 = gemme · ✨ = enchant · ⚠️ = enchant manquant sur slot enchantable</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                      {liveGear.map((g) => {
+                        const missingEnchant = g.enchantable && !g.hasEnchant;
+                        return (
+                          <div key={g.key} className="flex items-center justify-between gap-2 rounded-lg border p-2 text-xs">
+                            <span className="text-muted-foreground shrink-0 w-20">{g.label}</span>
+                            <span className="flex-1 truncate font-medium">{g.name ?? "—"}</span>
+                            <span className="flex items-center gap-1 shrink-0">
+                              {g.gemCount > 0 && <span title={`${g.gemCount} gemme(s)`}>💎{g.gemCount > 1 ? g.gemCount : ""}</span>}
+                              {g.hasEnchant && <span title="Enchanté">✨</span>}
+                              {missingEnchant && <span title="Enchant manquant" className="text-amber-400">⚠️</span>}
+                              <Badge className={g.ilvl >= 285 ? "bg-emerald-500" : g.ilvl >= 278 ? "bg-blue-500" : "bg-amber-500"}>{g.ilvl}</Badge>
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                    {liveGear.some((g) => g.enchantable && !g.hasEnchant) && (
+                      <div className="mt-2 rounded bg-amber-500/10 border border-amber-500/30 p-2 text-xs text-amber-300">
+                        ⚠️ Slots enchantables sans enchant détecté — un enchant gratuit = du DPS gratuit. Vérifie les slots marqués.
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
+
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-base flex items-center gap-2"><Skull className="h-4 w-4" />Tes 8 best runs cette semaine</CardTitle>
+                  <CardTitle className="text-base flex items-center gap-2"><Skull className="h-4 w-4" />{rio.status === "ok" && liveBestRuns.length ? "Tes meilleures clés (live)" : "Tes 8 best runs (dernier relevé)"}</CardTitle>
                 </CardHeader>
                 <CardContent className="text-sm">
                   <div className="space-y-1 text-xs">
-                    {[
-                      { d: "Algeth'ar Academy", lvl: 16, time: "27:22", score: 429.4, up: true },
-                      { d: "Seat of the Triumvirate", lvl: 16, time: "30:38", score: 428.7, up: true },
-                      { d: "Magisters' Terrace", lvl: 16, time: "32:22", score: 426.8, up: true },
-                      { d: "Windrunner Spire", lvl: 16, time: "31:47", score: 426.4, up: true },
-                      { d: "Nexus-Point Xenas", lvl: 16, time: "29:30", score: 425.6, up: true },
-                      { d: "Maisara Caverns", lvl: 15, time: "27:38", score: 416.1, up: true },
-                      { d: "Pit of Saron", lvl: 15, time: "25:16", score: 415.9, up: true },
-                      { d: "Skyreach", lvl: 15, time: "25:52", score: 412.9, up: true },
-                    ].map((r, i) => (
+                    {(rio.status === "ok" && liveBestRuns.length
+                      ? liveBestRuns.map((r: any) => ({
+                          d: r.dungeon,
+                          lvl: r.mythic_level,
+                          time: typeof r.clear_time_ms === "number" ? fmtMs(r.clear_time_ms) : "—",
+                          score: r.score ? Math.round(r.score * 10) / 10 : "—",
+                          up: (r.num_keystone_upgrades ?? 0) > 0,
+                        }))
+                      : [
+                          { d: "Algeth'ar Academy", lvl: 16, time: "27:22", score: 429.4, up: true },
+                          { d: "Seat of the Triumvirate", lvl: 16, time: "30:38", score: 428.7, up: true },
+                          { d: "Magisters' Terrace", lvl: 16, time: "32:22", score: 426.8, up: true },
+                          { d: "Windrunner Spire", lvl: 16, time: "31:47", score: 426.4, up: true },
+                          { d: "Nexus-Point Xenas", lvl: 16, time: "29:30", score: 425.6, up: true },
+                          { d: "Maisara Caverns", lvl: 15, time: "27:38", score: 416.1, up: true },
+                          { d: "Pit of Saron", lvl: 15, time: "25:16", score: 415.9, up: true },
+                          { d: "Skyreach", lvl: 15, time: "25:52", score: 412.9, up: true },
+                        ]
+                    ).map((r: any, i: number) => (
                       <div key={i} className="flex items-center gap-2 p-2 rounded border">
-                        <Badge className={r.lvl >= 16 ? "bg-purple-500" : "bg-blue-500"}>+{r.lvl}</Badge>
+                        <Badge className={r.lvl >= 20 ? "bg-rose-500" : r.lvl >= 18 ? "bg-amber-500" : r.lvl >= 16 ? "bg-purple-500" : "bg-blue-500"}>+{r.lvl}</Badge>
                         <span className="flex-1 font-medium">{r.d}</span>
                         <span className="text-muted-foreground">{r.time}</span>
                         <span className="font-semibold text-pink-500">{r.score}</span>
@@ -2079,7 +2290,11 @@ export default function ShadowPriestDashboardV2() {
                   </div>
                   <div className="mt-3 rounded p-2 bg-amber-500/10 border border-amber-500/30 text-xs">
                     <div className="font-semibold text-amber-500">📌 Observation</div>
-                    <div className="text-muted-foreground mt-1">Tu as 5 donjons en +16 timed (1-chest) et 3 en +15. Il manque <b>2 donjons</b> au moins en +16 pour push score, et les +16 actuels sont chestés à +1 seulement — du temps à récup pour +2/+3.</div>
+                    <div className="text-muted-foreground mt-1">
+                      {rio.status === "ok" && liveBestRuns.length
+                        ? <>Meilleure clé actuelle : <b>+{liveBestKey}</b>. Prochain palier réaliste : <b>+{insight.nextKey}</b> (puis +{insight.stretchKey} en stretch). Priorise les donjons où tu timies le plus large pour convertir en points.</>
+                        : <>Dernier relevé : 5 donjons en +16 timed (1-chest) et 3 en +15. Ouvre la page dans ton navigateur pour la vraie liste live à jour.</>}
+                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -2106,19 +2321,19 @@ export default function ShadowPriestDashboardV2() {
                   </div>
                   <Separator />
                   <div>
-                    <div className="font-semibold mb-1">📈 Objectif réaliste 2 semaines</div>
+                    <div className="font-semibold mb-1">📈 Objectif réaliste 2 semaines {rio.status === "ok" ? <Badge variant="outline" className="ml-1 text-[10px] border-emerald-500/50 text-emerald-300">recalculé live</Badge> : ""}</div>
                     <div className="grid grid-cols-3 gap-2 text-xs">
                       <div className="rounded p-2 bg-muted">
                         <div className="font-semibold">Score</div>
-                        <div className="text-muted-foreground">3382 → 3550</div>
+                        <div className="text-muted-foreground">{liveScore} → {insight.scoreTarget}</div>
                       </div>
                       <div className="rounded p-2 bg-muted">
                         <div className="font-semibold">Meilleure clé</div>
-                        <div className="text-muted-foreground">+16 → +18 (2/3 chests)</div>
+                        <div className="text-muted-foreground">+{liveBestKey} → +{insight.nextKey} (stretch +{insight.stretchKey})</div>
                       </div>
                       <div className="rounded p-2 bg-muted">
                         <div className="font-semibold">iLvl</div>
-                        <div className="text-muted-foreground">282 → 288</div>
+                        <div className="text-muted-foreground">{liveIlvl} → {insight.ilvlTarget}</div>
                       </div>
                     </div>
                   </div>
@@ -2722,9 +2937,74 @@ export default function ShadowPriestDashboardV2() {
                 <Brain className="h-6 w-6" />Mon analyse pure de Màlenïa — verdict honnête
               </CardTitle>
               <CardDescription>
-                Sources croisées : raider.io · WarcraftLogs (271k parses S1) · murlok.io · Archon.gg · Maxroll · Icy-Veins · Method.gg · Wowhead
+                Sources croisées : raider.io (live) · WarcraftLogs · murlok.io · Archon.gg · Maxroll · Icy-Veins · Method.gg · Wowhead
               </CardDescription>
             </CardHeader>
+          </Card>
+
+          {/* ANALYSE DYNAMIQUE — recalculée à partir des valeurs live */}
+          <Card className={`border-2 ${(TIER_CLASSES[insight.tierColor] ?? TIER_CLASSES.purple).card}`}>
+            <CardHeader className="pb-2">
+              <div className="flex items-center justify-between gap-2 flex-wrap">
+                <CardTitle className="flex items-center gap-2">
+                  <Brain className="h-5 w-5" />Analyse dynamique — adaptée à ta progression
+                </CardTitle>
+                {rio.status === "ok"
+                  ? <Badge variant="outline" className="gap-1 border-emerald-500/50 text-emerald-300"><span className="relative flex h-2 w-2"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-60" /><span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" /></span>live</Badge>
+                  : <Badge variant="outline" className="border-amber-500/40 text-amber-300">dernier relevé</Badge>}
+              </div>
+              <CardDescription>Ce bloc se recalcule tout seul à partir de ta côte, ta meilleure clé et ton iLvl actuels — plus besoin de réécrire l'analyse à la main.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="flex items-center gap-3 flex-wrap">
+                <Badge className={`${(TIER_CLASSES[insight.tierColor] ?? TIER_CLASSES.purple).badge} text-sm`}>Palier : {insight.tier}</Badge>
+                <span className="text-xs text-muted-foreground">{insight.tierBlurb}</span>
+              </div>
+
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                <div className="rounded-lg border p-3">
+                  <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Côte M+</div>
+                  <div className="text-xl font-bold font-display text-amber-300">{liveScore}</div>
+                  <div className="text-[10px] text-muted-foreground">cible {insight.scoreTarget}</div>
+                </div>
+                <div className="rounded-lg border p-3">
+                  <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Meilleure clé</div>
+                  <div className="text-xl font-bold font-display text-purple-300">+{liveBestKey}</div>
+                  <div className="text-[10px] text-muted-foreground">prochain +{insight.nextKey}</div>
+                </div>
+                <div className="rounded-lg border p-3">
+                  <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Stretch</div>
+                  <div className="text-xl font-bold font-display text-rose-300">+{insight.stretchKey}</div>
+                  <div className="text-[10px] text-muted-foreground">objectif haut</div>
+                </div>
+                <div className="rounded-lg border p-3">
+                  <div className="text-[10px] uppercase tracking-wider text-muted-foreground">iLvl</div>
+                  <div className="text-xl font-bold font-display text-sky-300">{liveIlvl}</div>
+                  <div className="text-[10px] text-muted-foreground">cible {insight.ilvlTarget}</div>
+                </div>
+              </div>
+
+              <div className="rounded-lg bg-muted/40 border p-3 text-sm">
+                🎯 {insight.headline}
+              </div>
+
+              <div className="space-y-2">
+                {insight.focus.map((f, i) => (
+                  <div key={i} className="flex items-start gap-2 rounded-lg border p-2.5 text-xs sm:text-sm">
+                    <Badge className={
+                      f.tone === "crit" ? "bg-red-500 shrink-0" :
+                      f.tone === "high" ? "bg-amber-500 shrink-0" :
+                      f.tone === "tech" ? "bg-sky-500 shrink-0" : "bg-slate-500 shrink-0"
+                    }>{f.tag}</Badge>
+                    <span className="flex-1">{f.text}</span>
+                  </div>
+                ))}
+              </div>
+
+              {rio.status !== "ok" && (
+                <p className="text-xs text-muted-foreground italic">⚠️ Affichage basé sur le dernier relevé ({LAST_KNOWN_SYNC}). Ouvre la page dans ton navigateur : l'analyse se recalculera sur tes vrais chiffres live.</p>
+              )}
+            </CardContent>
           </Card>
 
           <Card className="border-2 border-violet-500/50">
