@@ -10,3 +10,5 @@ dist-ssr
 .env
 .env.*
 !.env.example
+# Dashboard perso local (contenu privé, non publié)
+local-dashboard/
