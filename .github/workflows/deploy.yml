@@ -2,7 +2,7 @@ name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: [main]
+    branches: [master, main]
   workflow_dispatch:
 
 permissions:
@@ -25,6 +25,14 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
+      # Le dashboard Moine Marche-Vent est un fichier HTML autonome : il est publié tel quel
+      # à côté de l'app React, sous /lyara-ww/.
+      - name: Add standalone Lyarà dashboard
+        run: |
+          if [ -d lyara-ww ]; then
+            mkdir -p dist/lyara-ww
+            cp lyara-ww/index.html dist/lyara-ww/index.html
+          fi
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
