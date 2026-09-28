@@ -1,0 +1,103 @@
+/* 70-analyse.css — «Analyse» report (§3.5). Stage 3b (the provenance components live in 30-ui.css). Phone: chip row of anchors (scrolls inside itself) above
+   the report; desktop ≥ 1024: sticky 240 px table of contents + 760 px report column. */
+/* ---- Analyse ---- */
+.an, .an-main{ display:flex; flex-direction:column; gap:var(--gap); min-width:0; }
+.an-toc{ display:flex; gap:8px; overflow-x:auto; overscroll-behavior-x:contain; scrollbar-width:none; min-width:0; }
+.an-toc::-webkit-scrollbar{ display:none; }
+.an-toc .chip-btn{ flex:none; }
+.an-sec{ display:flex; flex-direction:column; gap:14px; scroll-margin-top:calc(var(--safe-t) + var(--status-h) + 12px); }
+.an-sec > .card-h{ margin-bottom:0; }
+.an-meta{ display:flex; flex-wrap:wrap; align-items:center; gap:4px 6px; margin-bottom:8px; }
+.an-pl{ font-size:12px; line-height:16px; color:var(--muted); margin-top:2px; }
+.an-cl{ margin-left:-12px; }
+.cert{ margin-top:12px; }
+.cbar{ display:flex; gap:2px; height:10px; margin:8px 0 6px; }
+.cbar i{ flex:var(--g, 1) 1 0; min-width:6px; border-radius:3px; }
+.cb-h{ background:var(--d-ramp-4); } .cb-m{ background:var(--d-ramp-2); } .cb-b{ border:1px dotted var(--ink2); }
+.tl{ display:flex; flex-direction:column; gap:14px; }
+.tl .btn{ margin-top:6px; }
+.an-hd{ padding:12px; border-radius:12px; background:var(--s2); border:1px solid var(--line); display:flex; flex-direction:column; gap:8px; }
+.an-hd .card-h{ margin-bottom:0; }
+.an-dd > summary{ justify-content:space-between; }
+.an-dd > summary > .i, .g-grp > summary > .i{ width:16px; height:16px; color:var(--muted); transition:transform var(--t-state) var(--ease); }
+.an-dd[open] > summary > .i, .g-grp[open] > summary > .i{ transform:rotate(90deg); }
+.urg{ display:inline-flex; align-items:center; gap:4px; font-size:12px; line-height:16px; font-weight:700; color:var(--ink); text-transform:none; letter-spacing:0; }
+.u-0 .i{ color:var(--crit-text); } .u-1 .i{ color:var(--serious); } .u-2 .i{ color:var(--mist); }
+.wk-g > .over{ display:flex; align-items:center; gap:6px; margin-bottom:8px; }
+.wk-g + .wk-g, .wk-spec{ margin-top:12px; }
+.wk{ display:flex; flex-direction:column; gap:8px; padding:12px; border-radius:12px; background:var(--s2); border:1px solid var(--line); min-width:0; }
+.wk + .wk{ margin-top:8px; }
+.wk-h{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.wk-kv{ display:grid; grid-template-columns:minmax(0,76px) minmax(0,1fr); gap:6px 12px; font-size:14px; line-height:20px; }
+.wk-kv dt{ color:var(--muted); font-size:12px; font-weight:600; }
+.wk-kv dd{ min-width:0; overflow-wrap:anywhere; color:var(--ink2); }
+.mir{ display:flex; flex-direction:column; gap:8px; }
+.mir-r{ display:grid; gap:8px; padding:12px; border-radius:12px; background:var(--s2); border:1px solid var(--line); min-width:0; font-size:14px; line-height:20px; }
+.mir-hd{ display:none; }
+.mir-k{ display:flex; flex-wrap:wrap; align-items:center; gap:4px 8px; }
+.mir-c{ min-width:0; overflow-wrap:anywhere; color:var(--ink2); }
+.mir-c p + p{ margin-top:6px; }
+.mir-l{ display:block; font-size:12px; line-height:16px; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:.04em; }
+.mir-c .input{ margin:4px 0; }
+.vd{ display:inline-flex; align-items:center; gap:4px; padding:2px 8px; border-radius:var(--r-pill); border:1px solid var(--line-strong); font-size:12px; line-height:16px; font-weight:600; color:var(--ink); }
+.vd-ok .i{ color:var(--good-text); } .vd-diff .i{ color:var(--serious); } .vd-unk{ border-style:dotted; } .vd-unk .i{ color:var(--mist); } .vd-debate{ border-color:var(--debate); }
+.emb{ display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:center; gap:6px 10px; margin-bottom:6px; }
+.emb .btn[aria-pressed="true"]{ background:var(--jade-tint); border-color:var(--jade); }
+.gates{ display:flex; flex-direction:column; }
+.gate{ display:flex; flex-wrap:wrap; align-items:center; gap:8px 10px; padding:10px 0; border-top:1px solid var(--line); font-size:14px; line-height:20px; }
+.gate:first-child{ border-top:0; }
+.gate > .i{ width:22px; height:22px; }
+.gate .grow{ flex:1 1 200px; min-width:0; }
+.g-ok > .i{ color:var(--good-text); } .g-no > .i{ color:var(--serious); } .g-unk > .i{ color:var(--mist); }
+.proj{ display:flex; flex-direction:column; gap:10px; padding:12px; border-radius:12px; background:var(--s2); border:1px solid var(--line); }
+.proj .card-h{ margin-bottom:0; }
+.proj-a{ display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:center; gap:8px 12px; }
+.proj .row{ flex-wrap:wrap; }
+.proj-r{ flex:1 1 180px; text-align:right; }
+.pl-g + .pl-g{ margin-top:8px; }
+.spts{ display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:8px; }
+.spt{ display:flex; flex-direction:column; gap:4px; padding:12px; border-radius:12px; background:var(--s2); border:1px solid var(--line); min-width:0; }
+.spt .i{ vertical-align:-4px; }
+.srcl{ list-style:decimal; padding-left:24px; font-size:13px; line-height:18px; color:var(--ink2); }
+.srcl li + li{ margin-top:2px; }
+@media (min-width:1024px){
+  .an{ display:grid; grid-template-columns:240px minmax(0,760px); justify-content:center; align-items:start; gap:24px; }
+  .an-toc{ position:sticky; top:calc(var(--top-h) + 12px); flex-direction:column; overflow:visible; }
+  .an-toc .chip-btn{ justify-content:flex-start; }
+  .an-sec{ scroll-margin-top:calc(var(--top-h) + 12px); }
+  .mir-r{ grid-template-columns:minmax(0,150px) repeat(3, minmax(0,1fr)); gap:14px; }
+  .mir-k{ flex-direction:column; align-items:flex-start; }
+  .mir-hd{ display:grid; padding:0 12px; background:none; border:0; font-size:12px; line-height:16px; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:.04em; }
+  .mir-l{ display:none; }
+}
+.wk .btn-row > .btn{ flex:0 1 auto; }
+.mir-c .sm{ display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:3; line-clamp:3; overflow:hidden; }
+
+/* ---- P1-2 projection chart (73-projection.js): blue réaliste in a 15 % blue band, jade measured pace, target hairlines ---- */
+.pj{ margin-top:14px; }
+.pj-band{ fill:var(--d-cible); fill-opacity:.15; }
+.pj-real{ fill:none; stroke:var(--d-cible); stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+.pj-meas{ fill:none; stroke:var(--d-toi); stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+.pj-tg{ stroke:var(--d-cible); stroke-width:1; stroke-opacity:.6; }
+.pj-tg-h{ stroke-width:2; stroke-opacity:1; }
+.pj-cap{ fill:var(--d-cible); fill-opacity:.08; }
+.pj-dot{ fill:var(--d-cible); }
+.ch-leg{ display:flex; flex-wrap:wrap; gap:4px 14px; margin-top:6px; }
+.ch-leg li{ display:inline-flex; align-items:center; gap:6px; }
+.lgk{ flex:none; display:inline-block; width:16px; height:2px; border-radius:1px; }
+.lgk-real{ background:var(--d-cible); }
+.lgk-meas{ background:var(--d-toi); }
+.lgk-band{ height:10px; background:rgba(57,135,229,.15); border-radius:2px; }
+.lgk-tg{ height:1px; background:rgba(57,135,229,.6); }
+.lgk-none{ height:0; border-top:1px dotted var(--mist); }
+.pj-plat{ margin-top:12px; }
+.pj-plat .t-cap{ margin-top:4px; }
+
+/* ---- P1-3 cutoff strip (74-cutoffs.js): orange raider.io thresholds, jade «toi», blue research milestones ---- */
+.cut{ margin-top:14px; }
+.cut > .t-call{ margin-bottom:6px; }
+.cut-ax{ stroke:var(--baseline); stroke-width:1; }
+.cut-top{ stroke:var(--d-top); stroke-width:2; }
+.cut-ms{ stroke:var(--d-cible); stroke-width:1; stroke-opacity:.6; }
+.cut-ms-h{ stroke-width:2; stroke-opacity:1; }
+.cut-lb{ fill:var(--ink2); font-size:12px; font-weight:600; }

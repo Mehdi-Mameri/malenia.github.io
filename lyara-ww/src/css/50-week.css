@@ -1,0 +1,89 @@
+/* 50-week.css — «Semaine» (spec §3.3) + «Radar de clés» (P0-9). Stage 3a.
+   Phone: one column, order reset → affixes → coffre → radar → clés → raid → monde (column wrappers are
+   display:contents). Desktop ≥ 1024: 7/12 (reset, coffre, radar) + 5/12 (affixes, clés, raid, monde). */
+.sem{ display:flex; flex-direction:column; gap:var(--gap); min-width:0; }
+.sem-l, .sem-r{ display:contents; }
+.sem-l > *, .sem-r > *{ min-width:0; }
+.o-w1{ order:1; } .o-w2{ order:2; } .o-w3{ order:3; } .o-w4{ order:4; } .o-w5{ order:5; } .o-w6{ order:6; } .o-w7{ order:7; } .o-w8{ order:8; }
+.o-w9{ order:9; }
+.o-w4:empty, .o-w9:empty{ display:none; }
+@media (min-width:1024px){
+  .sem{ display:grid; grid-template-columns:minmax(0,7fr) minmax(0,5fr); align-items:start; }
+  .sem-l, .sem-r{ display:flex; flex-direction:column; gap:var(--gap); }
+}
+.sem-mt{ margin-top:12px; }
+
+/* reset card + 7-day strip */
+.sem-cd{ margin-top:-4px; }
+.sem-cd .t-display{ white-space:nowrap; }
+.sem-days{ display:grid; grid-template-columns:repeat(7, minmax(0,1fr)); gap:4px; margin-top:12px; }
+.sem-d{ position:relative; display:flex; flex-direction:column; align-items:center; gap:0; padding:6px 0 10px; border-radius:10px; background:var(--s2); font-size:12px; line-height:16px; font-weight:600; color:var(--ink2); }
+.sem-d .num{ font-size:15px; line-height:20px; color:var(--ink); }
+.sem-d.is-past{ background:transparent; color:var(--muted); }
+.sem-d.is-past .num{ color:var(--muted); }
+.sem-d.is-today{ box-shadow:inset 0 0 0 2px var(--jade); }
+.sem-rn{ position:absolute; bottom:3px; left:50%; width:5px; height:5px; margin-left:-2.5px; border-radius:50%; background:var(--gold); }
+
+/* vault (rows from K.nowUI.vaultRows, bigger cells here) */
+.sem-vault .vgrid{ gap:8px; }
+.sem-vault .vc{ min-height:52px; font-size:14px; line-height:18px; }
+.sem-vault .vl{ font-size:14px; }
+.sem-hint{ margin-top:12px; }
+.sem-hint .over{ margin-bottom:2px; }
+
+/* key list, raid tapper, delves */
+.sem-run{ align-items:flex-start; }
+.sem-lv{ flex:none; min-width:3.2ch; font-size:19px; line-height:24px; font-weight:650; }
+.sem-run .btn{ width:var(--tap); padding:0; margin:-6px -8px -6px 0; }
+.sem-season{ display:flex; align-items:center; flex-wrap:wrap; gap:4px 8px; margin-bottom:6px; }
+.sem-bosses{ display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:8px; margin-top:10px; }
+.sem-boss{
+  display:flex; align-items:center; justify-content:space-between; gap:8px; min-height:var(--tap); padding:6px 10px; min-width:0;
+  border-radius:var(--r-chip); background:var(--s2); border:1px solid var(--line); text-align:left; transition:transform var(--t-press) var(--ease);
+}
+.sem-boss:active{ transform:scale(.97); }
+.sem-boss[aria-pressed="true"]{ background:var(--jade-tint); border-color:var(--jade); }
+.sem-bn{ min-width:0; font-size:13px; line-height:16px; font-weight:600; color:var(--ink); overflow-wrap:anywhere; display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:2; line-clamp:2; overflow:hidden; }
+.sem-bv{ flex:none; min-width:3ch; text-align:right; font-size:14px; font-weight:700; color:var(--ink2); }
+.sem-boss[aria-pressed="true"] .sem-bv{ color:var(--ink); }
+.sem-addrow{ display:flex; align-items:flex-end; gap:8px; }
+.sem-addrow .field{ flex:1 1 auto; }
+.chip-btn .i{ color:var(--muted); }
+
+/* radar: segmented control + tiles (phone 2 columns, desktop 4) */
+.seg{ display:grid; grid-auto-flow:column; grid-auto-columns:minmax(0,1fr); gap:6px; margin-bottom:10px; }
+.seg button{ min-height:var(--tap); border-radius:var(--r-chip); background:var(--s2); border:1px solid var(--line); color:var(--ink2); font-size:14px; font-weight:600; text-align:center; padding:0 6px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.seg button[aria-pressed="true"]{ background:var(--jade-tint); border-color:var(--jade); color:var(--ink); }
+.sem-rh{ margin-bottom:4px; }
+.rt-grid{ display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:8px; margin-top:10px; }
+@media (min-width:1024px){ .rt-grid{ grid-template-columns:repeat(4, minmax(0,1fr)); } }
+.rt{
+  display:flex; flex-direction:column; gap:6px; min-width:0; min-height:112px; padding:10px; border-radius:12px;
+  background:var(--s2); border:1px solid var(--line); text-align:left; transition:transform var(--t-press) var(--ease);
+}
+.rt:active{ transform:scale(.98); }
+.rt-ghost{ background:transparent; border:1px dotted var(--line-strong); }
+.rt-h{ display:block; min-width:0; overflow-wrap:anywhere; display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:2; line-clamp:2; overflow:hidden; }
+.rt-s{ margin-right:6px; font-size:12px; line-height:16px; font-weight:700; letter-spacing:.04em; color:var(--ink2); }
+.rt-n{ font-size:14px; line-height:18px; font-weight:500; color:var(--ink); }
+.rt-l{ display:flex; align-items:baseline; flex-wrap:wrap; gap:0 6px; min-width:0; }
+.rt-lv{ font-size:19px; line-height:24px; font-weight:700; }
+.rt-up{ font-size:12px; line-height:16px; font-weight:700; color:var(--ink2); }
+.rt-m{ margin-left:auto; min-width:0; display:inline-flex; align-items:center; gap:3px; font-size:12px; line-height:16px; font-weight:600; color:var(--ink2); white-space:nowrap; }
+.rt-m .i{ color:var(--warn); }
+.rt-g{ font-size:13px; line-height:18px; color:var(--ink2); }
+.rt-b{ display:flex; flex-wrap:wrap; gap:4px; margin-top:auto; }
+.rt-b .chip{ padding:2px 6px; }
+.rt-re .i{ color:var(--warn); }
+/* timer bar: full width = 1,15 × par; track = par; ticks ~ at 60 % / 80 % of par (moyenne), par = solid */
+.rt-bar{ position:relative; display:block; height:6px; margin:2px 0; }
+.rt-bar::before{ content:""; position:absolute; left:0; top:0; bottom:0; width:86.96%; border-radius:3px; background:var(--d-track); box-shadow:inset 0 0 0 1px var(--line-strong); }
+.rt-bar::after{ content:""; position:absolute; left:86.96%; right:0; top:2px; height:2px; background:var(--line); }
+.rt-f{ position:absolute; left:0; top:0; bottom:0; width:var(--p, 0%); border-radius:3px; background:var(--d-toi); }
+.rt-t{ position:absolute; top:-2px; bottom:-2px; left:var(--x, 50%); width:1px; background:var(--d-cible); opacity:.6; }
+.rt-par{ position:absolute; top:-3px; bottom:-3px; left:86.96%; width:2px; margin-left:-1px; border-radius:1px; background:var(--d-cible); }
+.rt-ov{ position:absolute; right:0; top:-3px; bottom:-3px; width:2px; background:var(--ink2); }
+
+/* ---- P1-8 «Et si…» (dungeon sheet) ---- */
+.wi-row{ display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+.wi-out{ flex:1 1 180px; min-width:0; }

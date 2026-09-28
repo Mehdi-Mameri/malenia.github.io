@@ -1,0 +1,157 @@
+/* 40-now.css — «Maintenant» (spec §3.1 phone, §3.2 desktop): meters, objective strip, budget control,
+   hero, plan strip, queue rows, «Pourquoi ?» / «Jauge» sheets. Stage 2.
+   Phone: one column, order meters → objective → budget → hero → plan → last-known → queue → done
+   (the two column wrappers are display:contents). Desktop ≥ 1024: 7/12 + 5/12 columns. */
+.now{ display:flex; flex-direction:column; gap:var(--gap); min-width:0; }
+.now-l, .now-r{ display:contents; }
+.now-l > *, .now-r > *{ min-width:0; }
+.o-meters{ order:1; } .o-obj{ order:2; } .o-budget{ order:3; } .o-hero{ order:4; } .o-plan{ order:5; }
+.o-lk{ order:6; } .o-queue{ order:7; } .o-pv{ order:8; } .o-diff{ order:8; } .o-done{ order:9; } .o-desk{ display:none; }
+.o-done:empty, .o-diff:empty, .o-pv:empty{ display:none; }
+@media (min-width:1024px){
+  .now{ display:grid; grid-template-columns:minmax(0,7fr) minmax(0,5fr); align-items:start; }
+  .now-l, .now-r{ display:flex; flex-direction:column; gap:var(--gap); }
+  .o-desk{ display:flex; flex-direction:column; gap:var(--gap); order:2; }
+}
+
+/* ---- meters: label 92 px · track · value (tabular, ≤ 11 ch). 28 px rows, 44 px hit boxes (flex column, −8 px margins) ---- */
+.meters{ padding:10px 14px; }
+.meters .card-h{ margin-bottom:4px; }
+.m-list{ display:flex; flex-direction:column; padding:6px 0; }
+.mrow{
+  display:grid; grid-template-columns:92px minmax(0,1fr) 10ch; align-items:center; column-gap:10px;
+  width:100%; height:var(--tap); margin:-8px 0; border-radius:8px; position:relative;
+}
+.mrow:active{ background:rgba(255,255,255,.04); }
+.m-l{ font-size:14px; line-height:20px; font-weight:500; color:var(--ink2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.m-t{ display:flex; align-items:center; gap:6px; min-width:0; height:20px; }
+.m-v{ font-size:14px; line-height:20px; font-weight:600; text-align:right; white-space:nowrap; color:var(--ink); }
+.m-q{ display:inline-grid; place-items:center; width:16px; height:16px; margin-left:4px; border-radius:50%; border:1px dashed var(--mist); color:var(--mist); font-size:11px; line-height:1; font-weight:700; vertical-align:1px; }
+.cells{ display:flex; align-items:center; gap:2px; flex:1 1 auto; min-width:0; height:12px; }
+.c{ flex:1 1 0; min-width:4px; height:8px; border-radius:3px; background:var(--d-track); box-shadow:inset 0 0 0 1px var(--line-strong); }
+.c-on{ background:var(--d-toi); box-shadow:none; }
+.c-decl{ background:var(--d-ramp-2); box-shadow:none; }
+.c-gap{ background:transparent; box-shadow:inset 0 0 0 1px rgba(57,135,229,.6); }
+.c-unk{ background:transparent; box-shadow:none; border:1px dotted var(--mist); }
+.tick{ flex:none; width:2px; height:12px; border-radius:1px; background:var(--d-cible); margin:0 1px; }
+.g3{ gap:6px; } .g3 .grp{ display:flex; gap:2px; flex:1 1 0; min-width:0; }
+.lab{ flex:none; font-size:12px; line-height:16px; color:var(--muted); }
+.bar{ position:relative; flex:1 1 auto; min-width:24px; height:6px; border-radius:3px; background:var(--d-track); box-shadow:inset 0 0 0 1px var(--line-strong); }
+.bar .fill{ position:absolute; left:0; top:0; bottom:0; width:var(--p, 0%); border-radius:3px; background:var(--d-toi); }
+.bar .gapo{ position:absolute; top:0; bottom:0; left:var(--p, 0%); right:0; border-radius:0 3px 3px 0; box-shadow:inset 0 0 0 1px rgba(57,135,229,.6); }
+.bar .tk{ position:absolute; top:-3px; bottom:-3px; left:var(--x, 100%); width:2px; margin-left:-2px; background:var(--d-cible); border-radius:1px; }
+.bar .tk-m{ width:1px; margin-left:-1px; opacity:.6; }
+.bar .tk-top{ background:var(--d-top); }
+
+/* ---- objective strip (gold edge, crown) ---- */
+.obj{
+  display:grid; grid-template-columns:24px minmax(0,1fr) 16px; align-items:center; gap:10px; width:100%; min-height:52px;
+  padding:6px 12px; background:var(--s1); border:1px solid var(--line); border-left:2px solid var(--gold); border-radius:var(--r-card);
+  box-shadow:var(--e2-shadow); text-align:left; transition:transform var(--t-press) var(--ease);
+}
+.obj:active{ transform:scale(.99); }
+.obj > .i-lg{ color:var(--gold); }
+.obj > .i:last-child{ color:var(--muted); width:16px; height:16px; }
+.obj-b{ display:flex; flex-direction:column; min-width:0; }
+.obj-o{ display:flex; align-items:center; gap:8px; min-width:0; }
+.obj-o .prov{ height:18px; }
+.obj-l, .obj-n{ font-size:14px; line-height:20px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.obj-l{ font-weight:650; color:var(--ink); }
+.obj-n{ color:var(--ink2); font-weight:500; }
+
+/* ---- budget segmented control ---- */
+.budget{ display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:6px; }
+.budget button{
+  min-height:var(--tap); border-radius:var(--r-chip); background:var(--s1); border:1px solid var(--line); color:var(--ink2);
+  font-size:15px; line-height:20px; font-weight:600; text-align:center; padding:0 4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  transition:transform var(--t-press) var(--ease);
+}
+.budget button:active{ transform:scale(.97); background:var(--s3); }
+.budget button[aria-pressed="true"]{ background:var(--jade-tint); border-color:var(--jade); color:var(--ink); }
+
+/* ---- hero ---- */
+.hero{ display:flex; flex-direction:column; gap:7px; padding-block:14px; }
+.hero-o{ display:flex; align-items:center; gap:6px; flex-wrap:wrap; min-width:0; }
+.hero-t{ font-size:19px; line-height:24px; font-weight:650; overflow-wrap:anywhere; display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:2; line-clamp:2; overflow:hidden; }
+.hero-w{ font-size:14px; line-height:20px; color:var(--ink2); overflow-wrap:anywhere; display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:2; line-clamp:2; overflow:hidden; }
+.hero-m{ display:flex; align-items:center; gap:6px 14px; flex-wrap:wrap; font-size:12px; line-height:16px; font-weight:600; color:var(--ink2); }
+.hero-m > span{ display:inline-flex; align-items:center; gap:6px; }
+.hero-b{ display:flex; gap:8px; margin-top:4px; }
+.hero-b .btn{ flex:1 1 auto; padding:0 10px; min-width:0; }
+.hero-b .btn-primary{ flex-grow:2; }
+.hero-b .btn span{ white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.hero-sk{ gap:12px; }
+.hero .card-foot{ margin-top:2px; }
+.pips{ display:inline-flex; gap:3px; align-items:center; }
+.pips i{ width:7px; height:7px; border-radius:50%; border:1px solid var(--ink2); }
+.pips i.on{ background:var(--ink2); }
+.tiles2{ display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:8px; margin-top:10px; }
+.tile2{ display:flex; flex-direction:column; gap:2px; min-height:var(--tap); padding:10px; border-radius:12px; background:var(--s2); border:1px solid var(--line); text-align:left; min-width:0; }
+
+/* ---- plan strip ---- */
+.plan{ padding:10px 14px; }
+.pbar{ position:relative; display:flex; gap:2px; height:24px; overflow:hidden; border-radius:6px; background:var(--bg); box-shadow:inset 0 0 0 1px var(--line); }
+.pseg{ flex:0 1 var(--w, 10%); min-width:14px; padding:0 5px; text-align:center; border-radius:5px; background:var(--s3); color:var(--ink); font-size:12px; line-height:24px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:clip; }
+.pbud{ position:absolute; top:0; bottom:0; left:var(--x, 100%); width:2px; margin-left:-1px; background:var(--ink2); }
+.plan-c{ margin-top:6px; }
+
+/* ---- queue rows ---- */
+.queue .t-h2{ margin-bottom:4px; }
+.qg{ margin-top:10px; }
+.qg > h3, .qg > summary{ margin:0 0 2px; }
+.qg > summary{ justify-content:space-between; }
+.qg[open] > summary .i{ transform:rotate(90deg); }
+.arow{ display:grid; grid-template-columns:22px minmax(0,1fr) 14px; align-items:center; gap:10px; width:100%; min-height:56px; padding:8px 2px; text-align:left; border-radius:10px; }
+.arow:active{ background:var(--s2); }
+.arow > .i:first-child{ color:var(--ink2); }
+.arow > .i:last-child{ width:14px; height:14px; color:var(--muted); }
+.arow.is-basse{ border:1px dotted var(--line-strong); padding-inline:8px; margin-block:4px; }
+.arow-b{ display:flex; flex-direction:column; gap:3px; min-width:0; }
+.arow-t{ font-size:15px; line-height:20px; font-weight:600; overflow-wrap:anywhere; display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:2; line-clamp:2; overflow:hidden; }
+.arow-m{ display:flex; align-items:center; flex-wrap:wrap; gap:4px 8px; font-size:12px; line-height:16px; color:var(--ink2); }
+.arow-m > span{ display:inline-flex; align-items:center; gap:4px; }
+.tag{ display:inline-flex; align-items:flex-start; gap:6px; font-size:12px; line-height:16px; font-weight:600; color:var(--ink); overflow-wrap:anywhere; }
+.tag .i{ margin-top:1px; color:var(--warn); }
+.tag-ok .i{ color:var(--good-text); }
+
+/* ---- vault mini-grid (desktop) + sheets ---- */
+.vgrid{ display:flex; flex-direction:column; gap:6px; }
+.vrow{ display:grid; grid-template-columns:minmax(106px, 1.2fr) repeat(3, minmax(0,1fr)); gap:6px; align-items:stretch; }
+.vl{ display:flex; flex-wrap:wrap; align-items:center; gap:4px 6px; font-size:13px; line-height:18px; font-weight:600; min-width:0; }
+.vl .prov{ height:18px; }
+.vc{ display:flex; align-items:center; justify-content:center; text-align:center; min-height:40px; padding:4px; border-radius:8px; background:var(--s2); border:1px solid var(--line); font-size:12px; line-height:16px; font-weight:600; color:var(--ink2); min-width:0; overflow-wrap:anywhere; }
+.vc-open{ border-color:var(--d-toi); color:var(--ink); }
+.vc-open.vc-decl{ border-color:var(--d-ramp-2); border-style:dashed; }
+.vc-unknown{ border-style:dotted; border-color:var(--mist); }
+.vpace{ margin-top:10px; }
+.kv-why dd{ text-align:left; }
+.kv-why{ grid-template-columns:minmax(0,40%) minmax(0,1fr); }
+.why-l{ margin-top:8px; }
+.srcs{ display:flex; flex-wrap:wrap; gap:0 12px; font-size:12px; line-height:16px; margin-top:4px; }
+.trow{ flex-wrap:wrap; }
+.trow-b{ flex:1 1 100%; }
+.trow-b .btn[aria-pressed="true"]{ background:var(--jade-tint); border-color:var(--jade); }
+
+/* ---- P1-1 «Depuis ta dernière visite» + journal sparkline in the meter sheets ---- */
+.vis .t-cap{ margin:-6px 0 10px; }
+.vis-more{ margin-top:6px; }
+.vis-more > summary{ gap:8px; }
+.vis-more[open] > summary{ display:none; }
+
+/* ---- P1-6 «Pré-vol» (button on Maintenant, sheet) ---- */
+.pv-open{ width:100%; }
+.pv-seg{ margin-bottom:0; }
+.pv-seg button{ display:inline-flex; align-items:center; justify-content:center; gap:6px; }
+.pv-list > li + li{ border-top:1px solid var(--line); }
+.pv-row{ display:flex; align-items:center; gap:8px; min-width:0; }
+.pv-ck{ flex:1 1 auto; display:flex; align-items:center; gap:12px; min-height:48px; padding:6px 0; text-align:left; min-width:0; border-radius:10px; }
+.pv-ck:active{ background:var(--s3); }
+.pv-box{ flex:none; display:grid; place-items:center; width:24px; height:24px; border-radius:6px; border:1.5px solid var(--line-strong); color:var(--on-jade); }
+.pv-ck[aria-pressed="true"] .pv-box{ background:var(--jade); border-color:var(--jade); }
+.pv-ck[aria-pressed="true"] .ink{ color:var(--ink2); }
+.pv-sys{ margin-top:8px; }
+.pv-row .cg-b{ margin:0; flex:none; }
+
+/* ---- P1-9 plan actions ---- */
+.plan-b{ margin-top:4px; margin-bottom:-6px; }
+.plan-b .btn{ flex:0 1 auto; padding:0 10px; color:var(--ink2); }

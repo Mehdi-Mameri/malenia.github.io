@@ -1,0 +1,3124 @@
+{
+  "meta": {
+    "asOf": "2026-09-28",
+    "patch": "12.1.0 « Curse of Ula'tek » (build live 12.1.0.69933, correctifs au 24/09) · 12.1.5 encore sur le PTR (build 12.1.5.69952)",
+    "season": "Midnight Saison 2",
+    "player": {
+      "name": "Lyarà",
+      "realm": "Archimonde",
+      "region": "eu",
+      "race": "Elfe de la nuit",
+      "spec": "Marche-vent",
+      "lastKnown": "Au 28/09 (base de l'addon Raider.IO, instantané quotidien de 06:31 UTC, décodé localement) : cote M+ S2 de 3403, sept donjons chronométrés en +16 et Murder Row en +15 ; Gouffre venimeux 8/8 Héroïque (4 à 6 clears) et 1/8 Mythique ; The Tidebound Grotto (repaire de raid à 1 boss, Nymrissa Wavecaller) 1/1 Héroïque. Équipement connu : seulement l'export SimC du 21/08 (≈ 303 d'ilvl, aucun enchant ni gemme, 0/5 tier), très probablement dépassé. L'objet réellement obtenu sur Ula'tek vers le 4/09 reste inconnu."
+    },
+    "method": "Recherche du 28/09/2026 menée par plusieurs agents, en deux temps. 1) Recherches web : seuls les résumés et extraits des résultats ont été lus ; aucune page n'a pu être ouverte directement (WebFetch bloqué par le proxy), et le quota de 200 recherches de la session s'est épuisé en cours de route, si bien que les pistes équipement, enchants et contenu reposent en partie sur des résultats déjà collectés plus tôt (5 septembre et 28 septembre). 2) Vérification contradictoire par un second agent, qui a recoupé chaque affirmation avec des données primaires publiques clonées depuis GitHub : données de jeu, liste de priorités et profils par défaut de SimulationCraft (branche midnight, live 12.1.0.69933 avec correctifs au 24/09, PTR 12.1.5.69952), base de l'addon Raider.IO générée le 28/09 (décodée localement pour retrouver Lyarà), addon SavedInstances et client TypeScript non officiel raiderio-api 0.6.1. Le vérificateur a aussi lancé ses propres simulations SimC, mais sur les profils par défaut (≈ 339 d'ilvl), pas sur ton équipement ; leurs chiffres ne sont pas repris ici, seulement leur sens. 3) Complément du 28/09, une fois le quota de recherches épuisé : lecture directe de données publiques sur GitHub, sans passer par des résultats de recherche : AllTheThings (tables de loot, jetons de tier, Catalyseur), RCLootCouncil (emplacements des jetons), modules de boss BigWigs et DBM (noms des capacités, marqueurs Mythique, interruptions et dissipations ; aucune stratégie écrite), textes et code d'interface du client 12.1.0 (grande chambre forte). Ce qui ne repose que sur l'une de ces sources est signalé comme tel. Limites : raider.io, Warcraft Logs et l'Armurerie étaient inaccessibles, donc ton équipement, tes enchants et tes talents actuels sont inconnus ; les données PTR peuvent changer ; plusieurs sources sont des sites de boost ou des agrégateurs ; les statistiques d'usage reflètent surtout le haut du classement ; certaines pages de guides mélangent encore du contenu de la saison 1. Les points contestés sont isolés dans « disputed » et ne sont jamais présentés comme des recommandations. L'ensemble est une recommandation à faire valider par un humain, pas une conclusion définitive."
+  },
+  "headline": {
+    "title": "3403 de cote, 8/8 HM, 1/8 M : cap sur le 4 pièces, le +17 et le Mythique",
+    "summary": "La base Raider.IO du 28/09 montre un personnage bien plus avancé que l'export du 21/08 : cote M+ S2 de 3403 (tout en +16 sauf Murder Row en +15), Gouffre venimeux 8/8 Héroïque et 1/8 Mythique. Le Marche-vent a reçu deux buffs PvE en septembre (≈ +4 % le 1er, puis auto-attaques, Dual Threat et Rising Sun Kick le 22), qui visent justement son point faible sur boss. Les priorités : vérifier en direct enchants, gemmes et 4 pièces, remplir le coffre chaque semaine, rattraper Murder Row puis viser le +17, et avancer en Mythique maintenant que le raid a été nerfé. 12.1.5 (raid Kith'ix, Venomstones) est attendu vers le 6 octobre, date non officielle. Recommandations à valider par un humain, pas des conclusions définitives.",
+    "keyPoints": [
+      "Ton équipement actuel est inconnu : l'export du 21/08 (≈ 303, sans enchants ni gemmes, 0/5 tier) est très probablement dépassé ; le tableau de bord le relit en direct.",
+      "Objectif de saison : le 4 pièces Guile of the Monkey King (jetons Venomcured, Slumbering Coil Curio d'Ula'tek, Catalyseur de Silvermoon ; le profil SimC laisse les mains hors tier), puis Abyssal Broodfiend's Bardiche et Voracious Heart of Ula'tek.",
+      "Enchants DPS en Midnight : arme, anneaux, torse et jambes. Il n'existe pas d'enchant de cape ni de poignets.",
+      "M+ : un +17 chronométré vaut 440 points par donjon ; Murder Row (+15) est ton seul donjon sous +16.",
+      "Arbre héroïque : Shado-Pan en raid mono-cible ; Conduit of the Celestials mérite d'être simulé pour le M+ dès le 4 pièces.",
+      "Ignore les logs et sims des 22–23/09 (bug PvP appliqué en PvE) ainsi que les sims PTR des arbres héroïques.",
+      "12.1.5 (PTR) : la pièce cantrip cuir de Kith'ix est désormais un torse, et les Venomstones n'améliorent qu'arme, bijou ou collier entièrement améliorés."
+    ]
+  },
+  "patchTimeline": [
+    {
+      "date": "2026-10-06",
+      "title": "Sortie estimée de 12.1.5 « The Promise of Tomorrow » (non officielle)",
+      "detail": "12.1.5 est sur le PTR depuis le 3 septembre. Au 28/09, aucune date officielle : le 6 octobre est une estimation communautaire fondée sur la cadence de 8 semaines. Contenu attendu : raid à un boss The Unbinding of Kith'ix (Mythique en 344), Labyrinthes, Ascendant Venomstones (jusqu'à l'équivalent Mythe 8, soit 340 dans les données SimC, d'après un seul résumé de recherche). Aucun changement propre au Marche-vent trouvé dans les notes et données PTR.",
+      "type": "annonce",
+      "forYou": "Termine d'améliorer l'arme, les bijoux et le collier que tu comptes garder : les Venomstones n'agissent que sur des objets entièrement améliorés.",
+      "confidence": "moyenne",
+      "sources": [
+        "s1",
+        "s2",
+        "s3",
+        "s126",
+        "s49"
+      ]
+    },
+    {
+      "date": "2026-09-26",
+      "title": "Mise à jour du modèle SimC du moine",
+      "detail": "SimulationCraft a modifié son modèle du moine le 26/09 (commit 36d6cfab) : le déclenchement de Rushing Wind Kick réinitialise désormais Rising Sun Kick, Chi Burst consomme Balanced Stratagem, et un correctif touche Purified Spirit.",
+      "type": "systeme",
+      "forYou": "Les sims Marche-vent antérieures au 26/09 peuvent être légèrement faussées : refais-les avec une version récente de SimC ou Raidbots.",
+      "confidence": "haute",
+      "sources": [
+        "s90"
+      ]
+    },
+    {
+      "date": "2026-09-23",
+      "title": "Correctif : Celestial Conduit et Flurry Strikes redeviennent PvP uniquement",
+      "detail": "Pendant environ une journée après le reset du 22/09 (NA), les ajustements PvP (Celestial Conduit +50 %, Flurry Strikes −15 %) s'appliquaient aussi en PvE. Corrigé par le correctif du 23/09. Le PTR 12.1.5 (build 69952) porte encore l'ancienne version.",
+      "type": "fix",
+      "forYou": "Ignore les logs, sims et tier lists capturés les 22–23/09 ainsi que les sims PTR qui comparent les arbres héroïques.",
+      "confidence": "haute",
+      "sources": [
+        "s4",
+        "s5",
+        "s6"
+      ]
+    },
+    {
+      "date": "2026-09-23",
+      "title": "Buffs PvE du Marche-vent (reset EU)",
+      "detail": "Annoncés pour le 22/09 (NA) : auto-attaques de mêlée +25 %, Dual Threat +20 %, Rising Sun Kick +8 % (le même modificateur couvre Glory of the Dawn et Rushing Wind Kick). Aucun effet en PvP, confirmé dans les données de jeu.",
+      "type": "buff",
+      "forYou": "Ces buffs visent le point faible du spé (mono-cible, boss) : les classements mesurés avant cette date sous-estiment probablement le Marche-vent. Refais tes sims de stats et de bijoux.",
+      "confidence": "haute",
+      "sources": [
+        "s7",
+        "s8",
+        "s6"
+      ]
+    },
+    {
+      "date": "2026-09-23",
+      "title": "Arbres héroïques : ajustements réservés au PvP",
+      "detail": "Celestial Conduit +50 % et Flurry Strikes −15 %, en PvP seulement. La justification de Blizzard (« Shado-Pan surperforme, Conduit sous-performe ») portait sur l'équilibre PvP.",
+      "type": "pvp",
+      "forYou": "Ne t'appuie pas sur cette note pour choisir ton arbre en PvE : ce sont les sims qui tranchent.",
+      "confidence": "haute",
+      "sources": [
+        "s8",
+        "s6",
+        "s5"
+      ]
+    },
+    {
+      "date": "2026-09-23",
+      "title": "Derniers réglages des bijoux de la saison 2",
+      "detail": "Gaze of the Alnseer −10 % de stat principale, Algeth'ar Puzzle Box −25 % de Maîtrise, Vaelgor's Final Stare −10 % de Maîtrise ; Font of Venomous Rage +25 % de dégâts ; Ruby Whelp Shell remanié (pas un nerf net) ; Unstable Felheart Crystal : recharge 120 → 90 s ; bijoux de soin renforcés. Voracious Heart of Ula'tek et Vile Vial of Volatile Venom inchangés. Blizzard parle des derniers gros réglages de bijoux de la saison.",
+      "type": "nerf",
+      "forYou": "Tes bijoux cibles (Voracious Heart, Zul'jin's Guillotine) ne bougent pas ; re-simule Font of Venomous Rage et une éventuelle Puzzle Box déjà améliorée.",
+      "confidence": "haute",
+      "sources": [
+        "s9",
+        "s10",
+        "s11",
+        "s6"
+      ]
+    },
+    {
+      "date": "2026-09-21",
+      "title": "Nerfs du Gouffre venimeux, dont Ula'tek Mythique",
+      "detail": "Dégâts de Stone Venom fortement réduits dans tous les modes, et correctif quand il ne se déclenchait pas. En Mythique seulement : Putrid Membrane dure 30 s (au lieu d'1 h), Blightscale Spawn passe à 8 par vague en phase 1 (au lieu de 13) et à 12 par côté en phase 2 (au lieu de 14), 8 œufs pendant l'intermission (au lieu de 14).",
+      "type": "nerf",
+      "forYou": "Le Mythique est nettement plus abordable qu'au moment du RWF : bon moment pour dépasser ton 1/8 M.",
+      "confidence": "haute",
+      "sources": [
+        "s12"
+      ]
+    },
+    {
+      "date": "2026-09-15",
+      "title": "Nerfs des quatre derniers boss du raid",
+      "detail": "Tempest −20 % en Héroïque et Mythique ; rotation de Curse Surge ramenée de 45 à 30 minutes ; ajustements en Outil raids (Mother's Wrath, Malice).",
+      "type": "nerf",
+      "forYou": "Contexte de progression Mythique : les combats de fin de raid sont plus cléments qu'au début de saison.",
+      "confidence": "moyenne",
+      "sources": [
+        "s13"
+      ]
+    },
+    {
+      "date": "2026-09-12",
+      "title": "BlizzCon : 12.2 « Eclipse », dernière grande mise à jour de Midnight",
+      "detail": "Annonce d'un raid de huit boss (le Worldcore, contre Xal'atath), d'une zone titanesque, d'un donjon de trois boss et d'une nouvelle saison de gouffres. Saison 3 annoncée pour début 2027 selon les comptes rendus, sans date ferme.",
+      "type": "annonce",
+      "forYou": "Planification à long terme seulement : la saison 2 continue avec 12.1.5.",
+      "confidence": "moyenne",
+      "sources": [
+        "s14"
+      ]
+    },
+    {
+      "date": "2026-09-03",
+      "title": "World first Ula'tek Mythique par Liquid",
+      "detail": "Liquid tue Ula'tek Mythique vers 19:04 UTC, Echo environ 25 minutes plus tard ; 307 ou 311 essais selon les sources. La composition publiée, incomplète, comporte au moins un Marche-vent.",
+      "type": "annonce",
+      "forYou": "Le spé a sa place au plus haut niveau, notamment pour Mystic Touch ; Blizzard a continué de nerfer le raid ensuite.",
+      "confidence": "haute",
+      "sources": [
+        "s15",
+        "s16"
+      ]
+    },
+    {
+      "date": "2026-09-02",
+      "title": "+4 % à tous les dégâts du Marche-vent (PvE)",
+      "detail": "Passage de réglages du 1er septembre (reset EU du 2) : environ +4,4 % sur tous les dégâts des techniques d'après les données de jeu, neutralisé en PvP.",
+      "type": "buff",
+      "forYou": "Déjà inclus dans toutes les sims récentes.",
+      "confidence": "haute",
+      "sources": [
+        "s17",
+        "s18",
+        "s19"
+      ]
+    },
+    {
+      "date": "2026-08-25",
+      "title": "Rushing Wind Kick −20 % « en PvP »… peut-être aussi en PvE",
+      "detail": "Blizzard présentait ce nerf comme PvP uniquement, mais les données utilisent le même type de modificateur « tout contenu » que le bug corrigé le 23/09 pour Celestial Conduit et Flurry Strikes, toujours présent dans le build du 24/09. Non confirmé par Blizzard.",
+      "type": "pvp",
+      "forYou": "Si ton build s'appuie sur Rushing Wind Kick, vérifie ses dégâts en jeu ou dans tes logs avant de t'y fier.",
+      "confidence": "basse",
+      "sources": [
+        "s20"
+      ]
+    },
+    {
+      "date": "2026-08-19",
+      "title": "Début de la saison 2 de Midnight (EU)",
+      "detail": "Ouverture du Gouffre venimeux (8 boss) et du pool M+ de 8 donjons, dont le nouveau Altar of Fangs.",
+      "type": "systeme",
+      "forYou": "Début du calendrier hebdomadaire de coffre et de crests.",
+      "confidence": "haute",
+      "sources": [
+        "s21",
+        "s22"
+      ]
+    },
+    {
+      "date": "2026-08-11",
+      "title": "Patch 12.1 : les dégâts passent du burst Zenith aux techniques de base et à l'AoE",
+      "detail": "Auto-attaques +30 %, Blackout Kick +50 %, Tiger Palm +200 %, Dual Threat +30 %, Whirling Dragon Punch +30 %, Jade Ignition +95 %, Spinning Crane Kick +38 % net ; Zenith Stomp −30 %, dégâts de Celestial Conduit −25 %, Weapon of Wind 10 → 5 % ; Temple Training (propre à Conduit) 10 → 30 %.",
+      "type": "systeme",
+      "forYou": "C'est ce qui a fait passer Conduit of the Celestials devant en AoE avec le 4 pièces.",
+      "confidence": "moyenne",
+      "sources": [
+        "s23",
+        "s20"
+      ]
+    }
+  ],
+  "standing": {
+    "mplus": {
+      "tier": "A",
+      "trend": "up",
+      "detail": "Fin septembre, les listes tierces (Wowhead et agrégateurs) placent le Marche-vent en A, environ 6e en M+ ; KeystoneLoot lui donne « AA ». Dans les logs de la semaine 5 d'Icy Veins (clés +14 à +22), il passe devant Beast Mastery à la 7e place, même si une autre mesure le montre en recul. Le « S » d'Icy Veins date d'août et de la période PTR. Tendance « en hausse » déduite : ces mesures précèdent en grande partie les buffs du 22/09.",
+      "confidence": "moyenne"
+    },
+    "raid": {
+      "tier": "A+",
+      "trend": "flat",
+      "detail": "A+ chez Icy Veins avant la saison et au 30/08 ; entré dans le top 10 des logs en semaine 3, recul en semaine 4, position Mythique de la semaine 5 incertaine. Le S de raid reste Arms, Devourer et Balance. Classement mis à jour le 24/09 non consulté.",
+      "confidence": "basse"
+    },
+    "strengths": [
+      "Meilleur burst AoE de mêlée sur les packs de trash en M+.",
+      "Deux buffs PvE en septembre (1er et 22), le second ciblant les dégâts soutenus et mono-cible.",
+      "Utilitaire de groupe très complet (voir ci-dessous)."
+    ],
+    "weaknesses": [
+      "Dégâts sur boss et en mono-cible, alors qu'une bonne partie du temps de combat en M+ se passe sur des boss (≈ 40 % selon des agrégateurs, non vérifié).",
+      "Seulement deux défensifs actifs (Fortifying Brew, Touch of Karma) : spé réputé fragile en clés hautes.",
+      "Très dépendant du 4 pièces.",
+      "Spinning Crane Kick et Fists of Fury font moins de dégâts au-delà de 5 cibles (plafond souple)."
+    ],
+    "groupValue": [
+      "Mystic Touch : les ennemis subissent plus de dégâts physiques (précieux avec Guerriers et Voleurs).",
+      "Ring of Peace (repousse et contrôle de zone ; avec Paralysis, permet d'éviter des packs).",
+      "Leg Sweep (étourdissement de zone).",
+      "Detox (retire poisons et maladies) : utile en raid sur Tempest (Sszorak), Venomfang (The Coiled Altar) et les poisons d'Ula'tek, d'après les boss mods."
+    ],
+    "sources": [
+      "s24",
+      "s25",
+      "s26",
+      "s27",
+      "s28",
+      "s20",
+      "s113",
+      "s117",
+      "s118"
+    ]
+  },
+  "heroTrees": {
+    "recommendation": "Recommandation à valider : Shado-Pan en raid mono-cible et tant que tu n'as pas le 4 pièces (il y est devant dans les sims du vérificateur, et les guides le jugent plus simple et moins punitif). En M+, à ton niveau (+16, cote 3403), simule et entraîne Conduit of the Celestials dès le 4 pièces : il est majoritaire en +10 et plus, domine le top 50 et passe devant en AoE avec le tier. Sans tier, les deux se valent en donjon. Ne choisis pas ton arbre PvE d'après la note PvP de Blizzard du 22/09.",
+    "trees": [
+      {
+        "name": "Shado-Pan",
+        "bestFor": "Raid mono-cible, clés hebdomadaires ou en pickup, personnage sans 4 pièces.",
+        "pros": [
+          "Plus simple et moins punitif (Icy Veins, Wowhead, ExpCarry).",
+          "Légèrement devant en mono-cible avec 4 pièces, nettement sans tier (sims du vérificateur sur profil SimC).",
+          "Suit la priorité de base : Strike of the Windlord et Whirling Dragon Punch à la recharge.",
+          "Profil SimC par défaut du Marche-vent."
+        ],
+        "cons": [
+          "Derrière Conduit en AoE dès que le 4 pièces est actif (sims du vérificateur).",
+          "Minoritaire en haut du classement M+."
+        ],
+        "usage": "≈ 42 % des runs +10 et plus (raider.io, 3 derniers resets) ; ≈ 6 builds sur 50 dans le top 50 M+ (murlok.io, cote 3707–4015, fin septembre). Chiffres tirés d'extraits de recherche (pages non ouvertes).",
+        "confidence": "moyenne",
+        "sources": [
+          "s83",
+          "s82",
+          "s81",
+          "s55",
+          "s84",
+          "s29"
+        ]
+      },
+      {
+        "name": "Conduit of the Celestials",
+        "bestFor": "Push M+ coordonné avec 4 pièces ; combats de cleave en raid si ses fenêtres tombent sur les phases d'adds.",
+        "pros": [
+          "Devant en AoE et en donjon avec 4 pièces (sims du vérificateur).",
+          "Porté par 12.1 : Temple Training 10 → 30 %, Spinning Crane Kick +38 %, Jade Ignition +95 %.",
+          "Plafond plus élevé selon les guides."
+        ],
+        "cons": [
+          "Plus exigeant : fenêtres Heart of the Jade Serpent, alignement Xuen → Zenith → Celestial Conduit.",
+          "Légèrement derrière Shado-Pan en mono-cible.",
+          "Dégâts de Celestial Conduit −25 % en 12.1.0."
+        ],
+        "usage": "≈ 58 % des runs +10 et plus (raider.io) ; ≈ 44 builds sur 50 dans le top 50 M+ (murlok.io) ; 96–98 % des tops selon MythiStone et Mythicstats (même petit échantillon de joueurs). Chiffres tirés d'extraits de recherche (pages non ouvertes).",
+        "confidence": "moyenne",
+        "sources": [
+          "s83",
+          "s82",
+          "s91",
+          "s92",
+          "s84",
+          "s30",
+          "s23"
+        ]
+      }
+    ]
+  },
+  "talents": {
+    "mplus": "Conduit of the Celestials est majoritaire en +10 et plus et écrasant dans le top 50 ; avec 4 pièces, il passe devant en AoE dans les sims du vérificateur. Les guides gardent Shado-Pan comme choix « simple » pour les clés hebdomadaires. À ton niveau de clés, simule les deux sur ton personnage et garde celui que tu joues le mieux. Adapte les talents de classe par donjon (Swift Art en Altar of Fangs).",
+    "raidST": "Shado-Pan, build mono-cible (celui du profil SimC par défaut) : légèrement devant Conduit avec 4 pièces, nettement sans tier.",
+    "raidAoE": "Sur les combats de cleave (Entombed Sentinels, The Twin Fangs, The Lost Explorers), passe au build M+ / AoE ; Conduit est une option si ses fenêtres coïncident avec les phases d'adds. Vashnik, Sszorak et Nymrissa sont surtout mono-cible (déduit des boss mods). Les sims à cibles empilées surestiment le cleave réel : golems d'Entombed Sentinels peut-être séparés, tortues de The Lost Explorers amicales à tour de rôle. Aucun guide boss par boss écrit n'a été lu.",
+    "keyChoices": [
+      {
+        "node": "Revolving Whirl ou Echo Technique",
+        "pickWhen": "Les deux profils SimC prennent Revolving Whirl ; Method dit « dans tous les cas », mais sa justification date peut-être de 12.0.5 : à vérifier dans l'arbre en jeu."
+      },
+      {
+        "node": "Drinking Horn Cover ou Spiritual Focus",
+        "pickWhen": "Drinking Horn Cover (+5 s de Zenith) dans les deux profils SimC ; Spiritual Focus réduit la recharge de Zenith de 20 s."
+      },
+      {
+        "node": "Swift Art",
+        "pickWhen": "Beaucoup plus pris en Altar of Fangs que dans les autres donjons (MythiStone) : la Roulade retire un ralentissement à intervalle régulier."
+      },
+      {
+        "node": "Ring of Peace ou Song of Chi-Ji",
+        "pickWhen": "Ring of Peace en M+ : avec Paralysis, il permet d'éviter des packs."
+      },
+      {
+        "node": "Arbre héroïque",
+        "pickWhen": "Shado-Pan en raid mono-cible et sans 4 pièces ; Conduit of the Celestials à simuler pour le M+ avec 4 pièces."
+      }
+    ],
+    "importStrings": [
+      {
+        "label": "Shado-Pan · profil SimC MID2 par défaut (build de sim raid Patchwerk, 27/09) — pas un build M+ de guide",
+        "string": "C0QAAAAAAAAAAAAAAAAAAAAAAMzYw2MmhlZGbzAAAAAAAAAAAAsMMaGzAGwMGmZmZY2GmhZZmAAWMz2MDzMzMAA2AQzys0MzMLAYgZGAGLDgB8B",
+        "source": "s29",
+        "verbatim": true
+      },
+      {
+        "label": "Conduit of the Celestials · profil SimC MID2 par défaut (build de sim raid Patchwerk, 27/09) — pas un build M+ de guide",
+        "string": "C0QAAAAAAAAAAAAAAAAAAAAAAMzYM2GGsMzMbzAAAAAAAAAAAAsMMaGzAGwMGmZmZY2GmhZZmAAWMz2MzYMzMAAWMzysNmgAAMGAzAMWGAzMzmLA",
+        "source": "s30",
+        "verbatim": true
+      }
+    ],
+    "notes": "Les deux chaînes viennent mot pour mot des profils SimC officiels de la saison 2 (branche midnight, 27/09) : ce sont des builds de simulation raid, pas des builds M+ sélectionnés par un guide. Le hash d'arbre est rempli de zéros : teste l'import en jeu. Pour le M+, récupère plutôt la chaîne d'un joueur du top sur murlok.io ou raider.io. Maxroll est encore étiqueté 12.0.5 : ne l'utilise pas pour les choix de build 12.1."
+  },
+  "rotation": {
+    "singleTarget": [
+      "Jeu à priorités, pas de rotation fixe : ne lance jamais deux fois de suite la même technique (Combo Strikes).",
+      "Tiger Palm en remplissage : avec moins de 4 Chi, moins de 2 charges de Blackout Kick! et l'énergie proche du plafond, et pas pendant Zenith. Pendant Zenith, seulement à court de Chi (moins de 2, ou moins de 3 si Fists of Fury est prêt) ; en Conduit, la liste SimC le prévoit explicitement à moins de 2 Chi hors Heart of the Jade Serpent (sans Harmonic Combo).",
+      "Zenith Stomp est un bouton à part depuis 12.0.5 (il remplace Zenith pendant l'effet et génère 2 Chi) : lance-le quand tu as moins de 2 Chi ou quand Zenith se termine.",
+      "Utilise les procs Combo Breaker et Dance of Chi-Ji un peu plus tôt que la priorité ne l'indique pour ne pas les perdre.",
+      "Touch of Death dès qu'il est utilisable (hors Zenith dans la liste SimC) : 100 % de tes PV max sur une cible qui en a moins que toi, 35 % sous 15 % de vie avec Improved Touch of Death."
+    ],
+    "aoe": [
+      "Avec le 4 pièces, sur 2 cibles ou plus : Spinning Crane Kick juste après Fists of Fury pour dépenser Unbroken Rhythm (buff de 20 s, jusqu'à 6 stacks).",
+      "Maximise les Fists of Fury : Rising Sun Kick, Blackout Kick et Spinning Crane Kick réduisent sa recharge (Xuen's Battlegear, Sharp Reflexes).",
+      "Spinning Crane Kick et Fists of Fury touchent toutes les cibles, avec des dégâts réduits au-delà de 5.",
+      "Macro conseillée par Method : /stopmacro [channeling:Fists of Fury] pour ne pas couper la canalisation."
+    ],
+    "opener": [
+      "Potion, racial et bijoux à stat avec la première charge de Zenith, pour que Zenith Stomp en profite (SimC les active juste après Zenith en Shado-Pan, pendant Invoke Xuen en Conduit).",
+      "Shado-Pan : mets Fists of Fury et Rising Sun Kick en recharge le plus tôt possible.",
+      "Conduit : Invoke Xuen, puis Zenith, puis Celestial Conduit pendant Zenith ; la fenêtre Heart of the Jade Serpent renforcée par Unity Within sert à enchaîner Rising Sun Kick et Fists of Fury.",
+      "Algeth'ar Puzzle Box avant le pull si tu en portes une (2 s d'incantation ; peu probable pour toi)."
+    ],
+    "cooldowns": [
+      "Zenith : 2 charges, 90 s de recharge, 15 s de durée. Il consomme jusqu'à 20 stacks de Tigereye Brew (+1 % de crit chacun, plafond 30) : n'enchaîne pas les deux charges sans raison.",
+      "Shado-Pan : garde la deuxième charge jusqu'à environ 20 stacks de Tigereye Brew (plus de 11 avec Spiritual Focus, d'après SimC).",
+      "Conduit : aligne Zenith sur Invoke Xuen et la Furie sanguinaire ; Celestial Conduit (90 s de recharge) n'est utilisable que dans les 60 s qui suivent Invoke Xuen (Xuen : 120 s de recharge, −30 s avec Xuen's Bond).",
+      "Strike of the Windlord et Whirling Dragon Punch : à la recharge en Shado-Pan ; en Conduit, garde-les si Xuen + Celestial Conduit arrivent dans ≈ 10 s.",
+      "Heart of the Jade Serpent accélère la récupération des recharges de 75 % (150 % pour la version Unity Within / Celestial Conduit) ; ce n'est pas une réduction de 75 %."
+    ],
+    "defensives": [
+      "Tu n'as que deux défensifs actifs : Fortifying Brew et Touch of Karma.",
+      "Diffuse Magic est désormais un effet passif de Fortifying Brew : l'activer renvoie les effets magiques néfastes à leur lanceur.",
+      "Fortifying Brew avant Touch of Karma augmente le plafond absolu de Karma, puisqu'il augmente tes PV max.",
+      "Touch of Karma avant un gros coup, ou pour geler les dégâts le temps que les soigneurs rattrapent ; les deux avant une séquence mortelle, pas une fois tes PV effondrés.",
+      "Les conseils d'utilisation de Dampen Harm sont périmés (voir le point contesté sur les défensifs)."
+    ],
+    "mistakes": [
+      "Répéter une technique et casser Combo Strikes.",
+      "Tiger Palm pendant Zenith alors qu'il te reste du Chi (à court de Chi, la liste SimC l'autorise, surtout en Conduit hors Heart of the Jade Serpent).",
+      "Couper la canalisation de Fists of Fury.",
+      "Laisser plafonner les Flurry Charges en Shado-Pan.",
+      "Enchaîner les deux charges de Zenith sans stacks de Tigereye Brew.",
+      "Laisser expirer Unbroken Rhythm (20 s).",
+      "Se fier aux logs et sims des 22–23/09, aux sims PTR 12.1.5 des arbres héroïques ou aux guides Maxroll 12.0.5."
+    ],
+    "heroDiffs": [
+      "Shado-Pan : les auto-attaques génèrent 1–2 Flurry Charges, libérées par Fists of Fury ; Wisdom of the Wall fait lancer 3 Flurry Strikes à Rising Sun Kick et Spinning Crane Kick pendant Zenith ; Against All Odds = +4 % d'Agilité.",
+      "Conduit : tout tourne autour des fenêtres Heart of the Jade Serpent (Zenith, Celestial Conduit, Strike of the Windlord, Whirling Dragon Punch) ; Temple Training (+30 % Fists of Fury et Spinning Crane Kick) lui est propre ; Invoke Xuen est réservé à cet arbre.",
+      "Bijoux à stat : juste après Zenith en Shado-Pan, pendant Invoke Xuen en Conduit."
+    ],
+    "confidence": "moyenne",
+    "sources": [
+      "s44",
+      "s20"
+    ]
+  },
+  "tierSet": {
+    "name": "Guile of the Monkey King",
+    "nameConfidence": "haute",
+    "slots": [
+      "head",
+      "shoulder",
+      "chest",
+      "hands",
+      "legs"
+    ],
+    "twoPiece": "Fists of Fury frappe une fois de plus au début de sa canalisation, à 50 % d'efficacité.",
+    "fourPiece": "Unbroken Rhythm : chaque frappe de Fists of Fury augmente de 10 % ton prochain Rising Sun Kick ou de 20 % ton prochain Spinning Crane Kick, cumulable 6 fois ; buff de 20 s, qui renforce aussi Rushing Wind Kick et Glory of the Dawn.",
+    "acquisition": [
+      "(confirmé) Pièces du set : Monkey King's Unyielding Visage (tête, 271519), Tassels of the Monkey King (épaules, 271517), Battle Gi of the Monkey King (torse, 271522), Monkey King's Fighting Fists (mains, 271520), Pantaloons of the Monkey King (jambes, 271518). Shinguards of the Monkey King (pieds, 271521) n'en fait pas partie.",
+      "(confirmé) Le tier du Moine tombe sous forme de jetons cuir « Venomcured », partagés avec Chasseur de démons, Druide et Voleur : Effigy = tête (270915), Remnant = épaules (270923), Icon = torse (270927), Idol = mains (270911), Relic = jambes (270919).",
+      "(une seule source : AllTheThings, à vérifier dans le Guide de l'aventurier) Boss par emplacement, dans les quatre modes : The Twin Fangs = tête, The Lost Explorers = épaules, Vashnik the Malignant = torse, Sszorak = jambes, Entombed Sentinels = mains. Nek'zali et The Coiled Altar ne donnent pas de jeton.",
+      "Slumbering Coil Curio (270909) : tombe sur Ula'tek dans les quatre modes (deux sources ; taux de drop inconnu). D'après AllTheThings, il donne une pièce du set à la difficulté du drop (Curio Héroïque → pièce Héros). (non vérifié) Emplacement au choix ou pièce manquante imposée : les sources se contredisent ; mode d'échange et limite éventuelle inconnus. Lis l'infobulle en jeu.",
+      "(confirmé par le client 12.1) Des pièces de set peuvent apparaître dans les neuf emplacements de la grande chambre forte (raid, donjons, monde) : une chance, pas une garantie.",
+      "Si ton objet d'Ula'tek du 4/09 était le Curio, tu l'as sans doute déjà utilisé : vérifie tes sacs et ton nombre de pièces.",
+      "(recommandation à valider, confiance basse) Vise le 4 pièces sur tête, épaules, torse et jambes et garde les mains pour la fin, comme le profil SimC. Si Gaze of the Coiled Watcher (tête d'Ula'tek) te tombe, catalyse-la en tête : le jeton tête des Twin Fangs compte alors moins."
+    ],
+    "catalyst": [
+      "Le Catalyseur est à Silvermoon (≈ 40.3, 65.5). (une seule source) La saison 2 a sa propre quête de déblocage, « Forged Through Fire » (Eldara Dawnrunner, ≈ 40.2, 64.8) : si tu ne l'as pas faite, ton Catalyseur S2 est peut-être verrouillé.",
+      "(une seule source) Chaque piste se convertit vers la difficulté correspondante : Vétéran → LFR, Champion → Normal, Héros → Héroïque, Mythe → Mythique.",
+      "Ne catalyse jamais cape, poignets, ceinture ou bottes pour le 4 pièces : tu obtiendrais Cape, Wristguards, Agile Cord ou Shinguards of the Monkey King, qui ne comptent pas dans le set.",
+      "(non vérifié) Rythme d'obtention, date de départ et plafond des charges de Catalyseur de la saison 2 : non trouvés. Le Venomblight Manaflux (monnaie 3465) pourrait être la monnaie des charges : simple hypothèse, regarde l'onglet Monnaies.",
+      "(non vérifié) Le correctif du 2/09 annonçait des « améliorations du Catalyseur » ; seul le titre est connu.",
+      "Une pièce catalysée garde les stats de l'objet d'origine en live d'après SimC (commit du 9/09) ; 12.1.5 l'annonce aussi pour les tertiaires et les cantrips (PTR, à vérifier en jeu). Catalyse donc de préférence une pièce aux bonnes stats ou à cantrip Venomcursed.",
+      "Chemin du profil SimC : tête catalysée depuis Gaze of the Coiled Watcher (Ula'tek, Venomcursed), épaules depuis Somber Spaulders, jambes depuis Coiled Hex Legguards (The Coiled Altar) ; seul le torse est une vraie pièce de tier, et les gants restent hors tier (Gauntlets of Fevered Defense).",
+      "12.1.5 (PTR) : la pièce cantrip cuir de Kith'ix (281236) est un torse dans les dernières données SimC (Chestwrap of Palpable Terror), des jambes dans les sources plus anciennes : ne bloque aucun emplacement pour elle tant que ce n'est pas fixé."
+    ],
+    "confidence": "moyenne",
+    "sources": [
+      "s31",
+      "s32",
+      "s33",
+      "s34",
+      "s35",
+      "s36",
+      "s37",
+      "s29",
+      "s38",
+      "s93",
+      "s94",
+      "s95",
+      "s96",
+      "s99",
+      "s100",
+      "s102",
+      "s104",
+      "s126",
+      "s125"
+    ],
+    "acquisitionConfidence": "moyenne",
+    "catalystConfidence": "basse",
+    "confidenceNote": "Nom et bonus 2/4 pièces vérifiés (données SimC). Obtention : chaque ligne indique son niveau de preuve (confirmé, une seule source, non vérifié). Catalyseur : charges et rythme inconnus."
+  },
+  "trinkets": {
+    "raid": [
+      {
+        "rank": 1,
+        "name": "Voracious Heart of Ula'tek",
+        "itemId": 270175,
+        "source": "Ula'tek (Gouffre venimeux, boss 8)",
+        "type": "on-use",
+        "why": "Critique passif et utilisation de 20 s toutes les 90 s qui donne de l'Agilité, avec des procs physiques qui en ajoutent. Bijou à utilisation des deux profils SimC Marche-vent ; inchangé le 22/09.",
+        "confidence": "moyenne",
+        "sources": [
+          "s39",
+          "s29",
+          "s30",
+          "s40"
+        ]
+      },
+      {
+        "rank": 2,
+        "name": "Zul'jin's Guillotine Technique",
+        "itemId": 270173,
+        "source": "The Coiled Altar (Zul'jan et Hex Lord Malacrass, boss 7)",
+        "type": "passif",
+        "why": "Hache physique qui proc (3 par minute, accélérée par la Hâte) et gagne 2 % de dégâts par 1 % de vie manquante de la cible : très forte en mono-cible et en exécution, option par défaut partout. Fait partie du mini-set Bite of Zul'jan.",
+        "confidence": "haute",
+        "sources": [
+          "s41",
+          "s42",
+          "s31",
+          "s29"
+        ]
+      },
+      {
+        "rank": 3,
+        "name": "Font of Venomous Rage",
+        "itemId": 270168,
+        "source": "Ula'tek (Gouffre venimeux, boss 8)",
+        "type": "on-use",
+        "why": "Maîtrise passive et canalisation de 2 s de gros dégâts Nature toutes les 4 minutes ; pas un choix par défaut du Marche-vent, mais +25 % de dégâts le 22/09. C'est un bijou à utilisation : avec la règle « un à utilisation + un passif », il concurrence surtout Voracious Heart (les deux partagent une recharge commune de 20 s d'après les données de sorts). À simuler face à Voracious Heart et à Zul'jin's Guillotine (Top Gear, toutes les paires).",
+        "confidence": "moyenne",
+        "sources": [
+          "s45",
+          "s11",
+          "s9",
+          "s40",
+          "s93"
+        ]
+      },
+      {
+        "rank": 4,
+        "name": "Gebbo's Bottomless Bag",
+        "itemId": 270164,
+        "source": "The Lost Explorers (AllTheThings, une seule source)",
+        "type": "passif",
+        "why": "Alternative passive citée par les guides, meilleure quand le nombre de cibles augmente : buffs de stat secondaire aléatoires, dont une option négative (« Rotting Voidfin », code SimC).",
+        "confidence": "basse",
+        "sources": [
+          "s46",
+          "s47",
+          "s93",
+          "s89"
+        ]
+      },
+      {
+        "rank": 5,
+        "name": "Vashnik's Sanguine Rancor",
+        "itemId": 270166,
+        "source": "Vashnik the Malignant (AllTheThings, une seule source)",
+        "type": "passif",
+        "why": "Bijou Agilité de DPS : cumul d'un buff qui explose en Crimson Bile de zone au maximum de stacks, ou en DoT mono-cible s'il ne touche qu'une cible (code SimC). Aucun guide ni sim récupéré ne le classe : simple candidat à simuler.",
+        "confidence": "basse",
+        "sources": [
+          "s93",
+          "s89",
+          "s123"
+        ]
+      }
+    ],
+    "mplus": [
+      {
+        "rank": 1,
+        "name": "Voracious Heart of Ula'tek",
+        "itemId": 270175,
+        "source": "Ula'tek (Gouffre venimeux)",
+        "type": "on-use",
+        "why": "Même logique qu'en raid : cycle de 90 s aligné sur Zenith.",
+        "confidence": "moyenne",
+        "sources": [
+          "s39",
+          "s29"
+        ]
+      },
+      {
+        "rank": 2,
+        "name": "Zul'jin's Guillotine Technique",
+        "itemId": 270173,
+        "source": "The Coiled Altar (Gouffre venimeux)",
+        "type": "passif",
+        "why": "Présentée par les guides comme option par défaut dans tout le contenu.",
+        "confidence": "haute",
+        "sources": [
+          "s41",
+          "s47"
+        ]
+      },
+      {
+        "rank": 3,
+        "name": "Vile Vial of Volatile Venom",
+        "itemId": 273796,
+        "source": "Altar of Fangs (Rav'i, premier boss — non vérifié)",
+        "type": "on-use",
+        "why": "Utilisation de 2 min : grosse hausse d'une stat secondaire aléatoire pendant 15 s, puis légère baisse d'une stat secondaire. Correct en attendant mieux, pas un choix de haut niveau ; pas de crests dessus.",
+        "confidence": "basse",
+        "sources": [
+          "s47",
+          "s40"
+        ]
+      }
+    ],
+    "pairingRule": "Un bijou à utilisation + un passif : Voracious Heart of Ula'tek (90 s, aligné sur Zenith) avec Zul'jin's Guillotine Technique. Font of Venomous Rage, autre bijou à utilisation, concurrence surtout Voracious Heart (recharge commune de 20 s entre les deux). Active les bijoux à stat juste après Zenith en Shado-Pan et pendant Invoke Xuen en Conduit (liste SimC). Remplace d'abord Drum of Renewed Bonds, et ne mets pas de crests sur Vile Vial.",
+    "avoid": [
+      {
+        "name": "Drum of Renewed Bonds (248583)",
+        "why": "Bijou vert de leveling : à remplacer dès que possible."
+      },
+      {
+        "name": "Gaze of the Alnseer",
+        "why": "Bijou passif de la saison 1, nerfé deux fois (août puis −10 % de stat principale le 22/09) ; l'ancien classement de sims qui le plaçait en tête est périmé."
+      },
+      {
+        "name": "Ranger-Captain's Iridescent Insignia et Radiant Plume",
+        "why": "Objets de la saison 1 (source exacte non vérifiée) : pas des cibles en S2."
+      },
+      {
+        "name": "Sapling of the Dawnroot",
+        "why": "Objet de début d'extension (ilvl de base 108) : probablement périmé, sauf si sa source est dans le pool S2 (non vérifié)."
+      },
+      {
+        "name": "Algeth'ar Puzzle Box (193701)",
+        "why": "Bijou de la saison 1 (Algeth'ar Academy, absente du pool M+ S2 d'après l'addon Raider.IO ; autre source en S2 non vérifiée) : ne la cherche pas. Seulement si tu en possèdes déjà une améliorée (peu probable pour Lyarà, montée en S2 : aucune dans ses sacs au 21/08), simule-la après son nerf de −25 % de Maîtrise du 22/09.",
+        "confidence": "basse",
+        "sources": [
+          "s43",
+          "s10",
+          "s21"
+        ]
+      }
+    ]
+  },
+  "weapons": [
+    {
+      "name": "Abyssal Broodfiend's Bardiche",
+      "itemId": 268215,
+      "type": "2M",
+      "source": "Ula'tek (Gouffre venimeux)",
+      "note": "Arme d'hast BiS signalée : Agilité + Maîtrise, cantrip Venomcursed Maîtrise ; arme des deux profils SimC. Cible prioritaire des bonus rolls et du coffre, et bonne candidate aux Venomstones en 12.1.5.",
+      "confidence": "moyenne",
+      "sources": [
+        "s46",
+        "s47",
+        "s34",
+        "s29"
+      ]
+    },
+    {
+      "name": "Aman'muso, Warlord's Vengeance",
+      "itemId": 268209,
+      "type": "1M",
+      "source": "The Coiled Altar (AllTheThings, une seule source) · mini-set Bite of Zul'jan",
+      "note": "Hache à une main : seule façon pour un moine d'activer le bonus 2 pièces avec Zul'jin's Guillotine Technique (la Guillotine ricoche sur une deuxième cible). L'autre arme du set, Maze-roa, est une hache à deux mains que les moines ne peuvent pas porter. Implique de jouer en ambidextrie ; SimC préfère quand même la Bardiche.",
+      "confidence": "moyenne",
+      "sources": [
+        "s31",
+        "s48",
+        "s93"
+      ]
+    },
+    {
+      "name": "Venom-Cursed Hidepiercer",
+      "itemId": 277806,
+      "type": "2M",
+      "source": "Ton arme du 21/08 (« Perce-cuir affolé par le venin »)",
+      "note": "Identifiée : arme d'hast à deux mains, modèle de base vert (placeholder). À remplacer, sans y mettre de crests.",
+      "confidence": "moyenne",
+      "sources": [
+        "s34"
+      ]
+    }
+  ],
+  "bisBySlot": [
+    {
+      "slot": "head",
+      "raid": "Monkey King's Unyielding Visage (tier, 271519), catalysée depuis Gaze of the Coiled Watcher (tête cuir d'Ula'tek, Venomcursed Hâte)",
+      "mplus": "Idem (SimC n'a pas de profil M+ distinct)",
+      "note": "Profil SimC MID2 par défaut, pas une liste BiS officielle ; presque toute pièce sans Polyvalence est viable. Jeton tête : Venomcured Effigy (The Twin Fangs, une seule source). 0 châsse de base : le profil en ajoute une (bonus 13750).",
+      "confidence": "moyenne",
+      "sources": [
+        "s29",
+        "s93",
+        "s34"
+      ]
+    },
+    {
+      "slot": "neck",
+      "raid": "Aqirbane Reliquary (Ula'tek) — 1 châsse de base ; le profil SimC en a 2 grâce à une châsse ajoutée (bonus 10835) — vérifie ton exemplaire en jeu",
+      "mplus": "Idem",
+      "note": "Stats secondaires réparties équitablement ; son « Critique » vient du proc Venomcursed. Provenance Ula'tek confirmée par AllTheThings.",
+      "confidence": "moyenne",
+      "sources": [
+        "s46",
+        "s29",
+        "s49",
+        "s34",
+        "s93"
+      ]
+    },
+    {
+      "slot": "shoulder",
+      "raid": "Tassels of the Monkey King (tier, 271517)",
+      "mplus": "Idem",
+      "note": "Jeton épaules : Venomcured Remnant (The Lost Explorers, une seule source). Catalysée depuis Somber Spaulders dans le profil SimC.",
+      "confidence": "moyenne",
+      "sources": [
+        "s29",
+        "s93"
+      ]
+    },
+    {
+      "slot": "back",
+      "raid": "Silken Voodoo Drape (268253)",
+      "mplus": "Idem",
+      "note": "Drop de The Coiled Altar d'après AllTheThings (une seule source). Pas d'enchant de cape en Midnight.",
+      "confidence": "basse",
+      "sources": [
+        "s29",
+        "s93"
+      ]
+    },
+    {
+      "slot": "chest",
+      "raid": "Battle Gi of the Monkey King (tier, 271522)",
+      "mplus": "Idem",
+      "note": "Jeton torse : Venomcured Icon (Vashnik, une seule source) ; seule vraie pièce de tier du profil SimC. En 12.1.5 (PTR), la pièce cantrip cuir de Kith'ix serait un torse : cet emplacement pourrait changer.",
+      "confidence": "moyenne",
+      "sources": [
+        "s29",
+        "s38",
+        "s93"
+      ]
+    },
+    {
+      "slot": "wrist",
+      "raid": "Silvermoon Agent's Deflectors (craft, Arcanoweave Lining)",
+      "mplus": "Idem",
+      "note": "Crafté à 331 dans le profil SimC ; Critique/Maîtrise en Shado-Pan, Hâte/Maîtrise en Conduit. 0 châsse de base : le profil en ajoute une (bonus 10835).",
+      "confidence": "moyenne",
+      "sources": [
+        "s29",
+        "s30",
+        "s50",
+        "s34"
+      ]
+    },
+    {
+      "slot": "hands",
+      "raid": "Gauntlets of Fevered Defense (251124, hors tier)",
+      "mplus": "Idem",
+      "note": "Jeton mains : Venomcured Idol (Entombed Sentinels, une seule source). Le profil SimC laisse les gants hors tier : les mains sont l'emplacement de tier le moins prioritaire (recommandation à valider). Monkey King's Fighting Fists (271520) reste une option pour le 4 pièces.",
+      "confidence": "moyenne",
+      "sources": [
+        "s29",
+        "s93"
+      ]
+    },
+    {
+      "slot": "waist",
+      "raid": "Sash of the Forlorn Vessel (268256)",
+      "mplus": "Idem",
+      "note": "Profil SimC ; drop de The Coiled Altar d'après AllTheThings (une seule source). 0 châsse de base : le profil en ajoute une (bonus 10835).",
+      "confidence": "basse",
+      "sources": [
+        "s29",
+        "s93",
+        "s34"
+      ]
+    },
+    {
+      "slot": "legs",
+      "raid": "Pantaloons of the Monkey King (tier, 271518)",
+      "mplus": "Idem",
+      "note": "Jeton jambes : Venomcured Relic (Sszorak, une seule source). Catalysée depuis Coiled Hex Legguards (The Coiled Altar) dans le profil SimC.",
+      "confidence": "moyenne",
+      "sources": [
+        "s29",
+        "s93"
+      ]
+    },
+    {
+      "slot": "feet",
+      "raid": "Silvermoon Agent's Sneakers (craft, Arcanoweave Lining)",
+      "mplus": "Idem",
+      "note": "Crafté à 331 dans le profil SimC (Hâte/Maîtrise).",
+      "confidence": "moyenne",
+      "sources": [
+        "s29",
+        "s50"
+      ]
+    },
+    {
+      "slot": "finger",
+      "raid": "Vile Alchemist's Band (268249) + Band of the Amani Warlord (273792)",
+      "mplus": "Idem ; le profil Conduit prend Sickening Signet of Atroxus (252258)",
+      "note": "Profil SimC. Sources d'après AllTheThings (une seule source) : Vile Alchemist's Band = Vashnik, Band of the Amani Warlord = Altar of Fangs, Sickening Signet of Atroxus = Voidscar Arena. 0 châsse de base : le profil en ajoute une par anneau (bonus 13668).",
+      "confidence": "basse",
+      "sources": [
+        "s29",
+        "s30",
+        "s93",
+        "s34"
+      ]
+    },
+    {
+      "slot": "trinket",
+      "raid": "Voracious Heart of Ula'tek + Zul'jin's Guillotine Technique",
+      "mplus": "Idem",
+      "note": "Les deux profils SimC. Font of Venomous Rage (Ula'tek) est à simuler face à Voracious Heart ; Algeth'ar Puzzle Box seulement si tu en possèdes déjà une améliorée (peu probable).",
+      "confidence": "moyenne",
+      "sources": [
+        "s29",
+        "s30"
+      ]
+    },
+    {
+      "slot": "mainhand",
+      "raid": "Abyssal Broodfiend's Bardiche (268215)",
+      "mplus": "Idem",
+      "note": "Deux-mains recommandé ; aucune source S2 ne montre l'ambidextrie devant.",
+      "confidence": "moyenne",
+      "sources": [
+        "s29",
+        "s46"
+      ]
+    }
+  ],
+  "crafting": {
+    "advice": [
+      "Crafte poignets et bottes avec Arcanoweave Lining : c'est la combinaison du profil SimC par défaut (Silvermoon Agent's Deflectors et Sneakers), et Arcanoweave sur les poignets est l'embellissement le plus répandu en M+ (WowValor).",
+      "Limite habituelle : 2 embellissements actifs.",
+      "Garde la cape pour un drop (Silken Voodoo Drape dans le profil SimC) plutôt qu'un craft.",
+      "Les crafts de qualité maximale « Tidal Crafted » seront éligibles aux Ascendant Venomstones en 12.1.5 (PTR ; arme, bijou et collier uniquement).",
+      "Ilvl par rang de qualité, coût en crests ou étincelles : non trouvés.",
+      "Châsses : le profil SimC sertit 7 gemmes (tête, collier ×2, poignets, ceinture, deux anneaux), mais une seule de ces châsses est native (collier) ; toutes les autres sont des châsses ajoutées (bonus 10835, 13668, 13750). Comment en ajouter en S2 et à quel coût : non trouvé.",
+      "Le combo « Stabilizing Gemstone Bandolier + Loa Worshiper's Band » vu sur Archon fin août n'est pas vérifié et vient probablement de données S1 : pas recommandé."
+    ],
+    "embellishments": [
+      {
+        "name": "Arcanoweave Lining",
+        "slot": "wrist",
+        "note": "Sur Silvermoon Agent's Deflectors (craft) : chance d'invoquer un wyrm de mana qui augmente ta stat principale et celle d'un allié."
+      },
+      {
+        "name": "Arcanoweave Lining",
+        "slot": "feet",
+        "note": "Sur Silvermoon Agent's Sneakers (craft), deuxième embellissement du profil SimC."
+      }
+    ],
+    "weaponCraftVerdict": "Arme craftée à deux mains : priorité basse. La Bardiche d'Ula'tek est la BiS signalée et les guides jugent le craft moins utile avec autant d'armes de raid disponibles ; ilvl et coût du craft S2 inconnus.",
+    "confidence": "moyenne",
+    "sources": [
+      "s29",
+      "s50",
+      "s51",
+      "s46",
+      "s52",
+      "s34",
+      "s49"
+    ]
+  },
+  "enchants": [
+    {
+      "slot": "mainhand",
+      "name": "Rite of the Hash'ey",
+      "alt": "Jan'alai's Precision, Berserker's Rage ou Arcane Mastery (très proches) ; Acuity of the Ren'dorei (conseillé par des guides, plus bas dans les sims du vérificateur). Un seul enchant avec un deux-mains.",
+      "confidence": "moyenne",
+      "sources": [
+        "s29",
+        "s53",
+        "s54"
+      ]
+    },
+    {
+      "slot": "finger",
+      "name": "Eyes of the Eagle",
+      "alt": null,
+      "confidence": "moyenne",
+      "sources": [
+        "s29",
+        "s54"
+      ]
+    },
+    {
+      "slot": "chest",
+      "name": "Mark of the Worldsoul",
+      "alt": null,
+      "confidence": "moyenne",
+      "sources": [
+        "s29",
+        "s53",
+        "s54"
+      ]
+    },
+    {
+      "slot": "legs",
+      "name": "Forest Hunter's Armor Kit",
+      "alt": null,
+      "confidence": "moyenne",
+      "sources": [
+        "s29",
+        "s53"
+      ]
+    },
+    {
+      "slot": "feet",
+      "name": "Lynx's Dexterity",
+      "alt": "Shaladrassil's Roots (Ponction) ou Farstrider's Hunt (Vitesse) : tous utilitaires, aucun gain de dégâts.",
+      "confidence": "moyenne",
+      "sources": [
+        "s29",
+        "s53"
+      ]
+    }
+  ],
+  "gems": [
+    {
+      "name": "Powerful Eversong Diamond",
+      "role": "Diamant unique (un seul par personnage), choix du profil SimC : gagne un peu d'efficacité de critique pour chaque couleur de gemme Midnight différente sertie.",
+      "confidence": "moyenne",
+      "sources": [
+        "s29"
+      ]
+    },
+    {
+      "name": "Indecipherable Eversong Diamond",
+      "role": "Alternative au Powerful si toutes tes autres gemmes sont de la même couleur ; l'écart entre les deux est minime.",
+      "confidence": "moyenne",
+      "sources": [
+        "s34",
+        "s54"
+      ]
+    },
+    {
+      "name": "Flawless Deadly Peridot",
+      "role": "Gemme à deux stats (Hâte + Critique) : bon choix par défaut pour les autres châsses.",
+      "confidence": "moyenne",
+      "sources": [
+        "s29",
+        "s34"
+      ]
+    },
+    {
+      "name": "Flawless Quick Amethyst · Flawless Deadly Lapis · Flawless Masterful Garnet",
+      "role": "Complètent le mélange de couleurs du profil SimC, utile avec le Powerful Eversong Diamond ; gemmes à deux stats.",
+      "confidence": "moyenne",
+      "sources": [
+        "s29"
+      ]
+    }
+  ],
+  "consumables": [
+    {
+      "type": "potion",
+      "name": "Potion of Recklessness",
+      "confidence": "basse",
+      "sources": [
+        "s29"
+      ]
+    },
+    {
+      "type": "flacon",
+      "name": "Flask of the Blood Knights",
+      "confidence": "basse",
+      "sources": [
+        "s29"
+      ]
+    },
+    {
+      "type": "nourriture",
+      "name": "Harandar Celebration (festin)",
+      "confidence": "basse",
+      "sources": [
+        "s29"
+      ]
+    },
+    {
+      "type": "rune",
+      "name": "Void-Touched Augment Rune",
+      "confidence": "basse",
+      "sources": [
+        "s29"
+      ]
+    },
+    {
+      "type": "huile",
+      "name": "Thalassian Phoenix Oil (arme principale seulement avec un deux-mains)",
+      "confidence": "basse",
+      "sources": [
+        "s29"
+      ]
+    }
+  ],
+  "stats": {
+    "priority": "Agilité > Hâte ≈ Critique ≈ Maîtrise > Polyvalence",
+    "note": "Consensus des guides 12.1, confirmé par les poids de stats du vérificateur sur le profil SimC : en mono-cible, Critique et Hâte passent légèrement devant la Maîtrise ; en M+, les trois se valent. Les meilleurs joueurs M+ portent surtout Maîtrise > Hâte > Critique > Polyvalence (équipement porté, pas des poids de sim). La Polyvalence est dernière partout. Les buffs du 22/09 ont pu déplacer ces valeurs : simule ton propre équipement avant d'acheter des gemmes. Aucun seuil ni palier propre au Marche-vent trouvé.",
+    "confidence": "moyenne",
+    "sources": [
+      "s55",
+      "s51",
+      "s29"
+    ]
+  },
+  "mplus": {
+    "dungeons": [
+      {
+        "name": "Kings' Rest",
+        "slug": "KR",
+        "origin": "BfA",
+        "tips": [
+          "Minuteur 33:00 (+2 sous 80 %, +3 sous 60 % du temps)."
+        ],
+        "loot": [
+          "Primal Dinomancer's Belt (159301) — d'après les notes d'objets du 21/08, non vérifié"
+        ],
+        "confidence": "moyenne",
+        "sources": [
+          "s21"
+        ]
+      },
+      {
+        "name": "Temple of Sethraliss",
+        "slug": "TOS",
+        "origin": "BfA",
+        "tips": [
+          "Minuteur 32:00."
+        ],
+        "loot": [
+          "Grips of Electrified Defense (159337) — d'après les notes d'objets du 21/08, non vérifié"
+        ],
+        "confidence": "moyenne",
+        "sources": [
+          "s21"
+        ]
+      },
+      {
+        "name": "Ruby Life Pools",
+        "slug": "RLP",
+        "origin": "DF",
+        "tips": [
+          "Minuteur 28:00, le plus court du pool."
+        ],
+        "loot": [],
+        "confidence": "moyenne",
+        "sources": [
+          "s21"
+        ]
+      },
+      {
+        "name": "Murder Row",
+        "slug": "MR",
+        "origin": "Midnight",
+        "tips": [
+          "Minuteur 34:00, le plus long du pool.",
+          "Au 28/09, ton seul donjon sous +16 (meilleur run : +15) : le chronométrer en +16 rapporte ≈ 15 points."
+        ],
+        "loot": [
+          "Vilefiend's Guise (251140) — d'après les notes d'objets du 21/08, non vérifié"
+        ],
+        "confidence": "moyenne",
+        "sources": [
+          "s21",
+          "s56"
+        ]
+      },
+      {
+        "name": "The Blinding Vale",
+        "slug": "BV",
+        "origin": "Midnight",
+        "tips": [
+          "Minuteur 30:00."
+        ],
+        "loot": [
+          "Lightspore Leggings (251198) — d'après les notes d'objets du 21/08, non vérifié"
+        ],
+        "confidence": "moyenne",
+        "sources": [
+          "s21"
+        ]
+      },
+      {
+        "name": "Den of Nalorakk",
+        "slug": "DON",
+        "origin": "Midnight",
+        "tips": [
+          "Minuteur 32:00.",
+          "Ton meilleur donjon au 28/09 (+16)."
+        ],
+        "loot": [
+          "Arctic Explorer's Legwraps (251153) — d'après les notes d'objets du 21/08, non vérifié",
+          "Yoke of the Charging Bear (251173) possible : nom d'ours et bonus de donjon M+, non vérifié"
+        ],
+        "confidence": "moyenne",
+        "sources": [
+          "s21",
+          "s56"
+        ]
+      },
+      {
+        "name": "Voidscar Arena",
+        "slug": "VSA",
+        "origin": "Midnight",
+        "tips": [
+          "Minuteur 30:00."
+        ],
+        "loot": [
+          "Sickening Signet of Atroxus (252258) — anneau du profil Conduit (AllTheThings, une seule source)"
+        ],
+        "confidence": "moyenne",
+        "sources": [
+          "s21",
+          "s93"
+        ]
+      },
+      {
+        "name": "Altar of Fangs",
+        "slug": "AOF",
+        "origin": "Midnight",
+        "tips": [
+          "Nouveau donjon de 12.1, 3 boss ; minuteur 30:00.",
+          "Beaucoup de Marche-vent y prennent Swift Art, contrairement aux autres donjons (MythiStone).",
+          "Depuis le 22/09, Blade of the Altar's Laced Edge et Shrouded Fang's Slither Strike ne peuvent plus être lancés sous contrôle (donjon déduit des noms, non confirmé) : tes étourdissements et incapacités les interrompent."
+        ],
+        "loot": [
+          "Vile Vial of Volatile Venom (273796), premier boss Rav'i — non vérifié",
+          "Band of the Amani Warlord (273792) — anneau du profil SimC (AllTheThings, une seule source)"
+        ],
+        "confidence": "moyenne",
+        "sources": [
+          "s21",
+          "s22",
+          "s57",
+          "s58",
+          "s93"
+        ]
+      }
+    ],
+    "affixes": {
+      "thisWeek": null,
+      "system": "Système d'affixes de la saison 2 non trouvé (paliers, reconduction éventuelle de Xal'atath's Bargain). Les affixes de la semaine sont lus en direct depuis raider.io.",
+      "confidence": "basse"
+    },
+    "keyTargets": [
+      {
+        "goal": "Remplir le coffre M+ chaque semaine",
+        "level": "+12",
+        "why": "À partir de +12, le coffre M+ offrirait déjà son meilleur choix (piste Mythe, une seule source ; si le vrai seuil est +10, le +12 reste sûr) ; au-delà, tu gagnes surtout du score. 1er emplacement : 1 donjon Héroïque, Mythique ou Marcheurs du temps (client 12.1) ; 4 et 8 pour les suivants : convention de The War Within, non vérifiée."
+      },
+      {
+        "goal": "Rattraper Murder Row",
+        "level": "+16",
+        "why": "Ton seul donjon sous +16 au 28/09 : ≈ 15 points de plus en le chronométrant en +16."
+      },
+      {
+        "goal": "Monter ta cote",
+        "level": "+17",
+        "why": "Un +17 chronométré vaut 440 points par donjon (15 de plus qu'un +16) ; une clé ratée en +12 ou plus plafonne vers 320 et ne fait pas monter ta cote."
+      },
+      {
+        "goal": "Préparer les Venomstones (12.1.5)",
+        "level": "+10",
+        "why": "Sur le PTR, les clés +10 et plus donnent des Ascendant Venomstones, comme les boss de raid Héroïque et Mythique."
+      }
+    ],
+    "milestones": [
+      {
+        "name": "Couleur « épique » raider.io",
+        "rating": 3226,
+        "reward": "Début de la bande de couleur 3226–4075 (repère visuel, pas une récompense de jeu).",
+        "confidence": "moyenne",
+        "sources": [
+          "s59"
+        ]
+      },
+      {
+        "name": "Moyenne des joueurs qui chronomètrent du +16",
+        "rating": 3350,
+        "reward": "Repère raider.io (moyenne sur 21 jours).",
+        "confidence": "moyenne",
+        "sources": [
+          "s60"
+        ]
+      },
+      {
+        "name": "Moyenne des joueurs qui chronomètrent du +17",
+        "rating": 3450,
+        "reward": "Repère raider.io (moyenne sur 21 jours).",
+        "confidence": "moyenne",
+        "sources": [
+          "s60"
+        ]
+      },
+      {
+        "name": "Les 8 donjons chronométrés en +17",
+        "rating": 3520,
+        "reward": "≈ 8 × 440 points, hors bonus de temps (calcul).",
+        "confidence": "moyenne",
+        "sources": [
+          "s60"
+        ]
+      },
+      {
+        "name": "Couleur maximale raider.io",
+        "rating": 4075,
+        "reward": "Couleur orange à partir de 4075.",
+        "confidence": "moyenne",
+        "sources": [
+          "s59"
+        ]
+      }
+    ]
+  },
+  "raid": {
+    "name": "The Venomous Abyss",
+    "slug": "the-venomous-abyss",
+    "bosses": [
+      {
+        "order": 1,
+        "name": "Nek'zali the Soulcoiler",
+        "tips": [
+          "Toujours le premier boss.",
+          "Probablement ton boss Mythique déjà tué (1er boss chez raider.io).",
+          "Pas de jeton de tier (AllTheThings) ; aucune mécanique récupérée pour ce boss."
+        ],
+        "loot": [],
+        "confidence": "moyenne",
+        "sources": [
+          "s61",
+          "s62",
+          "s63",
+          "s93",
+          "s106",
+          "s122"
+        ]
+      },
+      {
+        "order": 2,
+        "name": "Entombed Sentinels",
+        "tips": [
+          "Ailes probables (déduit de l'Outil raids et des hauts faits) : Entombed Sentinels + Vashnik, The Lost Explorers + Sszorak, dans l'ordre de ton choix.",
+          "Deux golems (Breath of Ula'tek et Blood of Ula'tek) plus de gros adds (Venom Coagulation) : combat multi-cibles, build AoE. Vérifie d'abord si ton raid garde les golems séparés (BigWigs suit ta distance à chacun, 40 m) avant de compter sur le cleave.",
+          "Mécaniques : soaks d'orbes (Toxic Droplets) et de groupe (Unstable Miasma), Blighted Blood (DoT magique qui laisse une flaque quand il est retiré ; pas de flaques en Normal et LFR), intermission Vitriolic Stasis (« puzzle »).",
+          "Mythique : Vashnik participe au combat avec Shifting Protovenom (debuff de partenaire / changement de couleur, cycle de 20 s).",
+          "Blighted Blood est magique : ton Detox ne le retire pas.",
+          "Enrage Mythique à 7:00 contre 9:00 en Héroïque (BigWigs seul, peut avoir changé) : vrai test de DPS.",
+          "Boss mods BigWigs et DBM : noms et rôles des capacités, pas une stratégie écrite."
+        ],
+        "loot": [
+          "Monkey King's Fighting Fists (271520) via le jeton Venomcured Idol (270911) — mains de tier",
+          "Keeper's Seething Core (270165) — bijou Force/Agilité",
+          "Sentinel's Vitriolic Chain (268250) — collier Critique/Hâte",
+          "Shadow Hunter's Warmask (268219) — tête cuir Polyvalence/Maîtrise"
+        ],
+        "confidence": "moyenne",
+        "sources": [
+          "s61",
+          "s62",
+          "s64",
+          "s93",
+          "s34",
+          "s107",
+          "s108",
+          "s129",
+          "s122"
+        ],
+        "lootConfidence": "basse",
+        "lootNote": "Attribution au boss d'après AllTheThings seul ; stats d'après SimC."
+      },
+      {
+        "order": 3,
+        "name": "The Lost Explorers",
+        "tips": [
+          "Conseil de trois Tortollans (Trader Gebbo, First Mate Nama, Scrollsage Iku) plus Mor'zahi, qui en renforce un à la fois (Mor'zahi's Command, ≈ 60 s) ; les tortues deviennent amicales à tour de rôle (bouton « Disgusting Fish ») : cleave, mais pas toujours sur les trois.",
+          "Interruption : prends un créneau de Spear Hand Strike sur Icebound Flames (Scrollsage Iku).",
+          "Esquive Shell Spin (Nama) : il t'étourdit s'il te touche. Frostfire Volley : place-toi dans la zone opposée à ton debuff pour le retirer.",
+          "Rien à dissiper pour toi : Icebound Flames est magique, Splinters est un saignement.",
+          "Aucune mécanique propre au Mythique repérée dans les boss mods (surtout le minutage change) ; certaines mécaniques de Mor'zahi n'ont pas d'événement de combat, donc la liste peut être incomplète.",
+          "Boss mods BigWigs et DBM : noms et rôles des capacités, pas une stratégie écrite."
+        ],
+        "loot": [
+          "Tassels of the Monkey King (271517) via le jeton Venomcured Remnant (270923) — épaules de tier",
+          "Gebbo's Bottomless Bag (270164) — bijou toutes classes",
+          "Unpossessed Skullsash (268227) — ceinture cuir Critique/Maîtrise"
+        ],
+        "confidence": "moyenne",
+        "sources": [
+          "s61",
+          "s64",
+          "s93",
+          "s34",
+          "s109",
+          "s110"
+        ],
+        "lootConfidence": "basse",
+        "lootNote": "Attribution au boss d'après AllTheThings seul ; stats d'après SimC."
+      },
+      {
+        "order": 4,
+        "name": "Vashnik the Malignant",
+        "tips": [
+          "Aile probable avec Entombed Sentinels (déduit).",
+          "Boss unique avec des adds : Shado-Pan mono-cible par défaut, un peu de dégâts sur les adds (déduit).",
+          "Mécaniques : Imbibe (cycle ≈ 84 s), Malignant Catalyst (soak), Plague Froth (vagues, sors), Adaptive Infection (Exploding : sors ; Siphoning : regroupe-toi ; Stygian : absorption).",
+          "Rien à dissiper pour toi : Exploding Infection et Congealing Bolt sont magiques.",
+          "Mythique : aura cumulable Malignance (BigWigs seul) ; minutages identiques à l'Héroïque selon DBM.",
+          "Boss mods BigWigs et DBM : noms et rôles des capacités, pas une stratégie écrite."
+        ],
+        "loot": [
+          "Battle Gi of the Monkey King (271522) via le jeton Venomcured Icon (270927) — torse de tier",
+          "Vashnik's Sanguine Rancor (270166) — bijou Agilité passif",
+          "Frothing Venom Spaulders (268246) — épaules cuir Critique/Maîtrise",
+          "Vile Alchemist's Band (268249) — anneau Critique/Maîtrise (profil SimC)"
+        ],
+        "confidence": "moyenne",
+        "sources": [
+          "s61",
+          "s93",
+          "s34",
+          "s111",
+          "s112"
+        ],
+        "lootConfidence": "basse",
+        "lootNote": "Attribution au boss d'après AllTheThings seul ; stats d'après SimC."
+      },
+      {
+        "order": 5,
+        "name": "Sszorak",
+        "tips": [
+          "Aile probable avec The Lost Explorers (déduit).",
+          "Pur mono-cible : Shado-Pan mono-cible.",
+          "Tempest (ralentissement) est le seul debuff Poison des boss 2 à 6 : ton Detox le retire (8 s de recharge).",
+          "Mécaniques : Venomous Surge (cercles, sors) avec Caustic Claws (disperse-toi), Raging Crosswinds (repoussements orientés, DBM annonce nord, sud, est ou ouest), Howling Maelstrom (poussée), Tempest (éloigne-toi du lancer).",
+          "Mythique : Serpent's Fury (ciblé), Virulence gauche/droite (le raid se sépare en deux), Unbound Ferocity (enrage à 100 d'énergie, BigWigs seul).",
+          "Boss mods BigWigs et DBM : noms et rôles des capacités, pas une stratégie écrite."
+        ],
+        "loot": [
+          "Pantaloons of the Monkey King (271518) via le jeton Venomcured Relic (270919) — jambes de tier",
+          "Apex Brute's Claw Ring (268252) — anneau Critique/Hâte",
+          "Ruthless Slaughtergrips (268234) — gants cuir Critique/Maîtrise",
+          "Slithering Savage's Gavel (268206) — masse à une main Agilité, Critique/Maîtrise"
+        ],
+        "confidence": "moyenne",
+        "sources": [
+          "s61",
+          "s93",
+          "s34",
+          "s113",
+          "s114"
+        ],
+        "lootConfidence": "basse",
+        "lootNote": "Attribution au boss d'après AllTheThings seul ; stats d'après SimC."
+      },
+      {
+        "order": 6,
+        "name": "The Twin Fangs",
+        "tips": [
+          "Deux boss (Vexhul et Ithraz) plus des vagues d'adds : vrai combat multi-cibles, build M+ / AoE.",
+          "Cycle Submerge d'environ 130 s en Mythique (BigWigs seul).",
+          "Vexhul : Caustic Deluge (rayon sur le tank et orbes), adds (Venomous Emergence, Beckon Progeny), Corrosive Spit (ligne sur un joueur), Stir the Depths (vagues), Vile Flood (frontal : 4 s d'incantation puis 14 s de canalisation à pleine énergie).",
+          "Ithraz : Ravenous Feast (soak de groupe), Coiling Ichor (flaques à esquiver), Stone Breaker (soak du tank et repoussement), Sanguine Storm (barrage, évite les flaques).",
+          "Mythique : Rouse the Brood à interrompre (prévois Spear Hand Strike), Blood Torrent (absorptions de soins), Envenomed, Tainted Blood, Visceral Burst.",
+          "Aucun debuff Poison ou Maladie repéré : ton Detox ne sert pas ici.",
+          "Boss mods BigWigs et DBM : noms et rôles des capacités, pas une stratégie écrite."
+        ],
+        "loot": [
+          "Monkey King's Unyielding Visage (271519) via le jeton Venomcured Effigy (270915) — tête de tier",
+          "Amulet of the Twin Fangs (268251) — collier Hâte/Maîtrise",
+          "Bespittled Slitherslippers (268261) — bottes cuir Critique/Hâte"
+        ],
+        "confidence": "moyenne",
+        "sources": [
+          "s61",
+          "s64",
+          "s93",
+          "s34",
+          "s115",
+          "s116"
+        ],
+        "lootConfidence": "basse",
+        "lootNote": "Attribution au boss d'après AllTheThings seul ; stats d'après SimC."
+      },
+      {
+        "order": 7,
+        "name": "The Coiled Altar",
+        "tips": [
+          "Zul'jan puis Hex Lord Malacrass : Zul'jan seul, puis Malacrass le possède vers 50 %, puis les deux ensemble.",
+          "Soulbound : tuer l'un en premier donne +100 % de vitesse d'attaque et de dégâts au survivant, donc descends les deux barres ensemble.",
+          "En Mythique, dose Touch of Death et tes cooldowns mono-cible pour ne pas trop entamer un seul boss (conseil déduit).",
+          "Mythique : variante d'adds Spiritcackle propre au Mythique, plus Mutagenic Venom, Malevolent Resonance et Spirit Erasure (intermission) (BigWigs).",
+          "Venomfang est un Poison : ton Detox le retire. Interromps Wail of Terror, sinon il apeure les joueurs.",
+          "Pas de jeton de tier (AllTheThings)."
+        ],
+        "loot": [
+          "Zul'jin's Guillotine Technique (270173)",
+          "Sash of the Forlorn Vessel (268256) — ceinture du profil SimC (AllTheThings seul)",
+          "Silken Voodoo Drape (268253) — cape du profil SimC (AllTheThings seul)",
+          "Coiled Hex Legguards (268225) — jambes que le profil SimC catalyse en jambes de tier (AllTheThings seul)",
+          "Aman'muso, Warlord's Vengeance (268209) — hache à une main du mini-set Bite of Zul'jan (AllTheThings seul)"
+        ],
+        "confidence": "moyenne",
+        "sources": [
+          "s42",
+          "s65",
+          "s41",
+          "s93",
+          "s117",
+          "s119"
+        ]
+      },
+      {
+        "order": 8,
+        "name": "Ula'tek",
+        "tips": [
+          "Mythique nerfé le 21/09 : Putrid Membrane 30 s, moins de Blightscale Spawn et d'œufs, Stone Venom réduit.",
+          "Mythique seulement : Toxic Burn, Noxious Shell, Noxious Splash et Rancid Yolk (BigWigs).",
+          "Poisonous Bite et Acidic Burst sont des Poisons : ton Detox les retire."
+        ],
+        "loot": [
+          "Voracious Heart of Ula'tek (270175)",
+          "Abyssal Broodfiend's Bardiche (268215)",
+          "Aqirbane Reliquary (268265) — collier, 1 châsse de base",
+          "Slumbering Coil Curio (270909) — dans les quatre modes ; pièce du set à la difficulté du drop (emplacement au choix ou imposé : non tranché)",
+          "Font of Venomous Rage (270168)",
+          "Gaze of the Coiled Watcher (271875, tête cuir Venomcursed)",
+          "Primeval Skyfriend (monture, Mythique)"
+        ],
+        "confidence": "moyenne",
+        "sources": [
+          "s12",
+          "s35",
+          "s36",
+          "s46",
+          "s34",
+          "s93",
+          "s118"
+        ]
+      }
+    ],
+    "ilvlByDifficulty": {
+      "lfr": 279,
+      "normal": 292,
+      "heroic": 305,
+      "mythic": 318
+    },
+    "mythicAdvice": [
+      "Tu étais 1/8 M au 28/09 (base raider.io) : avec les nerfs des 15 et 21/09, dont Ula'tek Mythique, le raid est bien plus accessible qu'au RWF.",
+      "Il faut un groupe organisé de 20 joueurs.",
+      "Attends-toi à ce que The Coiled Altar et Ula'tek soient le mur (déduit, non vérifié).",
+      "Shado-Pan mono-cible par défaut (Vashnik, Sszorak) ; build AoE (ou Conduit) sur Entombed Sentinels, The Twin Fangs et The Lost Explorers.",
+      "Garde le clear Héroïque hebdomadaire : deux boss HM suffiraient pour un choix de coffre sur la piste Mythe (selon Method et plusieurs sites, à confirmer dans ton coffre).",
+      "Les guides visent 305+ d'ilvl pour le Mythique : enchants, gemmes et 4 pièces d'abord.",
+      "Ton Detox (Poison et Maladie) sert sur Tempest (Sszorak), Venomfang (The Coiled Altar), Poisonous Bite et Acidic Burst (Ula'tek) ; les autres debuffs des boss 2 à 6 sont magiques ou physiques (boss mods).",
+      "Interruptions à prévoir : Icebound Flames (Scrollsage Iku, The Lost Explorers), Rouse the Brood (The Twin Fangs, Mythique seulement), Wail of Terror (The Coiled Altar).",
+      "Entombed Sentinels Mythique : enrage à 7:00 contre 9:00 en Héroïque (BigWigs seul) : c'est un test de DPS."
+    ],
+    "rwf": "Liquid a tué Ula'tek Mythique le 3 septembre 2026 vers 19:04 UTC (cinquième victoire d'affilée), Echo environ 25 minutes plus tard ; 307 ou 311 essais selon les sources. Les 200 premières guildes obtiennent le Hall of Fame et le titre « Famed Slayer of Ula'tek ».",
+    "upcoming": {
+      "name": "The Unbinding of Kith'ix",
+      "status": "PTR 12.1.5 · sortie estimée vers le 6 octobre (non officielle)",
+      "detail": "Raid à un boss en deux phases (10 à 30 joueurs hors Mythique), du LFR au Mythique. Le Mythique donne du 344, au-dessus de la piste normale ; les autres modes donnent du 3/6 de leur piste. Une pièce cantrip par type d'armure sur un emplacement de tier : pour le cuir, Chestwrap of Palpable Terror (torse, 281236) sur le PTR actuel. Son proc de dégâts d'Ombre gagne 15 % si tu portes un objet Venomcursed. Données PTR susceptibles de changer.",
+      "confidence": "moyenne",
+      "sources": [
+        "s3",
+        "s66",
+        "s38",
+        "s1"
+      ]
+    },
+    "lair": {
+      "name": "The Tidebound Grotto",
+      "type": "Repaire de raid à 1 boss (« Lair », « Repaire » dans le client français)",
+      "boss": "Nymrissa Wavecaller",
+      "status": "Actif en 12.1 · Lyarà 1/1 Héroïque au 28/09 (base Raider.IO)",
+      "detail": "Instance à un seul boss sur The Coiled Isle, en quatre difficultés : Monde (le jeu te place dans un groupe), Normal, Héroïque et Mythique ; quête hebdomadaire « Lair: Nymrissa Wavecaller ». Raider.IO la suit comme un raid à part (1 boss) ; Warcraft Logs classe Nymrissa avec le Gouffre venimeux (une seule source). Pas de jeton de tier ni de Curio : petite source d'améliorations, pas une cible de tier ou de bijou.",
+      "tips": [
+        "Surtout mono-cible ; seule fenêtre de cleave : les adds Alluring Bubble, à tuer.",
+        "Esquive Swirling Whirlpools et Tidepiercer's Rush ; sors l'orbe de Chilling Frost ; Abyssal Rain inflige des dégâts à tout le raid ; enrage : Unending Tides.",
+        "Mythique : Water Jet (ligne frontale sur le tank, qui applique une vulnérabilité) remplace Iceblade Flurry.",
+        "Aucun Poison ni Maladie repéré : ton Detox ne sert pas ici."
+      ],
+      "loot": [
+        "Breakwater Boots (268247) — bottes cuir Hâte/Polyvalence",
+        "Alluring Bubbleband (268266) — anneau Hâte/Polyvalence",
+        "Tidepiercer's Bubble Popper (268199) — bâton Agilité à deux mains, Critique/Polyvalence",
+        "Wavecaller's Seastone (270167) — bijou Intelligence, pas pour toi"
+      ],
+      "lootConfidence": "basse",
+      "ilvl": "inconnu",
+      "vault": "Inconnu : aucune source ne dit si Nymrissa compte pour la rangée raid du coffre. Survole les emplacements raid de la grande chambre forte : si « The Tidebound Grotto » apparaît dans la liste des boss, le kill compte.",
+      "confidence": "moyenne",
+      "sources": [
+        "s101",
+        "s120",
+        "s121",
+        "s63",
+        "s102",
+        "s103",
+        "s123",
+        "s124"
+      ]
+    }
+  },
+  "progression": {
+    "ilvlTable": [
+      {
+        "source": "Raid LFR",
+        "ilvl": "279",
+        "note": "Niveau de drop.",
+        "confidence": "moyenne",
+        "sources": [
+          "s67",
+          "s68"
+        ]
+      },
+      {
+        "source": "Raid Normal",
+        "ilvl": "292",
+        "note": "Niveau de drop.",
+        "confidence": "moyenne",
+        "sources": [
+          "s67",
+          "s68"
+        ]
+      },
+      {
+        "source": "Raid Héroïque",
+        "ilvl": "305",
+        "note": "Niveau de drop (piste Héros 1/6).",
+        "confidence": "moyenne",
+        "sources": [
+          "s67",
+          "s68"
+        ]
+      },
+      {
+        "source": "Raid Mythique",
+        "ilvl": "318",
+        "note": "Niveau de drop (piste Mythe 1/6).",
+        "confidence": "moyenne",
+        "sources": [
+          "s67",
+          "s68"
+        ]
+      },
+      {
+        "source": "Fin de donjon M+ +12",
+        "ilvl": "311",
+        "note": "Plafond du butin de fin de donjon (une seule source).",
+        "confidence": "moyenne",
+        "sources": [
+          "s69",
+          "s68"
+        ]
+      },
+      {
+        "source": "Coffre M+ (+12 et plus)",
+        "ilvl": "318",
+        "note": "Piste Mythe 1/6 (une seule source).",
+        "confidence": "moyenne",
+        "sources": [
+          "s69",
+          "s68"
+        ]
+      },
+      {
+        "source": "Coffre monde (Gouffres palier 8)",
+        "ilvl": "305",
+        "note": "Piste Héros ; une seule source : vérifie l'ilvl affiché dans l'aperçu du coffre. Valeur des paliers 9 à 11 inconnue.",
+        "confidence": "basse",
+        "sources": [
+          "s67",
+          "s70",
+          "s71"
+        ]
+      },
+      {
+        "source": "Coffre raid (2 boss HM)",
+        "ilvl": "318",
+        "note": "Piste Mythe 1/6 selon Method et plusieurs sites (extraits de recherche, à confirmer dans ton coffre) ; le « ≈ 311 » d'une autre source n'est pas un rang Mythe.",
+        "confidence": "moyenne",
+        "sources": [
+          "s70",
+          "s71",
+          "s69",
+          "s49"
+        ]
+      },
+      {
+        "source": "Piste Mythe 6/6",
+        "ilvl": "334",
+        "note": "Plafond d'amélioration actuel (12.1.0).",
+        "confidence": "moyenne",
+        "sources": [
+          "s72",
+          "s49"
+        ]
+      },
+      {
+        "source": "Piste Mythe 7/8 et 8/8 (Venomstones, PTR 12.1.5)",
+        "ilvl": "337 / 340",
+        "note": "Rangs 7 et 8 présents dans les données SimC (Héros 7 et 8 : 324 / 328) ; probablement débloqués par les Ascendant Venomstones en 12.1.5 sur arme, bijou ou collier entièrement améliorés (plafond « Myth 8 » d'après un seul résumé de recherche).",
+        "confidence": "basse",
+        "sources": [
+          "s49",
+          "s126",
+          "s127",
+          "s52"
+        ]
+      },
+      {
+        "source": "Objets « Very Rare » (Myth 9)",
+        "ilvl": "344",
+        "note": "Bonus à part, pas un rang d'amélioration.",
+        "confidence": "moyenne",
+        "sources": [
+          "s49",
+          "s72"
+        ]
+      },
+      {
+        "source": "Kith'ix Mythique (PTR 12.1.5)",
+        "ilvl": "344",
+        "note": "Au-dessus de la piste normale ; données PTR.",
+        "confidence": "moyenne",
+        "sources": [
+          "s3"
+        ]
+      },
+      {
+        "source": "Craft (profil SimC)",
+        "ilvl": "331",
+        "note": "Valeur du profil, pas forcément le maximum.",
+        "confidence": "basse",
+        "sources": [
+          "s29"
+        ]
+      }
+    ],
+    "crests": [
+      {
+        "name": "Mistcrest Aventurier",
+        "range": "piste Aventurier ≈ 266–282 (6 rangs probables)",
+        "howToGet": "Non vérifié (monnaie 3442)."
+      },
+      {
+        "name": "Mistcrest Vétéran",
+        "range": "piste Vétéran ≈ 279–295",
+        "howToGet": "Non vérifié (monnaie 3443)."
+      },
+      {
+        "name": "Mistcrest Champion",
+        "range": "piste Champion ≈ 292–308",
+        "howToGet": "Clés +2 à +3 d'après une source (monnaie 3444)."
+      },
+      {
+        "name": "Mistcrest Héros",
+        "range": "piste Héros ≈ 305–321",
+        "howToGet": "Paliers de clés non trouvés ; certains coffres donnent « 10 Hero and Myth Mistcrests » (monnaie 3445)."
+      },
+      {
+        "name": "Mistcrest Mythe",
+        "range": "piste Mythe 318–334",
+        "howToGet": "Paliers de clés non trouvés ; raid Mythique et coffres (monnaie 3446)."
+      }
+    ],
+    "crestRules": [
+      "Les Mistcrests (monnaies 3442 à 3446) remplacent les Dawncrests de la saison 1.",
+      "N'améliore que ce que tu gardes : tier, objets d'Ula'tek (Bardiche, Voracious Heart, Aqirbane Reliquary), pièces Héros et Mythe.",
+      "Ordre conseillé par les guides d'août (non revérifié) : arme > bijoux > tête, torse, jambes > épaules, mains, ceinture, pieds > cape, poignets.",
+      "Rien sur les placeholders : Circlet of Encroaching Shadow, Drum of Renewed Bonds, Venom-Cursed Hidepiercer.",
+      "Plafond hebdomadaire et coût par rang non vérifiés (les seuls chiffres trouvés sont incohérents) : ne pas s'y fier."
+    ],
+    "vaultRules": [
+      "Raid : selon Method et plusieurs sites (extraits de recherche du 5/09, à confirmer dans ton coffre), le coffre paie une piste au-dessus de la difficulté : deux boss Héroïques débloqueraient un choix Mythe 1/6 (318). Le « ≈ 311 » d'une autre source ne correspond à aucun rang Mythe (voir les points contestés).",
+      "Raid : 1er emplacement à 2 boss (une source S2) ; 4 et 6 boss pour les suivants = convention de The War Within, non vérifiée. L'infobulle des emplacements raid liste les boss comptés par instance : c'est là que tu verras si The Tidebound Grotto compte.",
+      "Donjons (client 12.1) : le 1er emplacement se débloque avec 1 donjon Héroïque, Mythique ou Marcheurs du temps au niveau maximum ; chaque emplacement vaut le plus bas de tes N meilleurs runs de la semaine. 4 et 8 runs pour les suivants : convention non vérifiée.",
+      "M+ : à partir de +12, le choix du coffre serait au maximum (318, Mythe 1/6 ; une seule source) ; au-delà, tu gagnes du score, pas d'ilvl. Si le vrai seuil est +10, le +12 reste la cible sûre.",
+      "Monde (confirmé par les textes du client 12.1) : 2, 4 et 8 activités ; chaque emplacement vaut le palier le plus bas de tes 2, 4 ou 8 meilleures activités. Comptent : Gouffres (paliers 1 à 11), activités du monde (palier 1), Traque (palier 1, 5 ou 8 selon la difficulté), Sites rituels (paliers 1 à 6).",
+      "(non vérifié, une seule source) Monde : les Gouffres de palier 8 donneraient la piste Héros à 305 ; valeur des paliers 9 à 11 inconnue. Vérifie l'ilvl affiché dans l'aperçu du coffre.",
+      "Tier (client 12.1) : des pièces de set peuvent apparaître dans les neuf emplacements du coffre (raid, donjons et monde) ; une chance, pas une garantie.",
+      "Garde un clear Héroïque par semaine toute la saison."
+    ],
+    "catalyst": [
+      "Catalyseur à Silvermoon. (une seule source) Quête de déblocage S2 « Forged Through Fire » : vérifie qu'elle est faite.",
+      "Rythme et plafond des charges de la saison 2 : inconnus ; compte tes charges en jeu.",
+      "Ne catalyse que tête, épaules, torse, mains ou jambes : cape, poignets, ceinture et bottes donnent des pièces Monkey King hors set.",
+      "Une pièce catalysée garde les stats de l'objet d'origine en live d'après SimC (commit du 9/09 ; annoncé aussi avec 12.1.5 pour les tertiaires et les cantrips) : catalyse de préférence une pièce avec de bonnes stats ou un cantrip Venomcursed.",
+      "Venomblight Manaflux (monnaie 3465) remplace le Dawnlight Manaflux de la S1 ; son rôle exact (charges de Catalyseur ?) n'est pas vérifié."
+    ],
+    "maxIlvl": {
+      "value": "334",
+      "confidence": "moyenne",
+      "sources": [
+        "s72",
+        "s49",
+        "s73",
+        "s126"
+      ],
+      "note": "334 aujourd'hui (Mythe 6/6). 340 possible après 12.1.5 (Mythe 8 via les Ascendant Venomstones, PTR, une seule source) sur arme, bijou ou collier ; 344 pour Kith'ix Mythique et les objets « Very Rare »."
+    },
+    "vaultSources": [
+      "s69",
+      "s70",
+      "s67",
+      "s68",
+      "s71",
+      "s49",
+      "s102",
+      "s103",
+      "s104",
+      "s105"
+    ],
+    "catalystSources": [
+      "s96",
+      "s95",
+      "s99",
+      "s100",
+      "s98",
+      "s97"
+    ]
+  },
+  "targets": {
+    "slotIlvlGood": 318,
+    "slotIlvlWeak": 305,
+    "mythicEntryIlvl": 305,
+    "vaultMplusLevel": 12,
+    "note": "Seuils adaptés à ton niveau actuel (8/8 HM, clés +16) : « faible » = sous le niveau d'un drop Héroïque (305), « bon » = au niveau d'un drop Mythique ou d'un choix de coffre sur la piste Mythe (318, selon Method et plusieurs sites, à confirmer dans ton coffre). L'entrée Mythique à 305+ est le repère des guides. +12 est le niveau de clé qui maximise le coffre M+ (une seule source)."
+  },
+  "actionRules": [
+    {
+      "id": "enchants-dps",
+      "priority": 1,
+      "when": {
+        "type": "missingEnchant",
+        "params": {
+          "slots": [
+            "mainhand",
+            "finger",
+            "chest",
+            "legs"
+          ]
+        }
+      },
+      "title": "Enchante arme, anneaux, torse et jambes",
+      "detail": "Ce sont les enchants qui apportent des dégâts en Midnight : Eyes of the Eagle sur chaque anneau (+2 % de dégâts critiques chacun), Rite of the Hash'ey sur l'arme (défaut SimC, alternatives proches), Mark of the Worldsoul au torse, Forest Hunter's Armor Kit aux jambes. Un seul enchant d'arme avec un deux-mains. Gain immédiat, sans dépendre du loot.",
+      "effort": "faible",
+      "dependsOnLoot": false
+    },
+    {
+      "id": "tier-4p",
+      "priority": 1,
+      "when": {
+        "type": "tierCountBelow",
+        "params": {
+          "count": 4
+        }
+      },
+      "title": "Complète le 4 pièces Guile of the Monkey King",
+      "detail": "Unbroken Rhythm (4 pièces) est le plus gros gain de la saison et fait basculer l'arbre optimal en M+. Jetons Venomcured d'après AllTheThings (une seule source, à vérifier) : Twin Fangs = tête, Lost Explorers = épaules, Vashnik = torse, Sszorak = jambes, Entombed Sentinels = mains. Autres pistes : Slumbering Coil Curio d'Ula'tek (pièce du set à la difficulté du drop ; emplacement à vérifier sur l'infobulle), charges de Catalyseur à Silvermoon (quête S2 « Forged Through Fire » à vérifier ; jamais sur cape, poignets, ceinture ou bottes) et la grande chambre forte, qui peut proposer du tier dans ses neuf emplacements. Recommandation à valider : tête, épaules, torse et jambes d'abord, mains en dernier (profil SimC).",
+      "effort": "moyen",
+      "dependsOnLoot": true
+    },
+    {
+      "id": "leveling-leftovers",
+      "priority": 1,
+      "when": {
+        "type": "slotIlvlBelow",
+        "params": {
+          "slots": [
+            "finger",
+            "trinket",
+            "back"
+          ],
+          "ilvl": 300
+        }
+      },
+      "title": "Remplace les derniers objets de leveling",
+      "detail": "Au 21/08 : Circlet of Encroaching Shadow (anneau vert), Drum of Renewed Bonds (bijou de leveling) et Preyhunter's Polished Cloak (cape) étaient sous 300. N'importe quel drop Héroïque ou choix de coffre les remplace ; n'y mets ni crests ni enchant coûteux.",
+      "effort": "moyen",
+      "dependsOnLoot": true
+    },
+    {
+      "id": "gems-sockets",
+      "priority": 2,
+      "when": {
+        "type": "missingGem",
+        "params": {
+          "slots": [
+            "neck",
+            "finger1",
+            "finger2"
+          ]
+        }
+      },
+      "title": "Sertis tes châsses",
+      "detail": "Un seul diamant Eversong (Powerful si tu mélanges les couleurs, Indecipherable si toutes tes gemmes sont identiques), puis des gemmes à deux stats comme Flawless Deadly Peridot. L'Aqirbane Reliquary n'a qu'une châsse de base ; le profil SimC en a deux et sertit aussi tête, poignets, ceinture et anneaux, toutes grâce à des châsses ajoutées (bonus 10835, 13668, 13750) : ton exemplaire peut en avoir moins. raider.io ne donne pas le nombre de châsses : vérifie en jeu.",
+      "effort": "faible",
+      "dependsOnLoot": false
+    },
+    {
+      "id": "vault-mplus-8",
+      "priority": 2,
+      "when": {
+        "type": "weeklyRunsBelow",
+        "params": {
+          "minLevel": 12,
+          "count": 8
+        }
+      },
+      "title": "Coffre M+ : 8 clés en +12 ou plus avant le reset",
+      "detail": "À partir de +12, le coffre M+ offrirait déjà son meilleur choix (piste Mythe 1/6, une seule source ; si le vrai seuil est +10, le +12 reste sûr) ; au-delà, tu gagnes surtout du score. 1er emplacement : 1 donjon Héroïque, Mythique ou Marcheurs du temps (client 12.1) ; 4 et 8 pour les suivants : convention de The War Within, non vérifiée. Chaque emplacement vaut le plus bas de tes N meilleurs runs.",
+      "effort": "élevé",
+      "dependsOnLoot": false
+    },
+    {
+      "id": "raid-mythic-next",
+      "priority": 2,
+      "when": {
+        "type": "raidNotCleared",
+        "params": {
+          "difficulty": "mythic"
+        }
+      },
+      "title": "Avance en Mythique au Gouffre venimeux",
+      "detail": "Tu étais 1/8 M au 28/09. Les nerfs des 15 et 21/09, dont Ula'tek Mythique, rendent le Mythique bien plus accessible qu'au RWF. Il faut un groupe organisé ; attends-toi à ce que The Coiled Altar et Ula'tek soient le mur (déduit). Prépare tes interruptions (Icebound Flames sur The Lost Explorers, Rouse the Brood sur The Twin Fangs en Mythique) et ton Detox (Tempest de Sszorak, Venomfang de The Coiled Altar, poisons d'Ula'tek).",
+      "effort": "élevé",
+      "dependsOnLoot": false
+    },
+    {
+      "id": "dungeon-weakest",
+      "priority": 2,
+      "when": {
+        "type": "dungeonScoreGap",
+        "params": {
+          "gap": 10
+        }
+      },
+      "title": "Rattrape ton donjon le plus en retard",
+      "detail": "Au 28/09 (base Raider.IO), Murder Row (+15) était ton seul donjon sous +16 : le chronométrer en +16 rapporte ≈ 15 points. Son minuteur (34:00) est le plus long du pool.",
+      "effort": "moyen",
+      "dependsOnLoot": false
+    },
+    {
+      "id": "sim-raidbots",
+      "priority": 2,
+      "when": {
+        "type": "always",
+        "params": {}
+      },
+      "title": "Simule ton personnage sur Raidbots (version postérieure au 26/09)",
+      "detail": "Top Gear sur ton export actuel : Shado-Pan contre Conduit, enchant d'arme (Rite of the Hash'ey contre les alternatives), Font of Venomous Rage (+25 % le 22/09) face à Voracious Heart et à Zul'jin's Guillotine (Top Gear, toutes les paires), gemmes. Les buffs du 22/09 et la mise à jour SimC du moine du 26/09 rendent les anciennes sims caduques.",
+      "effort": "faible",
+      "dependsOnLoot": false
+    },
+    {
+      "id": "raid-heroic-clear",
+      "priority": 3,
+      "when": {
+        "type": "raidNotCleared",
+        "params": {
+          "difficulty": "heroic"
+        }
+      },
+      "title": "Termine le Gouffre venimeux en Héroïque",
+      "detail": "Deux boss Héroïques par semaine débloqueraient déjà un choix de coffre sur la piste Mythe (318, selon Method et plusieurs sites, à confirmer dans ton coffre) ; les jetons de tier tombent aussi en Héroïque (pièces Héros). Garde ce clear toute la saison.",
+      "effort": "élevé",
+      "dependsOnLoot": false
+    },
+    {
+      "id": "slots-below-mythic-drop",
+      "priority": 3,
+      "when": {
+        "type": "slotIlvlBelow",
+        "params": {
+          "ilvl": 318
+        }
+      },
+      "title": "Vise la piste Mythe sur tes emplacements les plus bas",
+      "detail": "Un emplacement sous le niveau d'un drop Mythique (318) se remplace par un choix du coffre (raid Héroïque, selon Method et plusieurs sites, à confirmer dans ton coffre ; ou M+ +12, une seule source) ou un drop Mythique. Commence par l'arme et les bijoux.",
+      "effort": "moyen",
+      "dependsOnLoot": true
+    },
+    {
+      "id": "push-plus17",
+      "priority": 3,
+      "when": {
+        "type": "dungeonScoreGap",
+        "params": {
+          "minScore": 440
+        }
+      },
+      "title": "Chronomètre du +17 dans les 8 donjons",
+      "detail": "Un +17 chronométré vaut 440 points par donjon, 15 de plus qu'un +16 ; les huit donnent ≈ 3520 hors bonus de temps. Une clé ratée en +12 ou plus plafonne vers 320 : seules les clés dans les temps font monter ta cote.",
+      "effort": "élevé",
+      "dependsOnLoot": false
+    },
+    {
+      "id": "avg-ilvl-mythic-entry",
+      "priority": 3,
+      "when": {
+        "type": "avgIlvlBelow",
+        "params": {
+          "ilvl": 305
+        }
+      },
+      "title": "Atteins l'ilvl d'entrée Mythique (305 et plus)",
+      "detail": "Repère des guides pour commencer le Mythique ; avec tes clears Héroïques répétés, tu l'as très probablement dépassé.",
+      "effort": "moyen",
+      "dependsOnLoot": true
+    },
+    {
+      "id": "hero-tree-mplus",
+      "priority": 4,
+      "when": {
+        "type": "always",
+        "params": {}
+      },
+      "title": "Teste Conduit of the Celestials pour le push M+",
+      "detail": "Avec le 4 pièces, Conduit passe devant en AoE dans les sims du vérificateur et domine le haut du classement ; Shado-Pan reste le choix sûr en raid mono-cible et sans tier. Entraîne-toi sur des clés hebdomadaires avant de pousser.",
+      "effort": "moyen",
+      "dependsOnLoot": false
+    },
+    {
+      "id": "crests-keepers",
+      "priority": 4,
+      "when": {
+        "type": "always",
+        "params": {}
+      },
+      "title": "Crests : seulement sur ce que tu gardes",
+      "detail": "Ordre des guides d'août : arme > bijoux > tête, torse, jambes > épaules, mains, ceinture, pieds > cape, poignets. Priorité à la Bardiche, au Voracious Heart, à l'Aqirbane Reliquary et au tier ; rien sur les placeholders.",
+      "effort": "faible",
+      "dependsOnLoot": false
+    },
+    {
+      "id": "prep-12-1-5",
+      "priority": 4,
+      "when": {
+        "type": "always",
+        "params": {}
+      },
+      "title": "Prépare 12.1.5 (sortie estimée vers le 6 octobre)",
+      "detail": "Sur le PTR, les Ascendant Venomstones n'améliorent qu'une arme, un bijou ou un collier entièrement améliorés (Héros, Mythe ou craft « Tidal Crafted » maximal) : termine d'abord la Bardiche, le Voracious Heart et l'Aqirbane Reliquary. Kith'ix Mythique donnera du 344. Date non officielle. Plafond annoncé : l'équivalent Mythe 8 (340), d'après un seul résumé de recherche.",
+      "effort": "moyen",
+      "dependsOnLoot": false
+    },
+    {
+      "id": "enchant-feet-utility",
+      "priority": 5,
+      "when": {
+        "type": "missingEnchant",
+        "params": {
+          "slots": [
+            "feet"
+          ]
+        }
+      },
+      "title": "Enchante les bottes (utilitaire)",
+      "detail": "Lynx's Dexterity (Évitement + Endurance) n'apporte aucun dégât : à faire en dernier. Même logique pour la tête et les épaules (Vitesse ou Ponction). Il n'existe pas d'enchant de cape ni de poignets en Midnight.",
+      "effort": "faible",
+      "dependsOnLoot": false
+    }
+  ],
+  "gearSnapshot": {
+    "date": "2026-08-21",
+    "items": [
+      {
+        "slot": "head",
+        "nameFr": "Semblance du démon abject",
+        "nameEn": "Vilefiend's Guise",
+        "itemId": 251140,
+        "ilvl": 308,
+        "verdict": "correct",
+        "note": "Murder Row. Emplacement de tier : le profil SimC catalyse la tête d'Ula'tek (Gaze of the Coiled Watcher) en tête de tier."
+      },
+      {
+        "slot": "neck",
+        "nameFr": "Joug de l'ours coureur",
+        "nameEn": "Yoke of the Charging Bear",
+        "itemId": 251173,
+        "ilvl": 311,
+        "verdict": "correct",
+        "note": "Noté comme récompense de renom, mais ses bonus ressemblent à ceux des objets de donjon M+ (Den of Nalorakk ?) : non vérifié. Cible : Aqirbane Reliquary."
+      },
+      {
+        "slot": "shoulder",
+        "nameFr": "Spallières de venin écumant",
+        "nameEn": "Frothing Venom Spaulders",
+        "itemId": 268246,
+        "ilvl": 298,
+        "verdict": "correct",
+        "note": "Vashnik the Malignant d'après AllTheThings (la note du 21/08 disait « adds du Gouffre venimeux », voir les points contestés). Emplacement de tier, le plus faible des cinq au 21/08."
+      },
+      {
+        "slot": "back",
+        "nameFr": "Cape distinguée de traque-proie",
+        "nameEn": "Preyhunter's Polished Cloak",
+        "itemId": 275525,
+        "ilvl": 292,
+        "verdict": "à remplacer",
+        "note": "Identifiée : modèle de base vert, probablement une récompense de Traque (déduit) ; en jeu, la qualité dépend de la piste d'amélioration. À remplacer par un drop (Silken Voodoo Drape dans le profil SimC). Pas d'enchant de cape en Midnight."
+      },
+      {
+        "slot": "chest",
+        "nameFr": "Brigandine de traqueur des brumes",
+        "nameEn": "Miststalker's Brigandine",
+        "itemId": 272239,
+        "ilvl": 305,
+        "verdict": "correct",
+        "note": "Coffre de gouffre Nemesis. Emplacement de tier ; à surveiller en 12.1.5 (cantrip cuir de Kith'ix sur le torse)."
+      },
+      {
+        "slot": "wrist",
+        "nameFr": "Brassards garde-racines",
+        "nameEn": "Rootwarden Wraps",
+        "itemId": 251183,
+        "ilvl": 302,
+        "verdict": "correct",
+        "note": "Renom. Cible : poignets craftés avec Arcanoweave Lining. Pas d'enchant de poignets en Midnight."
+      },
+      {
+        "slot": "hands",
+        "nameFr": "Poignes de défense électrifiée",
+        "nameEn": "Grips of Electrified Defense",
+        "itemId": 159337,
+        "ilvl": 311,
+        "verdict": "bon",
+        "note": "Temple of Sethraliss (d'après les notes du 21/08). Emplacement de tier, mais le profil SimC garde des gants hors tier."
+      },
+      {
+        "slot": "waist",
+        "nameFr": "Ceinture de dinomancien primordial",
+        "nameEn": "Primal Dinomancer's Belt",
+        "itemId": 159301,
+        "ilvl": 302,
+        "verdict": "bon",
+        "note": "Kings' Rest (d'après les notes du 21/08)."
+      },
+      {
+        "slot": "legs",
+        "nameFr": "Jambières lumsporeuses",
+        "nameEn": "Lightspore Leggings",
+        "itemId": 251198,
+        "ilvl": 311,
+        "verdict": "correct",
+        "note": "The Blinding Vale. Emplacement de tier."
+      },
+      {
+        "slot": "feet",
+        "nameFr": "Jambards d'exploration arctique",
+        "nameEn": "Arctic Explorer's Legwraps",
+        "itemId": 251153,
+        "ilvl": 311,
+        "verdict": "correct",
+        "note": "Den of Nalorakk. Cible : bottes craftées avec Arcanoweave Lining."
+      },
+      {
+        "slot": "finger1",
+        "nameFr": "Diadème de l'ombre envahissante",
+        "nameEn": "Circlet of Encroaching Shadow",
+        "itemId": 256986,
+        "ilvl": 292,
+        "verdict": "à remplacer",
+        "note": "Anneau vert de leveling (confirmé dans les données d'objets) : remplace-le, sans crests ni enchant coûteux."
+      },
+      {
+        "slot": "finger2",
+        "nameFr": "Bague précieuse chapardée",
+        "nameEn": "Pilfered Precious Band",
+        "itemId": 251148,
+        "ilvl": 302,
+        "verdict": "correct",
+        "note": "Renom."
+      },
+      {
+        "slot": "trinket1",
+        "nameFr": "Fiole ignoble de venin volatil",
+        "nameEn": "Vile Vial of Volatile Venom",
+        "itemId": 273796,
+        "ilvl": 292,
+        "verdict": "bon",
+        "note": "Altar of Fangs (Rav'i, non vérifié). Utilisation de 2 min correcte en attendant Voracious Heart ou Zul'jin's Guillotine ; pas de crests dessus."
+      },
+      {
+        "slot": "trinket2",
+        "nameFr": "Tambour de liens renouvelés",
+        "nameEn": "Drum of Renewed Bonds",
+        "itemId": 248583,
+        "ilvl": 295,
+        "verdict": "à remplacer",
+        "note": "Bijou vert de leveling (confirmé dans les données d'objets)."
+      },
+      {
+        "slot": "mainhand",
+        "nameFr": "Perce-cuir affolé par le venin",
+        "nameEn": "Venom-Cursed Hidepiercer",
+        "itemId": 277806,
+        "ilvl": 308,
+        "verdict": "à remplacer",
+        "note": "Identifiée : arme d'hast à deux mains, modèle de base vert (placeholder). Cible : Abyssal Broodfiend's Bardiche (Ula'tek). À noter : 251149 dans tes sacs (Victor's Flashfrozen Blade) est aussi un deux-mains, pas une arme à une main."
+      }
+    ]
+  },
+  "apiNotes": {
+    "profileFields": [
+      "gear",
+      "talents",
+      "guild",
+      "raid_progression",
+      "mythic_plus_scores_by_season:current",
+      "mythic_plus_ranks",
+      "mythic_plus_recent_runs",
+      "mythic_plus_best_runs",
+      "mythic_plus_alternate_runs",
+      "mythic_plus_highest_level_runs",
+      "mythic_plus_weekly_highest_level_runs",
+      "mythic_plus_previous_weekly_highest_level_runs",
+      "mythic_plus_dungeon_run_counts",
+      "previous_mythic_plus_ranks",
+      "raid_achievement_curve:the-venomous-abyss"
+    ],
+    "gearItemFields": [
+      "item_id",
+      "item_level",
+      "name",
+      "icon",
+      "item_quality",
+      "enchant",
+      "enchants",
+      "enchants_detail",
+      "gems",
+      "gems_detail",
+      "bonuses",
+      "tier",
+      "Clés d'emplacement : head, neck, shoulder, back, chest, waist, shirt, wrist, hands, legs, feet, finger1, finger2, trinket1, trinket2, mainhand, offhand.",
+      "tier est typé chaîne dans le client non officiel : sens supposé ; recouper avec les item_id du set 271517, 271518, 271519, 271520, 271522 (271521 n'en fait pas partie).",
+      "bonuses de la S2 → piste et rang (rang = position dans la plage, 1 à 8) : Aventurier 12817–12824, Vétéran 12825–12832, Champion 12833–12840, Héros 12841–12848, Mythe 12849–12856. Afficher « x/6 » pour les rangs 1 à 6. Rangs 7 et 8 (12855 = Mythe 337, 12856 = Mythe 340 ; 12847 = Héros 324, 12848 = Héros 328 ; idem pour les autres pistes) : afficher « Mythe 7/8 · Venomstone (12.1.5) » ou « Mythe 8/8 · Venomstone (12.1.5) » (idem « Héros 7/8 », « Héros 8/8 »), jamais « 7/6 » ni « 8/6 ». 13848 = 344 (Myth 9, bonus à part, pas un rang).",
+      "Autres bonus : 13440 = source « Mythic+ », 13751 = « Tidal Crafted », 13708 / 13846 / 13847 / 13987 = Venomcursed, 10835 / 13668 / 13750 / 1808 = châsse ajoutée (seul le collier Aqirbane Reliquary a une châsse native parmi les objets du profil SimC).",
+      "Enchants attendus en Midnight : head, shoulder, chest, legs, feet, finger1, finger2, mainhand — jamais back ni wrist.",
+      "Qualité : lire item_quality ; la qualité de base des données SimC est remplacée par la piste d'amélioration."
+    ],
+    "weeklyRunsField": "mythic_plus_weekly_highest_level_runs",
+    "talentsField": "talents",
+    "affixesEndpoint": "https://raider.io/api/v1/mythic-plus/affixes?region=eu&locale=fr",
+    "cutoffsEndpoint": "https://raider.io/api/v1/mythic-plus/season-cutoffs?region=eu&season=season-mn-2",
+    "staticDataEndpoint": "https://raider.io/api/v1/mythic-plus/static-data?expansion_id=11",
+    "raidSlug": "the-venomous-abyss",
+    "cors": "Non vérifié : raider.io était bloqué depuis le bac à sable. Prévoir un repli (collage manuel du JSON). Limites de débit inconnues ; la plupart des points d'accès ne demandent pas de clé. Bornes de semaine : GET /api/v1/periods (reset EU). Couleurs de cote : GET /api/v1/mythic-plus/score-tiers?season=current. Talents : talentLoadout.loadout_text (chaîne d'import) et active_hero_tree.slug. Scores : clés de spé « spec_0 » ou « spec0 » selon la version, lire les deux. Schémas tirés du client non officiel raiderio-api 0.6.1, non testés en direct.",
+    "confidence": "moyenne",
+    "sources": [
+      "s74",
+      "s75",
+      "s76",
+      "s77",
+      "s78",
+      "s49",
+      "s31",
+      "s21",
+      "s34"
+    ]
+  },
+  "disputed": [
+    {
+      "topic": "Tier et Kith'ix : la pièce cantrip cuir est-elle un pantalon ou un torse ?",
+      "versions": [
+        "Couverture web, page Wowhead PTR et AllTheThings : Leggings of Palpable Terror (jambes, 281236) ; conseil de garder les jambes pour la fin du 4 pièces.",
+        "Données PTR actuelles (build 69952, 22/09) : l'objet 281236 est devenu Chestwrap of Palpable Terror, un torse ; le tissu a récupéré les jambes."
+      ],
+      "resolution": "Dans les dernières données PTR de SimC, c'est un torse (et 281235 est devenu un pantalon en tissu) : les pièces semblent avoir été renommées et changées d'emplacement dans un build PTR récent. Ne garde pas les jambes « en dernier » pour elle ; données PTR, susceptibles de changer encore.",
+      "sources": [
+        "s79",
+        "s38",
+        "s80",
+        "s128"
+      ]
+    },
+    {
+      "topic": "Arbre héroïque en M+ : Shado-Pan ou Conduit of the Celestials ?",
+      "versions": [
+        "Guides (Icy Veins, Wowhead, ExpCarry) : Shado-Pan par défaut, plus simple, et même présenté comme meilleur en AoE.",
+        "Haut du classement : Conduit à ≈ 44 builds sur 50 dans le top 50, ≈ 58 % des runs +10 et plus.",
+        "Note de Blizzard du 22/09 (« Shado-Pan surperforme ») : portait sur le PvP, pas sur le PvE."
+      ],
+      "resolution": "Les sims du vérificateur (profils SimC, pas ton équipement) placent Conduit devant en AoE et en donjon avec le 4 pièces, Shado-Pan devant en mono-cible et sans tier. L'argument « Shado-Pan meilleur en AoE » ne tient pas en 12.1. À simuler sur ton personnage.",
+      "sources": [
+        "s81",
+        "s82",
+        "s83",
+        "s8",
+        "s84"
+      ]
+    },
+    {
+      "topic": "Arbre héroïque en raid : taux d'utilisation de Shado-Pan",
+      "versions": [
+        "Ancienne base : ≈ 86,6 % de Shado-Pan en raid.",
+        "Pages Archon : 99,8 à 100 % de Shado-Pan."
+      ],
+      "resolution": "Les pages Archon trouvées concernent des boss de la saison 1 ; aucune répartition fiable pour le Gouffre venimeux. Ne pas s'appuyer sur ces chiffres.",
+      "sources": [
+        "s21"
+      ]
+    },
+    {
+      "topic": "4 pièces en mono-cible : dépenser Unbroken Rhythm avec Rising Sun Kick ?",
+      "versions": [
+        "Guides : Rising Sun Kick sur une cible, Spinning Crane Kick seulement à 2 cibles et plus ; SCK sur une cible serait une erreur.",
+        "Liste SimC live (27/09) : en Shado-Pan, RSK sauf proc Dance of Chi-Ji (alors SCK) ; en Conduit, SCK même sur une seule cible."
+      ],
+      "resolution": "Consensus sur 2 cibles et plus (SCK juste après Fists of Fury). En mono-cible, Shado-Pan : RSK (SCK avec Dance of Chi-Ji) ; Conduit : SCK — forcer RSK lui coûte des dégâts dans la sim du vérificateur. Ne considère pas SCK sur une cible comme une erreur en Conduit.",
+      "sources": [
+        "s85",
+        "s86",
+        "s44"
+      ]
+    },
+    {
+      "topic": "Défensifs : durées et plafonds",
+      "versions": [
+        "Recherche : Fortifying Brew dure 20 s ; Touch of Karma absorbe jusqu'à tes PV max ; Dampen Harm est devenu passif.",
+        "Données de jeu live : Fortifying Brew dure 15 s ; Touch of Karma absorbe jusqu'à 50 % de tes PV max (et en renvoie 70 %), 90 s de recharge ; Dampen Harm n'existe plus du tout."
+      ],
+      "resolution": "Les données de jeu font foi : 15 s, plafond à 50 % des PV max, Dampen Harm supprimé. Point commun : deux défensifs actifs seulement, Diffuse Magic devenu un effet passif de Fortifying Brew.",
+      "sources": [
+        "s87",
+        "s20",
+        "s88"
+      ]
+    },
+    {
+      "topic": "Bijou Algeth'ar Puzzle Box : reliquat de la saison 1 ?",
+      "versions": [
+        "Recherche build : les mentions de la Puzzle Box dans les ouvertures sont des restes de la saison 1, sans intérêt en S2.",
+        "Réglages du 22/09 et liste SimC : bijou de la S1 encore assez fort pour être nerfé de 25 % en S2, avec une logique dédiée dans SimC."
+      ],
+      "resolution": "Ce n'est pas un simple reliquat : si tu en possèdes une améliorée (peu probable pour Lyarà), simule-la face aux bijoux S2. Algeth'ar Academy n'est pas dans le pool M+ S2 (addon Raider.IO) ; une autre source en S2 n'a pas été vérifiée (son réglage du 22/09 laisse penser qu'elle est encore portée).",
+      "sources": [
+        "s85",
+        "s10",
+        "s44",
+        "s21"
+      ]
+    },
+    {
+      "topic": "Enchant d'arme : Acuity of the Ren'dorei, Arcane Mastery ou Rite of the Hash'ey ?",
+      "versions": [
+        "Guides du 5/09 (Icy Veins, u.gg, Noxxic) : Acuity of the Ren'dorei.",
+        "Instantanés Archon de fin août : Arcane Mastery (alternatives Jan'alai's Precision, Berserker's Rage).",
+        "Profil SimC depuis le 26/08 : Rite of the Hash'ey (Arcane Mastery avant cette date)."
+      ],
+      "resolution": "Rite of the Hash'ey est le défaut SimC et sort premier dans la sim du vérificateur ; Jan'alai's, Berserker's et Arcane Mastery sont très proches, Acuity dernier. Sim sur profil BiS, pas sur ton équipement ; obtention de la recette de Hash'ey non vérifiée. À simuler.",
+      "sources": [
+        "s54",
+        "s29",
+        "s53"
+      ]
+    },
+    {
+      "topic": "Enchants de cape et de poignets",
+      "versions": [
+        "Guides : Chant of Leeching Fangs ou Chant of Winged Grace sur la cape, « +38 Leech » sur les poignets.",
+        "Données de jeu : ces enchants datent de The War Within et sont limités aux objets d'ilvl 170 au plus ; aucun enchant de cape ou de poignets n'existe en Midnight."
+      ],
+      "resolution": "N'achète pas d'enchant de cape ni de poignets. Pour la Ponction, les options Midnight sont sur la tête (Hex of Leeching), les épaules (Silvermoon's Mending, Thalassian Recovery) ou les bottes (Shaladrassil's Roots), sans gain de dégâts.",
+      "sources": [
+        "s54",
+        "s53",
+        "s29"
+      ]
+    },
+    {
+      "topic": "Gemmes : quelle stat donne un Peridot ?",
+      "versions": [
+        "Recherche : Flawless Deadly Peridot = Critique, Flawless Masterful Peridot = Maîtrise.",
+        "Données de jeu : la famille donne la stat principale (Peridot = Hâte, Garnet = Critique, Amethyst = Maîtrise, Lapis = Polyvalence) et le préfixe la stat secondaire."
+      ],
+      "resolution": "Flawless Deadly Peridot = Hâte + Critique ; Masterful Peridot = Hâte + Maîtrise. Pour la Maîtrise, prends une Amethyst (Quick ou Deadly). Évite les gemmes à une seule stat, qui donnent moins de stats au total.",
+      "sources": [
+        "s54",
+        "s34"
+      ]
+    },
+    {
+      "topic": "Consommables : les noms sont-ils connus ?",
+      "versions": [
+        "Recherche : aucun nom vérifié ; Potion of Recklessness serait un reste de la saison 1.",
+        "Profil SimC S2 (depuis le 24/08) : Potion of Recklessness, Flask of the Blood Knights, Harandar Celebration, Void-Touched Augment Rune, Thalassian Phoenix Oil."
+      ],
+      "resolution": "Potion of Recklessness est bien une potion Midnight et le défaut SimC. La liste des consommables vient de ce profil (équipement BiS) : confiance basse, à re-simuler sur ton personnage.",
+      "sources": [
+        "s85",
+        "s29"
+      ]
+    },
+    {
+      "topic": "Talents : existe-t-il une chaîne d'import vérifiée ?",
+      "versions": [
+        "Recherche : aucune chaîne attribuable à une source nommée.",
+        "Vérificateur : les profils SimC MID2 officiels contiennent deux chaînes complètes (Shado-Pan et Conduit)."
+      ],
+      "resolution": "Chaînes fournies, étiquetées « profil SimC par défaut, build de sim raid » : ce ne sont pas des builds M+ de guide.",
+      "sources": [
+        "s29",
+        "s30"
+      ]
+    },
+    {
+      "topic": "Pistes d'amélioration : 8 rangs ou 6 rangs ?",
+      "versions": [
+        "Données SimC brutes : 8 paliers par piste (ex. Mythe 318–340).",
+        "Guides et saison 1 : Mythe 6/6 = 334, choix de coffre en « 1/6 », ce qui laisse deux paliers inutilisés."
+      ],
+      "resolution": "6 rangs accessibles aujourd'hui avec les crests : Aventurier 266–282, Vétéran 279–295, Champion 292–308, Héros 305–321, Mythe 318–334. Les rangs 7 et 8 des données (Mythe 337/340, Héros 324/328) sont probablement ceux des Ascendant Venomstones de 12.1.5 (PTR, plafond « Myth 8 » d'après un seul résumé de recherche). À confirmer en jeu pour les petites pistes.",
+      "sources": [
+        "s49",
+        "s72",
+        "s126"
+      ]
+    },
+    {
+      "topic": "Plafond d'ilvl : 334, 337 ou 344 ?",
+      "versions": [
+        "Mythe 6/6 = 334 (guides, SimC).",
+        "Un titre d'Icy Veins annonce du 337.",
+        "Objets « Very Rare » / Myth 9 et Kith'ix Mythique (PTR) : 344."
+      ],
+      "resolution": "334 est le plafond d'amélioration actuel (Mythe 6/6). 337/340 = rangs 7–8 de la piste Mythe dans les données SimC, probablement débloqués par les Ascendant Venomstones en 12.1.5 (PTR). 344 correspond à un bonus à part (Very Rare / Myth 9) et au futur Kith'ix Mythique.",
+      "sources": [
+        "s72",
+        "s73",
+        "s49",
+        "s126"
+      ]
+    },
+    {
+      "topic": "Coffre raid Héroïque : choix à 311 ou à 318 ?",
+      "versions": [
+        "Une source : ≈ 311.",
+        "Autres sources : piste Mythe 1/6, ≈ 318."
+      ],
+      "resolution": "318 : cohérent avec la piste Mythe des données SimC (Mythe 1 = 318, Héros 1 = 305, le niveau d'un drop Héroïque). 311 n'est pas un rang Mythe (c'est Héros 3 ou Champion 7) et correspond au plafond de fin de donjon +12 cité dans le même extrait : il semble recopié par erreur. Le 318 repose toutefois sur des extraits de recherche (Method et plusieurs sites) : à confirmer dans ton coffre.",
+      "sources": [
+        "s69",
+        "s70",
+        "s49",
+        "s68"
+      ]
+    },
+    {
+      "topic": "Bijoux Venomcursed : Voracious Heart et Font comptent-ils pour le bonus de Kith'ix ?",
+      "versions": [
+        "Infobulles Wowhead et tables de loot : les deux bijoux d'Ula'tek sont « Venomcursed ».",
+        "Code SimC 12.1.5 : l'étiquette Venomcursed n'est portée que par les cantrips (Bardiche, Aqirbane Reliquary, armures d'Ula'tek, même catalysées), jamais par ces deux bijoux."
+      ],
+      "resolution": "Non tranché pour les bijoux ; sans importance si tu portes la Bardiche ou l'Aqirbane Reliquary, qui activent déjà les +15 %. La pièce Venomcursed cuir d'Ula'tek est Gaze of the Coiled Watcher (tête).",
+      "sources": [
+        "s45",
+        "s89",
+        "s34"
+      ]
+    },
+    {
+      "topic": "Aqirbane Reliquary : collier de Critique ?",
+      "versions": [
+        "Guides : « de loin le meilleur accessoire », collier de Critique avec une deuxième châsse.",
+        "Données de jeu : stats secondaires réparties à parts égales ; le « Critique » vient d'un proc Venomcursed (variante Critique ou stat aléatoire selon le drop)."
+      ],
+      "resolution": "Bon collier dans tous les cas (profil SimC), mais ne le présente pas comme un collier de Critique pur ; vérifie la variante de proc de ton exemplaire.",
+      "sources": [
+        "s46",
+        "s49",
+        "s29"
+      ]
+    },
+    {
+      "topic": "Stats : la Maîtrise est-elle en tête ?",
+      "versions": [
+        "Guides : Agilité > Hâte ≈ Critique ≈ Maîtrise > Polyvalence.",
+        "Équipement porté par le top 50 M+ : Maîtrise > Hâte > Critique > Polyvalence.",
+        "Poids de stats du vérificateur : Critique ≈ Hâte devant la Maîtrise en mono-cible, égalité en M+."
+      ],
+      "resolution": "Les trois stats secondaires utiles sont proches ; la Polyvalence est dernière partout. Ne sacrifie pas une stat pour une autre sans sim de ton équipement.",
+      "sources": [
+        "s55",
+        "s51",
+        "s29"
+      ]
+    },
+    {
+      "topic": "Rushing Wind Kick : nerf de 20 % aussi en PvE ?",
+      "versions": [
+        "Blizzard (25–26/08) : −20 % en PvP uniquement.",
+        "Données de jeu : modificateur de type « tout contenu », le même que celui du bug corrigé le 23/09, toujours présent au 24/09."
+      ],
+      "resolution": "Non tranché : à vérifier en jeu ou dans tes logs avant de t'appuyer sur un build centré sur Rushing Wind Kick.",
+      "sources": [
+        "s20"
+      ]
+    },
+    {
+      "topic": "Tigereye Brew : dégâts critiques réduits en 12.1 ?",
+      "versions": [
+        "Recherche : passés de 10/20 % à 5/10 % en 12.1.",
+        "Données live : déjà à 5/10 % depuis 12.0.1 ; seul un coefficient PvP a été ajouté le 25/08."
+      ],
+      "resolution": "Pas un changement de 12.1 ; rien ne change pour toi en PvE.",
+      "sources": [
+        "s20"
+      ]
+    },
+    {
+      "topic": "Classement des bijoux en M+ : quel bijou mène les sims ?",
+      "versions": [
+        "Instantané MythicSim du 5/09 : Gaze of the Alnseer en tête.",
+        "Instantané plus récent : Voracious Heart of Ula'tek en tête, avec exactement le même gain chiffré."
+      ],
+      "resolution": "Probable confusion d'extraits de recherche ; Gaze of the Alnseer a de toute façon été nerfé le 22/09. Ne te fie à aucun des deux chiffres : simule.",
+      "sources": [
+        "s9"
+      ]
+    },
+    {
+      "topic": "Ula'tek Mythique : garder Zenith pour les fenêtres « Venomous Heart » ?",
+      "versions": [
+        "Couverture du RWF : Liquid a tué le boss pendant la dernière amplification de dégâts « Venomous Heart ».",
+        "Vérificateur : on ne sait pas si c'est une fenêtre favorable aux joueurs ou un soft-enrage du boss."
+      ],
+      "resolution": "Non tranché : ne cale pas tes cooldowns dessus avant qu'un guide Mythique d'Ula'tek le confirme (à ne pas confondre avec le bijou Voracious Heart).",
+      "sources": [
+        "s15"
+      ]
+    },
+    {
+      "topic": "Qualité des objets 277806 et 275525 : verts ?",
+      "versions": [
+        "Données d'objets SimC : modèle de base de qualité verte (2).",
+        "Bonus de piste S2 : la qualité est remplacée (Aventurier = bleu, autres pistes = épique)."
+      ],
+      "resolution": "Seul le modèle de base est vert ; à 308 et 292, ces objets apparaissaient sans doute bleus ou épiques en jeu. Le tableau de bord lit item_quality de raider.io.",
+      "sources": [
+        "s34",
+        "s49"
+      ]
+    },
+    {
+      "topic": "Slumbering Coil Curio : emplacement au choix ou pièce manquante ?",
+      "versions": [
+        "Sites de loot et de boost (extraits de recherche) : « échangé contre une pièce de tier de ton choix ».",
+        "Autres sites : « se convertit en la pièce du set qui te manque ».",
+        "AllTheThings : lié à tout le set de la difficulté du drop (n'importe quel emplacement)."
+      ],
+      "resolution": "Non tranché : lis l'infobulle du Curio en jeu avant de l'utiliser. Seul point commun : il vient d'Ula'tek et donne une pièce du set Guile of the Monkey King.",
+      "sources": [
+        "s93",
+        "s35",
+        "s125"
+      ]
+    },
+    {
+      "topic": "Nom français du raid : « Gouffre venimeux » ou « L'Abîme venimeux » ?",
+      "versions": [
+        "Tableau de bord (traduction maison) : Gouffre venimeux.",
+        "Titre français de l'addon BigWigs (traduit par des bénévoles) : L'abîme Venimeux."
+      ],
+      "resolution": "Non tranché, une seule source pour « L'Abîme venimeux » : vérifie dans le Guide de l'aventurier du client français. Le tableau garde « Gouffre venimeux » en attendant.",
+      "sources": [
+        "s106"
+      ]
+    },
+    {
+      "topic": "Frothing Venom Spaulders : drop de Vashnik ou des adds du raid ?",
+      "versions": [
+        "Notes d'objets du 21/08 : adds du Gouffre venimeux.",
+        "AllTheThings : butin de Vashnik the Malignant."
+      ],
+      "resolution": "Probablement Vashnik (données du jeu extraites par AllTheThings, une seule source) ; les deux ne s'excluent pas. Sans importance pour tes choix : ce n'est pas une cible BiS.",
+      "sources": [
+        "s93"
+      ]
+    }
+  ],
+  "unknowns": [
+    "Ton équipement actuel (ilvl, enchants, gemmes, nombre de pièces de tier), tes talents et ton arbre héroïque : raider.io, Warcraft Logs et l'Armurerie étaient inaccessibles ; seule la base de l'addon Raider.IO du 28/09 a été lue.",
+    "L'objet obtenu sur Ula'tek vers le 4/09 (Voracious Heart, Font of Venomous Rage ou Slumbering Coil Curio), ton nombre de pièces de tier, de charges de Catalyseur et de crests, et si tu as fait la quête S2 du Catalyseur « Forged Through Fire ».",
+    "Deuxième source pour la carte boss → jeton de tier (seul AllTheThings) ; fonctionnement du Slumbering Coil Curio : utilisation depuis les sacs ou auprès d'un PNJ, choix de l'emplacement ou pièce imposée, ilvl exact, limite hebdomadaire ou saisonnière, taux de drop ; possibilité d'obtenir jetons ou Curio via le coffre raid.",
+    "Rythme, date de départ et plafond des charges de Catalyseur en S2 ; contenu des « améliorations du Catalyseur » du 2/09 ; rôle du Venomblight Manaflux (3465) et du Crystallized Venomblight Manaflux (274707, haut fait « Serpent Scion »).",
+    "Plafond hebdomadaire des Mistcrests, coût par rang et paliers de clés qui donnent des crests Héros ou Mythe.",
+    "Grande chambre forte : seuils raid à 4 et 6 boss et donjons à 4 et 8 runs (fournis par le serveur), ilvl des choix raid en LFR, Normal et Mythique, seuil M+ exact (+10 ou +12), ilvl de la rangée Monde par palier (palier 8 = Héros 305 d'une seule source ; paliers 9 à 11 ?), prise en compte de The Tidebound Grotto (vérifiable dans l'infobulle), contenu du correctif « Delve Vault Fixes ».",
+    "Affixes de la semaine et système d'affixes de la saison 2 ; paliers de cote et récompenses (Keystone Master, Keystone Hero, titre) et seuils EU actuels.",
+    "Conseils donjon par donjon (hors Altar of Fangs) et bijoux Agilité de donjon intéressants pour le Marche-vent.",
+    "Stratégie Mythique écrite (placements, assignations) : aucun guide Method, Wowhead ou Icy Veins lu, les mécaniques viennent seulement du code des boss mods. Inconnus : disposition réelle des ailes, espacement des golems d'Entombed Sentinels, adds étourdissables ou repoussables (Leg Sweep, Ring of Peace), infobulles des effets Mythiques, réglages Mythiques des 15 et 21/09 sur les boss 2 à 6, enrages Mythiques autres que celui des Sentinels ; aucune mécanique récupérée pour Nek'zali.",
+    "Classement récent du Marche-vent après le 24/09 (tier lists Icy Veins M+ et raid) et estimation Wowhead de l'effet des buffs du 22/09.",
+    "Répartition actuelle Shado-Pan / Conduit en raid pour le Gouffre venimeux.",
+    "Classement des bijoux Marche-vent après le 22/09 (aucune sim récente récupérée).",
+    "Deuxième source pour les drops attribués par AllTheThings seul : Silken Voodoo Drape, Sash of the Forlorn Vessel, Coiled Hex Legguards et Aman'muso (The Coiled Altar), Vile Alchemist's Band (Vashnik), Gebbo's Bottomless Bag (The Lost Explorers), Band of the Amani Warlord (Altar of Fangs), Sickening Signet of Atroxus (Voidscar Arena).",
+    "Craft S2 : ilvl par rang de qualité (le profil SimC utilise 331), nom et quantité hebdomadaire des étincelles, coût en crests du rang maximal, liste complète des embellissements, Arcanoweave Lining unique ou non, et si une arme craftée au maximum bat une Bardiche en 318–334.",
+    "Ajout de châsses en S2 : objet ou recette pour ajouter une châsse (collier, anneaux, ceinture, poignets, tête), coût et limites. Dans le profil SimC, une seule des 7 châsses est native (collier) : c'est ce qui décide du nombre réel de gemmes.",
+    "Date officielle de 12.1.5 et ouverture de Kith'ix Héroïque/Mythique dès le premier jour ; changements éventuels du Marche-vent ou des bijoux dans les builds PTR suivants.",
+    "Fonctionnement réel des Ascendant Venomstones (10 pierres par amélioration, plafond « Myth 8 » = 340 dans les données SimC, quête d'Orin Straylight) et des Labyrinthes (Kindo'jan, non vérifié).",
+    "Nombre de places encore libres au Hall of Fame d'Ula'tek et progression Mythique des guildes d'Archimonde.",
+    "Chiffre exact des essais de Liquid sur Ula'tek (307 ou 311) et composition complète.",
+    "Suppression de la pénalité de mort en +2/+3 : probablement un article de The War Within (2025), non applicable en l'état.",
+    "Comportement CORS et limites de débit de l'API raider.io ; orthographe réelle des clés de score (spec_0 ou spec0).",
+    "Seuil éventuel ou palier de stats propre au Marche-vent ; valeurs exactes des racials Elfe de la nuit en 12.1 (Touch of Elune : +1 % de Critique le jour, +1 % de Hâte la nuit d'après les données).",
+    "The Tidebound Grotto : ilvl et piste de chaque difficulté (Monde, Normal, Héroïque, Mythique).",
+    "Rôle des objets « Nebulous Voidcache: <boss> » (un par boss du Gouffre venimeux dans AllTheThings, 12.1) : peut-être un moyen de cibler le loot d'un boss, non vérifié.",
+    "Emplacement final de la pièce cantrip cuir de Kith'ix (torse dans les dernières données PTR, jambes dans les sources plus anciennes)."
+  ],
+  "sources": [
+    {
+      "id": "s1",
+      "label": "Blizzard Watch · date estimée de 12.1.5",
+      "url": "https://blizzardwatch.com/2026/09/09/wow-patch-12-1-5-release-date/"
+    },
+    {
+      "id": "s2",
+      "label": "SimulationCraft · build PTR 12.1.5",
+      "url": "https://github.com/simulationcraft/simc/blob/midnight/SpellDataDump/build_info_ptr.txt"
+    },
+    {
+      "id": "s3",
+      "label": "Icy Veins · Kith'ix : équipement 344 et cantrips",
+      "url": "https://www.icy-veins.com/wow/news/the-unbinding-of-kithix-offers-players-344-gear-new-cantrips/"
+    },
+    {
+      "id": "s4",
+      "label": "Icy Veins · correctifs du 23 septembre",
+      "url": "https://www.icy-veins.com/wow/news/midnight-12-1-hofixes-september-23rd/"
+    },
+    {
+      "id": "s5",
+      "label": "SimulationCraft · correctif du 23 septembre (commit c97e14c7)",
+      "url": "https://github.com/simulationcraft/simc/commit/c97e14c7a5ad8b9b7d49f9c2e07c614c389024c0"
+    },
+    {
+      "id": "s6",
+      "label": "SimulationCraft · données live du 22 septembre (commit 3602eac1)",
+      "url": "https://github.com/simulationcraft/simc/commit/3602eac166d91590450ba6e71a9878554ea54591"
+    },
+    {
+      "id": "s7",
+      "label": "Icy Veins · grand passage de réglages du 22 septembre",
+      "url": "https://www.icy-veins.com/wow/news/the-big-class-tuning-pass-midnight-12-1-hotfixes-september-22nd/"
+    },
+    {
+      "id": "s8",
+      "label": "Blue Tracker · Class Tuning Incoming – 22 septembre",
+      "url": "https://www.bluetracker.gg/wow/topic/us-en/2354340-class-tuning-incoming-september-22/"
+    },
+    {
+      "id": "s9",
+      "label": "Icy Veins · derniers réglages des bijoux S2 (22/09)",
+      "url": "https://www.icy-veins.com/wow/news/final-trinket-tuning-for-season-2-september-22nd/"
+    },
+    {
+      "id": "s10",
+      "label": "MMO-Champion · réglages des bijoux S2 (22/09)",
+      "url": "https://www.mmo-champion.com/content/14525-Midnight-Season-2-Trinket-Tuning-September-22"
+    },
+    {
+      "id": "s11",
+      "label": "SimulationCraft · SpellDataDump objets/bijoux",
+      "url": "https://github.com/simulationcraft/simc/blob/midnight/SpellDataDump/nonclass.txt"
+    },
+    {
+      "id": "s12",
+      "label": "Icy Veins · nerfs de raid du 21 septembre",
+      "url": "https://www.icy-veins.com/wow/news/raid-nerfs-and-class-fixes-midnight-12-1-hotfixes-september-21st/"
+    },
+    {
+      "id": "s13",
+      "label": "Icy Veins · correctifs du 15 septembre",
+      "url": "https://www.icy-veins.com/wow/news/curse-surge-rotation-shortened-raid-nerfs-class-fixes-midnight-12-1-hotfixes-september-15th/"
+    },
+    {
+      "id": "s14",
+      "label": "Warcraft Tavern · 12.2 « Eclipse » à la BlizzCon",
+      "url": "https://www.warcrafttavern.com/news/wow-midnight-patch-12-2-eclipse-revealed-at-blizzcon-2026/"
+    },
+    {
+      "id": "s15",
+      "label": "Blizzard Watch · world first Ula'tek par Liquid",
+      "url": "https://blizzardwatch.com/2026/09/03/world-first-ulatek-venomous-abyss-liquid-win/"
+    },
+    {
+      "id": "s16",
+      "label": "PullCount · Ula'tek",
+      "url": "https://www.pullcount.gg/boss/the-venomous-abyss/ulatek"
+    },
+    {
+      "id": "s17",
+      "label": "Blue Tracker · Class Tuning Incoming – 1er septembre",
+      "url": "https://www.bluetracker.gg/wow/topic/us-en/2342331-class-tuning-incoming-september-1/"
+    },
+    {
+      "id": "s18",
+      "label": "Icy Veins · réglages de classes du 1er septembre",
+      "url": "https://www.icy-veins.com/wow/news/frost-feral-hunter-dps-buffs-and-more-class-tuning-september-1st/"
+    },
+    {
+      "id": "s19",
+      "label": "SimulationCraft · données live du 1er septembre (commit 622ebcf4)",
+      "url": "https://github.com/simulationcraft/simc/commit/622ebcf42a6fc24c19abd7e2d1f161a8af58ceed"
+    },
+    {
+      "id": "s20",
+      "label": "SimulationCraft · SpellDataDump moine (live 12.1)",
+      "url": "https://github.com/simulationcraft/simc/blob/midnight/SpellDataDump/monk.txt"
+    },
+    {
+      "id": "s21",
+      "label": "Addon Raider.IO · donjons et raids de la saison",
+      "url": "https://github.com/RaiderIO/raiderio-addon/blob/1433bebe2569d9ce7c71a48ba302ff0183758caa/db/db_dungeons.lua"
+    },
+    {
+      "id": "s22",
+      "label": "Wowhead · Altar of Fangs",
+      "url": "https://www.wowhead.com/guide/midnight/altar-of-fangs-dungeon-overview-location-rewards"
+    },
+    {
+      "id": "s23",
+      "label": "SimulationCraft · passage au live 12.1.0 (commit 0a21fb29)",
+      "url": "https://github.com/simulationcraft/simc/commit/0a21fb29f63323013a2eb6153b09ccf09767a927"
+    },
+    {
+      "id": "s24",
+      "label": "Leprestore · classement DPS M+",
+      "url": "https://leprestore.com/guides/wow/mythic-plus-dps-rankings/"
+    },
+    {
+      "id": "s25",
+      "label": "KeystoneLoot · tier list DPS",
+      "url": "https://keystoneloot.io/en/tier-list/dps"
+    },
+    {
+      "id": "s26",
+      "label": "Icy Veins · M+ semaine 5 (spés populaires et performantes)",
+      "url": "https://www.icy-veins.com/wow/news/theres-hunters-and-paladins-rising-most-popular-and-top-dps-specs-in-midnight-mythic-season-2-week-5/"
+    },
+    {
+      "id": "s27",
+      "label": "Icy Veins · logs de raid semaine 4",
+      "url": "https://www.icy-veins.com/wow/news/a-stable-meta-arrives-popularity-and-dps-rankings-week-4-raid-logs/"
+    },
+    {
+      "id": "s28",
+      "label": "Icy Veins · logs de raid semaine 5",
+      "url": "https://www.icy-veins.com/wow/news/top-specs-drop-like-a-stone-in-mythic-popularity-and-dps-rankings-week-5-raid-logs/"
+    },
+    {
+      "id": "s29",
+      "label": "SimulationCraft · profil MID2 Marche-vent (Shado-Pan)",
+      "url": "https://github.com/simulationcraft/simc/blob/midnight/profiles/MID2/MID2_Monk_Windwalker.simc"
+    },
+    {
+      "id": "s30",
+      "label": "SimulationCraft · profil MID2 Marche-vent (Conduit)",
+      "url": "https://github.com/simulationcraft/simc/blob/midnight/profiles/MID2/MID2_Monk_Windwalker_Conduit.simc"
+    },
+    {
+      "id": "s31",
+      "label": "SimulationCraft · bonus d'ensemble (item_set_bonus)",
+      "url": "https://github.com/simulationcraft/simc/blob/midnight/engine/dbc/generated/item_set_bonus.inc"
+    },
+    {
+      "id": "s32",
+      "label": "Method · bonus de tier S2",
+      "url": "https://www.method.gg/guides/wow-midnight-season-2-tier-set-bonuses"
+    },
+    {
+      "id": "s33",
+      "label": "Wowhead · Unbroken Rhythm",
+      "url": "https://www.wowhead.com/spell=1296624/unbroken-rhythm"
+    },
+    {
+      "id": "s34",
+      "label": "SimulationCraft · données d'objets live",
+      "url": "https://github.com/simulationcraft/simc/blob/midnight/engine/dbc/generated/item_data.inc"
+    },
+    {
+      "id": "s35",
+      "label": "ExpCarry · table de loot du Gouffre venimeux",
+      "url": "https://expcarry.com/wow-venomous-abyss-loot-table"
+    },
+    {
+      "id": "s36",
+      "label": "WowCarry · table de loot du Gouffre venimeux",
+      "url": "https://wowcarry.com/blog/wow/raids/venomous-abyss-loot-table"
+    },
+    {
+      "id": "s37",
+      "label": "Icy Veins · correctifs du 2 septembre (Catalyseur)",
+      "url": "https://www.icy-veins.com/wow/news/class-fixes-raid-nerfs-catalyst-improvements-midnight-12-1-hotfixes-september-2nd/"
+    },
+    {
+      "id": "s38",
+      "label": "SimulationCraft · objets PTR 12.1.5",
+      "url": "https://github.com/simulationcraft/simc/blob/midnight/engine/dbc/generated/item_data_ptr.inc"
+    },
+    {
+      "id": "s39",
+      "label": "Wowhead · Voracious Heart of Ula'tek",
+      "url": "https://www.wowhead.com/item=270175/voracious-heart-of-ulatek"
+    },
+    {
+      "id": "s40",
+      "label": "SimulationCraft · tous les sorts (live)",
+      "url": "https://github.com/simulationcraft/simc/blob/midnight/SpellDataDump/allspells.txt"
+    },
+    {
+      "id": "s41",
+      "label": "Wowhead · Zul'jin's Guillotine Technique",
+      "url": "https://www.wowhead.com/item=270173/zuljins-guillotine-technique"
+    },
+    {
+      "id": "s42",
+      "label": "Icy Veins · guide The Coiled Altar",
+      "url": "https://www.icy-veins.com/wow/coiled-altar-raid-guide"
+    },
+    {
+      "id": "s43",
+      "label": "Wowhead · Algeth'ar Puzzle Box",
+      "url": "https://www.wowhead.com/item=193701/algethar-puzzle-box"
+    },
+    {
+      "id": "s44",
+      "label": "SimulationCraft · liste de priorités Marche-vent",
+      "url": "https://github.com/simulationcraft/simc/blob/midnight/ActionPriorityLists/default/monk_windwalker.simc"
+    },
+    {
+      "id": "s45",
+      "label": "Wowhead · Font of Venomous Rage",
+      "url": "https://www.wowhead.com/item=270168/font-of-venomous-rage"
+    },
+    {
+      "id": "s46",
+      "label": "Icy Veins · équipement BiS Marche-vent",
+      "url": "https://www.icy-veins.com/wow/windwalker-monk-pve-dps-gear-best-in-slot"
+    },
+    {
+      "id": "s47",
+      "label": "Method · équipement Marche-vent",
+      "url": "https://www.method.gg/guides/windwalker-monk/gearing"
+    },
+    {
+      "id": "s48",
+      "label": "Warcraft Wiki · Bite of Zul'jan",
+      "url": "https://warcraft.wiki.gg/wiki/Bite_of_Zul'jan"
+    },
+    {
+      "id": "s49",
+      "label": "SimulationCraft · bonus d'objets (pistes d'amélioration)",
+      "url": "https://github.com/simulationcraft/simc/blob/4c7c73621e596419b5bd6faa5d68940a9c640379/engine/dbc/generated/item_bonus.inc"
+    },
+    {
+      "id": "s50",
+      "label": "SimulationCraft · embellissements",
+      "url": "https://github.com/simulationcraft/simc/blob/midnight/engine/dbc/generated/embellishment_data.inc"
+    },
+    {
+      "id": "s51",
+      "label": "WowValor · statistiques top 50 M+ Marche-vent",
+      "url": "https://wowvalor.app/en/stats/monk/windwalker/mm"
+    },
+    {
+      "id": "s52",
+      "label": "Wowhead · Ascendant Venomstones et colliers",
+      "url": "https://www.wowhead.com/news/ascendant-venomstones-will-also-upgrade-necklaces-in-patch-12-1-5-382731"
+    },
+    {
+      "id": "s53",
+      "label": "SimulationCraft · enchantements (live 12.1)",
+      "url": "https://github.com/simulationcraft/simc/blob/4c7c73621e596419b5bd6faa5d68940a9c640379/engine/dbc/generated/spell_item_enchantment.inc"
+    },
+    {
+      "id": "s54",
+      "label": "Icy Veins · gemmes, enchants et consommables",
+      "url": "https://www.icy-veins.com/wow/windwalker-monk-pve-dps-gems-enchants-consumables"
+    },
+    {
+      "id": "s55",
+      "label": "ExpCarry · guide Marche-vent 12.1",
+      "url": "https://expcarry.com/wow-windwalker-monk-best-build-guide"
+    },
+    {
+      "id": "s56",
+      "label": "Addon Raider.IO · base M+ EU (générée le 28/09)",
+      "url": "https://github.com/RaiderIO/raiderio-addon/blob/1433bebe2569d9ce7c71a48ba302ff0183758caa/db/db_mythicplus_eu_lookup.lua"
+    },
+    {
+      "id": "s57",
+      "label": "MythiStone · Altar of Fangs",
+      "url": "https://mythistone.com/dungeons/altar-of-fangs"
+    },
+    {
+      "id": "s58",
+      "label": "Seramate · correctifs du 22 septembre",
+      "url": "https://seramate.com/news/2026/09/22/patch-121-class-trinket-hotfixes-1f1b6de9"
+    },
+    {
+      "id": "s59",
+      "label": "Addon Raider.IO · couleurs de cote",
+      "url": "https://github.com/RaiderIO/raiderio-addon/blob/1433bebe2569d9ce7c71a48ba302ff0183758caa/db/db_score_tiers.lua"
+    },
+    {
+      "id": "s60",
+      "label": "Addon Raider.IO · points par niveau de clé",
+      "url": "https://github.com/RaiderIO/raiderio-addon/blob/1433bebe2569d9ce7c71a48ba302ff0183758caa/db/db_score_stats.lua"
+    },
+    {
+      "id": "s61",
+      "label": "Wowhead · The Venomous Abyss",
+      "url": "https://www.wowhead.com/zone=16915/the-venomous-abyss"
+    },
+    {
+      "id": "s62",
+      "label": "Cardsrealm · ordre des boss du Gouffre venimeux",
+      "url": "https://cardsrealm.com/en-us/articles/venomous-abyss-layout-bosses-and-progression-order"
+    },
+    {
+      "id": "s63",
+      "label": "Addon Raider.IO · base raid EU (générée le 28/09)",
+      "url": "https://github.com/RaiderIO/raiderio-addon/blob/1433bebe2569d9ce7c71a48ba302ff0183758caa/db/db_raiding_eu_lookup.lua"
+    },
+    {
+      "id": "s64",
+      "label": "Timesaver · classement DPS raid S2",
+      "url": "https://timesaver.gg/blog/wow-midnight-season-2-raid-dps-rankings"
+    },
+    {
+      "id": "s65",
+      "label": "Method · The Coiled Altar (Héroïque)",
+      "url": "https://www.method.gg/guides/the-venomous-abyss/the-coiled-altar-heroic"
+    },
+    {
+      "id": "s66",
+      "label": "Wowhead · calendrier de test de Kith'ix",
+      "url": "https://www.wowhead.com/news/the-unbinding-of-kithix-raid-testing-schedule-patch-12-1-5-ptr-382788"
+    },
+    {
+      "id": "s67",
+      "label": "Timesaver · loot Héroïque vs Mythique",
+      "url": "https://timesaver.gg/blog/wow-midnight-venomous-abyss-loot-table-heroic-vs-mythic"
+    },
+    {
+      "id": "s68",
+      "label": "Timesaver · guide d'équipement S2",
+      "url": "https://timesaver.gg/blog/wow-midnight-season-2-gearing-guide-item-level-chart"
+    },
+    {
+      "id": "s69",
+      "label": "Method · Grande chambre forte S2",
+      "url": "https://www.method.gg/guides/wow-midnight-season-2-great-vault-reward-item-levels-and-upgrade-track"
+    },
+    {
+      "id": "s70",
+      "label": "AccountShark · récompenses du Gouffre venimeux",
+      "url": "https://accountshark.net/blog/wow-midnight-season-2-raid-guide-venomous-abyss-rewards"
+    },
+    {
+      "id": "s71",
+      "label": "LFCarry · guide raid Midnight",
+      "url": "https://lfcarry.com/guides/wow-raid-guide-midnight"
+    },
+    {
+      "id": "s72",
+      "label": "Method · pistes d'amélioration S2",
+      "url": "https://www.method.gg/guides/all-midnight-season-2-upgrade-tracks-and-item-levels"
+    },
+    {
+      "id": "s73",
+      "label": "Icy Veins · niveaux d'objet S2",
+      "url": "https://www.icy-veins.com/wow/news/item-level-of-loot-in-midnight-season-2/"
+    },
+    {
+      "id": "s74",
+      "label": "raiderio-api 0.6.1 · types du profil personnage (client non officiel)",
+      "url": "https://github.com/aovee/raiderio-api/blob/12cc4db145cbf7672d161f030d6f135f8cd633e5/src/resources/character/types.ts"
+    },
+    {
+      "id": "s75",
+      "label": "raiderio-api 0.6.1 · points d'accès M+ (client non officiel)",
+      "url": "https://github.com/aovee/raiderio-api/blob/12cc4db145cbf7672d161f030d6f135f8cd633e5/src/resources/mythic-plus/mythic-plus.ts"
+    },
+    {
+      "id": "s76",
+      "label": "raiderio-api 0.6.1 · types raid (client non officiel)",
+      "url": "https://github.com/aovee/raiderio-api/blob/12cc4db145cbf7672d161f030d6f135f8cd633e5/src/resources/raiding/types.ts"
+    },
+    {
+      "id": "s77",
+      "label": "raiderio-api 0.6.1 · périodes hebdomadaires (client non officiel)",
+      "url": "https://github.com/aovee/raiderio-api/blob/12cc4db145cbf7672d161f030d6f135f8cd633e5/src/resources/general/types.ts"
+    },
+    {
+      "id": "s78",
+      "label": "npm · raiderio-api 0.6.1",
+      "url": "https://www.npmjs.com/package/raiderio-api"
+    },
+    {
+      "id": "s79",
+      "label": "Wowhead PTR · objet 281236 (ancienne version « Leggings »)",
+      "url": "https://www.wowhead.com/ptr-2/item=281236/leggings-of-palpable-terror"
+    },
+    {
+      "id": "s80",
+      "label": "SimulationCraft · données PTR 12.1.5 (commit a2cacf01)",
+      "url": "https://github.com/simulationcraft/simc/commit/a2cacf01fc7ea756b0aa8388e91b1afca894c016"
+    },
+    {
+      "id": "s81",
+      "label": "Icy Veins · builds et talents Marche-vent",
+      "url": "https://www.icy-veins.com/wow/windwalker-monk-pve-dps-spec-builds-talents"
+    },
+    {
+      "id": "s82",
+      "label": "murlok.io · top 50 Marche-vent M+",
+      "url": "https://murlok.io/monk/windwalker/m+"
+    },
+    {
+      "id": "s83",
+      "label": "raider.io · talents Marche-vent (+10 et plus)",
+      "url": "https://raider.io/specs/windwalker-monk/talents"
+    },
+    {
+      "id": "s84",
+      "label": "SimulationCraft · profils MID2 (sims du vérificateur)",
+      "url": "https://github.com/simulationcraft/simc/tree/midnight/profiles/MID2"
+    },
+    {
+      "id": "s85",
+      "label": "Method · style de jeu et rotation",
+      "url": "https://www.method.gg/guides/windwalker-monk/playstyle-and-rotation"
+    },
+    {
+      "id": "s86",
+      "label": "Icy Veins · rotation et temps de recharge",
+      "url": "https://www.icy-veins.com/wow/windwalker-monk-pve-dps-rotation-cooldowns-abilities"
+    },
+    {
+      "id": "s87",
+      "label": "Icy Veins · guide Marche-vent",
+      "url": "https://www.icy-veins.com/wow/windwalker-monk-pve-dps-guide"
+    },
+    {
+      "id": "s88",
+      "label": "SimulationCraft · module moine",
+      "url": "https://github.com/simulationcraft/simc/blob/midnight/engine/class_modules/monk/sc_monk.cpp"
+    },
+    {
+      "id": "s89",
+      "label": "SimulationCraft · effets d'objets Midnight",
+      "url": "https://github.com/simulationcraft/simc/blob/midnight/engine/player/unique_gear_midnight.cpp"
+    },
+    {
+      "id": "s90",
+      "label": "SimulationCraft · correctifs du moine du 26/09 (commit 36d6cfab)",
+      "url": "https://github.com/simulationcraft/simc/commit/36d6cfab74e8da292e24ec5e1c63bec965fe64a8"
+    },
+    {
+      "id": "s91",
+      "label": "MythiStone · Marche-vent (extraits de recherche)",
+      "url": "https://mythistone.com/classes/Dps/Windwalker_Monk"
+    },
+    {
+      "id": "s92",
+      "label": "Mythicstats · Marche-vent M+ (extraits de recherche)",
+      "url": "https://mythicstats.com/spec/windwalker-monk"
+    },
+    {
+      "id": "s93",
+      "label": "AllTheThings · The Venomous Abyss (loot, jetons, Curio ; 28/09)",
+      "url": "https://github.com/ATTWoWAddon/AllTheThings/blob/be1b98585edb9efb6fcfb5cf1e6394de3df9133d/.contrib/Parser/DATAS/01%20-%20Dungeons%20Raids/12%20-%20Midnight/5%20-%20The%20Venomous%20Abyss.lua"
+    },
+    {
+      "id": "s94",
+      "label": "RCLootCouncil · emplacements des jetons de tier",
+      "url": "https://github.com/evil-morfar/RCLootCouncil2/blob/4c7fcfed51e05a77b803626b9414f986d822040f/Utils/tokenData.lua"
+    },
+    {
+      "id": "s95",
+      "label": "AllTheThings · set de tier S2 et sorties du Catalyseur",
+      "url": "https://github.com/ATTWoWAddon/AllTheThings/blob/master/.contrib/Parser/lib/Structures/Tier%20Sets/Tier%20MIDNIGHT.2.lua"
+    },
+    {
+      "id": "s96",
+      "label": "AllTheThings · quêtes de Silvermoon (« Forged Through Fire »)",
+      "url": "https://github.com/ATTWoWAddon/AllTheThings/blob/master/.contrib/Parser/DATAS/02%20-%20Outdoor%20Zones/16%20Quel'Thalas/1%20-%20Silvermoon%20City/Quests.lua"
+    },
+    {
+      "id": "s97",
+      "label": "AllTheThings · hauts faits Midnight",
+      "url": "https://github.com/ATTWoWAddon/AllTheThings/blob/master/.contrib/Parser/DATAS/06%20-%20Expansion%20Features/12%20-%20Midnight/Achievements.lua"
+    },
+    {
+      "id": "s98",
+      "label": "AllTheThings · monnaies Midnight (Manaflux)",
+      "url": "https://github.com/ATTWoWAddon/AllTheThings/blob/master/.contrib/Parser/DATAS/00%20-%20Missing%20DB/99%20-%20Midnight/MissingCurrencies.txt"
+    },
+    {
+      "id": "s99",
+      "label": "AllTheThings · pistes d'amélioration par difficulté",
+      "url": "https://github.com/ATTWoWAddon/AllTheThings/blob/master/.contrib/Parser/lib/Constants/UpgradeTracks.lua"
+    },
+    {
+      "id": "s100",
+      "label": "SimulationCraft · stats des objets catalysés (commit f8126f7b, 9/09)",
+      "url": "https://github.com/simulationcraft/simc/commit/f8126f7b9c0b4d664ce33110c5e2d83c8a07cc2a"
+    },
+    {
+      "id": "s101",
+      "label": "AllTheThings · The Tidebound Grotto (Nymrissa Wavecaller)",
+      "url": "https://github.com/ATTWoWAddon/AllTheThings/blob/be1b98585edb9efb6fcfb5cf1e6394de3df9133d/.contrib/Parser/DATAS/01%20-%20Dungeons%20Raids/12%20-%20Midnight/4%20-%20The%20Tidebound%20Grotto.lua"
+    },
+    {
+      "id": "s102",
+      "label": "Client 12.1.0 · textes de l'interface (enUS)",
+      "url": "https://github.com/Ketho/BlizzardInterfaceResources/blob/36dd01db2d8fa5086dffda5cbfb3d55f4a70e526/Resources/GlobalStrings/enUS.lua"
+    },
+    {
+      "id": "s103",
+      "label": "Client 12.1.0 · textes de l'interface (frFR)",
+      "url": "https://github.com/Ketho/BlizzardInterfaceResources/blob/36dd01db2d8fa5086dffda5cbfb3d55f4a70e526/Resources/GlobalStrings/frFR.lua"
+    },
+    {
+      "id": "s104",
+      "label": "Client 12.1.0 · code de la grande chambre forte",
+      "url": "https://github.com/Gethe/wow-ui-source/blob/09b9db7948abc9b9648dedaab51eb0cf3ee67b31/Interface/AddOns/Blizzard_WeeklyRewards/Blizzard_WeeklyRewards.lua"
+    },
+    {
+      "id": "s105",
+      "label": "Client 12.1.0 · utilitaires de la grande chambre forte",
+      "url": "https://github.com/Gethe/wow-ui-source/blob/09b9db7948abc9b9648dedaab51eb0cf3ee67b31/Interface/AddOns/Blizzard_WeeklyRewardsUtil/Blizzard_WeeklyRewardsUtil.lua"
+    },
+    {
+      "id": "s106",
+      "label": "BigWigs · ordre des boss du Gouffre venimeux",
+      "url": "https://github.com/BigWigsMods/BigWigs/blob/5e0db87d25de707eb33d588527594ef2c39d7e76/TheVenomousAbyss/BigWigs_TheVenomousAbyss.toc"
+    },
+    {
+      "id": "s107",
+      "label": "BigWigs · Entombed Sentinels",
+      "url": "https://github.com/BigWigsMods/BigWigs/blob/5e0db87d25de707eb33d588527594ef2c39d7e76/TheVenomousAbyss/Sentinels.lua"
+    },
+    {
+      "id": "s108",
+      "label": "DBM · Entombed Sentinels",
+      "url": "https://github.com/DeadlyBossMods/DBM-Retail/blob/9b5f8bb5632b5e74de472c19f9311c87f2e512a4/DBM-Raids-Midnight/TheVenomousAbyss/EntombedSentinels.lua"
+    },
+    {
+      "id": "s109",
+      "label": "BigWigs · The Lost Explorers",
+      "url": "https://github.com/BigWigsMods/BigWigs/blob/5e0db87d25de707eb33d588527594ef2c39d7e76/TheVenomousAbyss/Explorers.lua"
+    },
+    {
+      "id": "s110",
+      "label": "DBM · The Lost Explorers",
+      "url": "https://github.com/DeadlyBossMods/DBM-Retail/blob/9b5f8bb5632b5e74de472c19f9311c87f2e512a4/DBM-Raids-Midnight/TheVenomousAbyss/TheLostExplorers.lua"
+    },
+    {
+      "id": "s111",
+      "label": "BigWigs · Vashnik the Malignant",
+      "url": "https://github.com/BigWigsMods/BigWigs/blob/5e0db87d25de707eb33d588527594ef2c39d7e76/TheVenomousAbyss/Vashnik.lua"
+    },
+    {
+      "id": "s112",
+      "label": "DBM · Vashnik the Malignant",
+      "url": "https://github.com/DeadlyBossMods/DBM-Retail/blob/9b5f8bb5632b5e74de472c19f9311c87f2e512a4/DBM-Raids-Midnight/TheVenomousAbyss/VashniktheMalignant.lua"
+    },
+    {
+      "id": "s113",
+      "label": "BigWigs · Sszorak",
+      "url": "https://github.com/BigWigsMods/BigWigs/blob/5e0db87d25de707eb33d588527594ef2c39d7e76/TheVenomousAbyss/Sszorak.lua"
+    },
+    {
+      "id": "s114",
+      "label": "DBM · Sszorak",
+      "url": "https://github.com/DeadlyBossMods/DBM-Retail/blob/9b5f8bb5632b5e74de472c19f9311c87f2e512a4/DBM-Raids-Midnight/TheVenomousAbyss/Sszorak.lua"
+    },
+    {
+      "id": "s115",
+      "label": "BigWigs · The Twin Fangs",
+      "url": "https://github.com/BigWigsMods/BigWigs/blob/5e0db87d25de707eb33d588527594ef2c39d7e76/TheVenomousAbyss/TwinFangs.lua"
+    },
+    {
+      "id": "s116",
+      "label": "DBM · The Twin Fangs",
+      "url": "https://github.com/DeadlyBossMods/DBM-Retail/blob/9b5f8bb5632b5e74de472c19f9311c87f2e512a4/DBM-Raids-Midnight/TheVenomousAbyss/TheTwinFangs.lua"
+    },
+    {
+      "id": "s117",
+      "label": "BigWigs · The Coiled Altar",
+      "url": "https://github.com/BigWigsMods/BigWigs/blob/5e0db87d25de707eb33d588527594ef2c39d7e76/TheVenomousAbyss/CoiledAltar.lua"
+    },
+    {
+      "id": "s118",
+      "label": "BigWigs · Ula'tek",
+      "url": "https://github.com/BigWigsMods/BigWigs/blob/5e0db87d25de707eb33d588527594ef2c39d7e76/TheVenomousAbyss/Ulatek.lua"
+    },
+    {
+      "id": "s119",
+      "label": "DBM · The Coiled Altar",
+      "url": "https://github.com/DeadlyBossMods/DBM-Retail/blob/9b5f8bb5632b5e74de472c19f9311c87f2e512a4/DBM-Raids-Midnight/TheVenomousAbyss/TheCoiledAltar.lua"
+    },
+    {
+      "id": "s120",
+      "label": "BigWigs · Nymrissa Wavecaller",
+      "url": "https://github.com/BigWigsMods/BigWigs/blob/5e0db87d25de707eb33d588527594ef2c39d7e76/MidnightLairs/Nymrissa.lua"
+    },
+    {
+      "id": "s121",
+      "label": "DBM · Nymrissa Wavecaller",
+      "url": "https://github.com/DeadlyBossMods/DBM-Retail/blob/9b5f8bb5632b5e74de472c19f9311c87f2e512a4/DBM-Lairs-Midnight/TideboundGrotto/NymrissaWavecaller.lua"
+    },
+    {
+      "id": "s122",
+      "label": "DBM · ordre des modules Midnight",
+      "url": "https://github.com/DeadlyBossMods/DBM-Retail/blob/9b5f8bb5632b5e74de472c19f9311c87f2e512a4/DBM-Raids-Midnight/DBM-Raids-Midnight.toc"
+    },
+    {
+      "id": "s123",
+      "label": "RCLootCouncil · données du Guide de l'aventurier",
+      "url": "https://github.com/evil-morfar/RCLootCouncil2/blob/4c7fcfed51e05a77b803626b9414f986d822040f/Utils/EncounterJournalData.lua"
+    },
+    {
+      "id": "s124",
+      "label": "Warcraft Logs · classement du Gouffre venimeux (zone 54)",
+      "url": "https://www.warcraftlogs.com/zone/rankings/54"
+    },
+    {
+      "id": "s125",
+      "label": "Mythic-Store · table de loot du Gouffre venimeux (extrait de recherche)",
+      "url": "https://mythic-store.com/blog/the-venomous-abyss-loot-table-complete-overview-for-wow-midnight-season-2"
+    },
+    {
+      "id": "s126",
+      "label": "AccountShark · guide des Ascendant Venomstones (extrait de recherche)",
+      "url": "https://accountshark.net/blog/wow-ascendant-venomstones-guide-midnight-12-1-5"
+    },
+    {
+      "id": "s127",
+      "label": "Timesaver · Ascendant Venomstones (extrait de recherche)",
+      "url": "https://timesaver.gg/blog/wow-patch-12-1-5-ascendant-venomstones-how-to-farm"
+    },
+    {
+      "id": "s128",
+      "label": "AllTheThings · The Unbinding of Kith'ix (PTR)",
+      "url": "https://github.com/ATTWoWAddon/AllTheThings/blob/master/.contrib/Parser/DATAS/01%20-%20Dungeons%20Raids/12%20-%20Midnight/6%20-%20The%20Unbinding%20of%20Kith'ix.lua"
+    },
+    {
+      "id": "s129",
+      "label": "Koroboost · guide du Gouffre venimeux (extrait de recherche)",
+      "url": "https://koroboost.com/guide/midnight-venomous-abyss-raid-guide"
+    }
+  ]
+}

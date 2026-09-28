@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content='%%CSP%%'>
+<meta name="viewport" content='width=device-width, initial-scale=1, viewport-fit=cover'>
+<meta name="color-scheme" content='dark'>
+<meta name="theme-color" content='#0b100f'>
+<meta name="apple-mobile-web-app-capable" content='yes'>
+<meta name="mobile-web-app-capable" content='yes'>
+<meta name="apple-mobile-web-app-status-bar-style" content='black-translucent'>
+<meta name="apple-mobile-web-app-title" content='KATA'>
+<meta name="format-detection" content='telephone=no'>
+<meta name="referrer" content='no-referrer'>
+<meta name="robots" content='noindex, nofollow'>
+<title>KATA · Lyarà</title>
+<link rel="apple-touch-icon" sizes="180x180" href="data:image/png;base64,%%TOUCH_ICON%%">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,%%FAVICON%%">
+<!--INLINE:CSS-->
+<!--INLINE:DATA-->
+</head>
+<body>
+<!--INLINE:ICONS-->
+<div id="safe-top-veil"></div>
+<div class="top">
+  <div class="top-in">
+    <header class="idrow" id="idrow"><span class="id-mono" aria-hidden="true">K</span><p class="id-text"><strong>KATA</strong></p></header>
+    <div class="actions">
+      <button type="button" class="icon-btn" data-act="refresh" aria-label="Mettre à jour depuis raider.io"><svg class="i" aria-hidden="true" focusable="false"><use href="#i-refresh"></use></svg></button>
+      <button type="button" class="icon-btn" data-act="sheet" data-sheet="settings" aria-label="Réglages"><svg class="i" aria-hidden="true" focusable="false"><use href="#i-cog"></use></svg></button>
+    </div>
+    <div id="status" class="status st-loading" data-qa="status" aria-live="polite"><button type="button" class="st-main" data-act="sheet" data-sheet="status"><span class="st-txt">Connexion à raider.io…</span></button></div>
+  </div>
+</div>
+<main id="main">
+  <section data-screen="now" aria-labelledby="h-now"><h1 id="h-now" class="sr-only">Maintenant</h1><div class="screen-root"></div></section>
+  <section data-screen="week" aria-labelledby="h-week" hidden><h1 id="h-week" class="sr-only">Semaine</h1><div class="screen-root"></div></section>
+  <section data-screen="gear" aria-labelledby="h-gear" hidden><h1 id="h-gear" class="sr-only">Stuff</h1><div class="screen-root"></div></section>
+  <section data-screen="analyse" aria-labelledby="h-analyse" hidden><h1 id="h-analyse" class="sr-only">Analyse</h1><div class="screen-root"></div></section>
+  <section data-screen="guide" aria-labelledby="h-guide" hidden><h1 id="h-guide" class="sr-only">Guide</h1><div class="screen-root"></div></section>
+</main>
+<nav class="tabs" aria-label="Navigation">
+  <button type="button" data-nav="now" aria-current="page"><svg class="i" aria-hidden="true" focusable="false"><use href="#i-bolt"></use></svg><span>Maintenant</span></button>
+  <button type="button" data-nav="week"><svg class="i" aria-hidden="true" focusable="false"><use href="#i-calendar"></use></svg><span>Semaine</span></button>
+  <button type="button" data-nav="gear"><svg class="i" aria-hidden="true" focusable="false"><use href="#i-helm"></use></svg><span>Stuff</span></button>
+  <button type="button" data-nav="analyse"><svg class="i" aria-hidden="true" focusable="false"><use href="#i-radar"></use></svg><span>Analyse</span></button>
+  <button type="button" data-nav="guide"><svg class="i" aria-hidden="true" focusable="false"><use href="#i-book"></use></svg><span>Guide</span></button>
+</nav>
+<dialog id="sheet" class="sheet" aria-labelledby="sheet-title"></dialog>
+<div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+<!--INLINE:JS-->
+</body>
+</html>

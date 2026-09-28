@@ -1,0 +1,84 @@
+/* 20-shell.css — safe areas, top bar (identity + status slot), main, the single nav
+   (bottom bar on phone, left rail ≥ 1024 px). Stage 1. */
+#safe-top-veil{ position:fixed; top:0; left:0; right:0; height:var(--safe-t); background:var(--bg); z-index:25; pointer-events:none; }
+
+/* Top bar. Phone: identity row (44) scrolls away, status slot (28) stays sticky just
+   below the safe area (sticky offset = −identity height). Desktop: one 56 px row. */
+.top{ position:sticky; top:calc(-1 * var(--idrow-h)); z-index:20; background:var(--bg); padding-top:var(--safe-t); }
+.top-in{
+  display:grid; grid-template-columns:minmax(0,1fr) auto; grid-template-areas:"id act" "st st";
+  padding:0 var(--gx-r) 0 var(--gx-l); max-width:calc(var(--content-max) + var(--gx-l) + var(--gx-r)); margin-inline:auto;
+}
+.idrow{ grid-area:id; display:flex; align-items:center; gap:10px; height:var(--idrow-h); min-width:0; }
+.id-mono{ flex:none; width:28px; height:28px; border-radius:8px; display:grid; place-items:center; background:var(--jade-tint); color:var(--jade); font-weight:700; font-size:14px; line-height:1; }
+.id-text{ min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size:14px; line-height:20px; color:var(--ink2); }
+.id-text strong{ color:var(--ink); font-weight:650; }
+.actions{ grid-area:act; display:flex; align-items:center; margin-right:-10px; }
+.icon-btn{ width:var(--tap); height:var(--tap); display:grid; place-items:center; border-radius:12px; color:var(--ink2); transition:transform var(--t-press) var(--ease); }
+.icon-btn:active{ background:var(--s3); transform:scale(.97); }
+.icon-btn.is-busy .i{ opacity:.45; }
+
+/* Status slot: fixed 28 px in every state (no layout shift). Children are inline-level so
+   innerText stays on one line; buttons get a 44 px hit box via negative margins. */
+.status{
+  grid-area:st; position:relative; height:var(--status-h); min-width:0; display:block; white-space:nowrap;
+  line-height:calc(var(--status-h) - 2px); border-radius:8px; background:var(--s1); border:1px solid var(--line);
+  font-size:13px; font-weight:500; color:var(--ink2);
+}
+.status.is-warn{ background:var(--warn-tint); border-color:var(--warn-line); color:var(--ink); }
+.st-main{
+  display:inline-block; vertical-align:top; max-width:100%; height:var(--tap); margin:-9px 0; padding:0 10px;
+  line-height:var(--tap); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+.status.has-retry .st-main{ max-width:calc(100% - 96px); }
+.st-main .i{ width:12px; height:12px; margin-right:6px; vertical-align:-1px; }
+.st-live .i, .st-partial .i{ color:var(--jade); }
+.st-loading .i, .st-refreshing .i, .st-cached .i{ color:var(--mist); }
+.is-warn .i{ color:var(--warn); }
+.st-retry{ display:inline-block; vertical-align:top; height:var(--tap); margin:-9px 0; padding:0 10px; line-height:var(--tap); font-weight:650; color:var(--ink); text-decoration:underline; text-underline-offset:2px; }
+.st-main:active, .st-retry:active{ background:rgba(255,255,255,.06); }
+
+/* main + screens */
+main{
+  display:block; padding:10px var(--gx-r) calc(var(--tab-h) + 24px + var(--safe-b)) var(--gx-l);
+  max-width:calc(var(--content-max) + var(--gx-l) + var(--gx-r)); margin-inline:auto; min-width:0;
+}
+section[data-screen]{ min-width:0; }
+.screen-root{ min-width:0; }
+
+/* THE nav: bottom tab bar on phone/tablet */
+.tabs{
+  position:fixed; left:0; right:0; bottom:0; z-index:30; display:flex; align-items:stretch;
+  background:rgba(11,16,15,.97); border-top:1px solid var(--line);
+  padding:0 var(--safe-r) max(8px, var(--safe-b)) var(--safe-l);
+}
+.tabs button{
+  flex:1 1 0; min-width:0; height:var(--tab-h); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px;
+  color:var(--muted); font-size:12px; line-height:16px; font-weight:600; transition:color var(--t-state) var(--ease), transform var(--t-press) var(--ease);
+}
+.tabs button span{ max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.tabs button .i{ width:22px; height:22px; }
+.tabs button:active{ transform:scale(.97); }
+.tabs button[aria-current="page"]{ color:var(--jade); }
+
+@media (min-width:1024px){
+  body{ padding-left:var(--rail-w); }
+  .top{ top:0; }
+  .top-in{ grid-template-columns:auto minmax(0,1fr) auto; grid-template-areas:"id st act"; column-gap:16px; align-items:center; height:var(--top-h); }
+  .status{ justify-self:end; max-width:100%; }
+  main{ padding-top:12px; padding-bottom:48px; }
+  .tabs{
+    top:0; bottom:0; right:auto; width:var(--rail-w); flex-direction:column; justify-content:flex-start; gap:4px;
+    padding:calc(12px + var(--safe-t)) 0 12px var(--safe-l); border-top:0; border-right:1px solid var(--line); background:var(--bg);
+  }
+  .tabs button{ flex:none; width:var(--rail-w); height:64px; padding:0 2px; font-weight:500; letter-spacing:-.02em; }
+}
+
+/* layout helpers used by screens */
+.stack{ display:flex; flex-direction:column; gap:var(--gap); min-width:0; }
+.cols{ display:grid; gap:var(--gap); grid-template-columns:minmax(0,1fr); min-width:0; }
+@media (min-width:1024px){
+  .cols-7-5{ grid-template-columns:minmax(0,7fr) minmax(0,5fr); align-items:start; }
+  .cols-5-7{ grid-template-columns:minmax(0,5fr) minmax(0,7fr); align-items:start; }
+  .cols-2{ grid-template-columns:repeat(2, minmax(0,1fr)); align-items:start; }
+}

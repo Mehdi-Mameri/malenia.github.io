@@ -1,0 +1,28 @@
+/* 80-guide.css — «Guide» (spec §3.6: <details> groups; desktop 2-column masonry via CSS columns,
+   column-width 460 px) + «Réglages» sheet. Stage 3b. */
+.g-intro{ margin-bottom:var(--gap); }
+.g-intro .prov{ margin-right:4px; }
+.g-cols{ column-width:460px; column-gap:var(--gap); }
+.g-grp{ display:block; break-inside:avoid; margin-bottom:var(--gap); padding-block:4px; }
+.g-grp > summary{ justify-content:space-between; }
+.g-st{ flex:1 1 auto; display:flex; flex-direction:column; align-items:flex-start; gap:4px; min-width:0; padding:6px 0; }
+.g-b{ display:flex; flex-direction:column; gap:12px; padding:6px 0 10px; min-width:0; }
+.g-sub{ display:flex; flex-direction:column; gap:6px; min-width:0; }
+.g-sub > .over{ display:flex; align-items:center; gap:4px; }
+.g-it{ display:flex; flex-direction:column; gap:6px; padding:10px 12px; border-radius:12px; background:var(--s2); border:1px solid var(--line); min-width:0; }
+.g-it .g-sub{ margin-top:2px; }
+.g-itt{ font-size:14px; line-height:20px; font-weight:600; overflow-wrap:anywhere; }
+.g-imp{ display:flex; flex-direction:column; gap:8px; padding:10px 12px; border-radius:12px; background:var(--bg); border:1px solid var(--line-strong); min-width:0; }
+.g-str{ margin:0; white-space:pre-wrap; word-break:break-all; color:var(--ink); user-select:all; -webkit-user-select:all; }
+
+/* ---- Réglages ---- */
+.set-s{ display:flex; flex-direction:column; gap:10px; padding-top:14px; border-top:1px solid var(--line); min-width:0; }
+.sheet-b > .set-s:first-child{ border-top:0; padding-top:0; }
+.set-g{ display:grid; grid-template-columns:minmax(0,96px) minmax(0,1fr); gap:10px; }
+.set-g > .field:last-child{ grid-column:1 / -1; }
+.set-2{ display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:10px; }
+.set-r{ display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px 10px; }
+.set-s > .btn{ align-self:flex-start; }
+.set-s details > summary{ justify-content:space-between; }
+.set-wipe{ display:flex; flex-direction:column; gap:10px; border-color:var(--crit); }
+.btn-danger{ background:var(--crit); color:#fff; border-color:transparent; }
