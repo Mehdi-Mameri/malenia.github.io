@@ -214,10 +214,9 @@
   const EVAL = {
     missingEnchant(p, x) {
       const M = x.M;
-      if (M.source === 'snapshot') return nev('Le snapshot ne contient pas les enchants');
       const slots = expand(p.slots && p.slots.length ? p.slots : x.R.enchants.map(e => e.slot));
       const st = slots.filter(s => M.gear[s].present).map(s => [s, M.gear[s].ench.state]);
-      if (!st.length || st.every(z => z[1] === 'inconnu')) return nev(M.gearPresent ? 'Enchants non renvoyés par raider.io' : 'Équipement indisponible');
+      if (!st.length || st.every(z => z[1] === 'inconnu')) return nev(M.source === 'snapshot' ? 'Le snapshot ne contient pas les enchants' : M.gearPresent ? 'Enchants non renvoyés par raider.io' : 'Équipement indisponible');
       const miss = st.filter(z => z[1] === 'manquant').map(z => z[0]);
       return { evaluable: true, hit: miss.length > 0, magnitude: miss.length, evidence: miss, seen: st, evidenceConf: M.source === 'live' ? 'haute' : 'moyenne' };
     },

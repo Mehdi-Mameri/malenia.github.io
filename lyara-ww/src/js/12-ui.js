@@ -129,7 +129,7 @@
   /* ---------- provenance chip (spec §7.1) ---------- */
   const PROV = {
     live: ['dot', 'Live'], cached: ['ring', 'Cache'], snapshot: ['diamond', 'Snapshot'], research: ['book', 'Recherche'],
-    lastknown: ['book', 'Base Raider.IO du'], estimate: ['approx', 'Estimation'], calc: ['approx', 'Calcul KATA'],
+    lastknown: ['book', 'Relevé du'], estimate: ['approx', 'Estimation'], calc: ['approx', 'Calcul KATA'],
     declared: ['hand', 'Déclaré'], unknown: ['dotted', 'Inconnu']
   };
   UI.prov = (kind, detail) => {
@@ -188,6 +188,6 @@
   UI.lastKnownCard = () => {
     const lk = K.research && K.research.lastKnown();
     if (!lk) return h``;
-    return h`<div class="card lk" data-qa="lastknown"><div class="card-h"><p class="over">Dernière progression connue</p>${UI.prov('lastknown', lk.date)}</div><p class="t-call ink2 any">${lk.text}</p><p class="card-foot">Relevé de la recherche (base Raider.IO du ${lk.date}) : ce n\'est pas une donnée en direct.</p></div>`;
+    return h`<div class="card lk" data-qa="lastknown"><div class="card-h"><p class="over">Dernière progression connue</p>${UI.prov('lastknown', lk.date)}</div><p class="t-call ink2 any">${lk.text}</p><p class="card-foot">Relevé de la recherche (ton export SimC et la base Raider.IO) : ce n\'est pas une donnée en direct.</p></div>`;
   };
 })(KATA);

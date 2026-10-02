@@ -68,7 +68,7 @@
       const c = statusCopy();
       const what = M.source === 'live' ? 'Données en direct de raider.io.'
         : M.source === 'cached' ? 'Données en cache enregistrées le ' + F.ddmm(M.at) + ' à ' + F.hhmm(M.at) + ' (' + F.rel(M.at) + ').'
-          : M.source === 'snapshot' ? 'Pas de données raider.io : affichage de l\'équipement du ' + F.ddmm(M.at) + ' (snapshot de la recherche). Enchants, gemmes, clés et raid sont inconnus.'
+          : M.source === 'snapshot' ? 'Pas de données raider.io : affichage de l\'équipement du ' + F.ddmm(M.at) + ' (snapshot de la recherche, avec enchants et gemmes). Clés et raid de la semaine sont inconnus.'
             : 'Aucune donnée pour ce personnage pour l\'instant.';
       const missing = M.partialPaths.map(K.model.label);
       const t = K.time.info();

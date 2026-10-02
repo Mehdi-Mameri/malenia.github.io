@@ -89,7 +89,7 @@
       if (!t) return null;
       const m = t.match(/\b(\d{1,2})\/(\d{1,2})\b/);
       const date = m ? m[1].padStart(2, '0') + '/' + m[2].padStart(2, '0') : RS.asOfFR;
-      return { text: t, date, label: 'base Raider.IO du ' + date };
+      return { text: t, date, label: 'relevé du ' + date };
     },
     dungeons: () => K.R.mplus.dungeons,
     /* research dungeon for an API run {dungeon, short} (or any {name, slug}); null if none */

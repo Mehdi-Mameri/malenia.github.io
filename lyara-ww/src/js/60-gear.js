@@ -129,9 +129,9 @@
         ${tp ? sec('Tier', '', h`<p class="t-call">${K.nowUI.tierLabel(tp)}</p>${K.nowUI.tierHint(tp, c)}${K.nowUI.tierBtns(tp)}`) : ''}
         ${bis ? sec('BiS (recherche)', h`<span class="nowrap">${UI.provResearch()} ${K.pv.conf(bis.confidence, bis.sources)}</span>`, h`<dl class="kv kv-why"><dt>Raid</dt><dd>${U.str(bis.raid) || F.DASH}</dd><dt>M+</dt><dd>${U.str(bis.mplus) || F.DASH}</dd></dl>${bis.note ? h`<p class="t-cap ink2">${U.str(bis.note)}</p>` : ''}`) : ''}
         ${where.length ? h`<div data-qa="loot-slot">${sec('Où l\'améliorer', UI.prov('calc'), h`<ul class="list-dot">${where.map(e => K.loot.li(e, true))}</ul>${K.loot.foot(T.slotIlvlGood)}`)}</div>` : ''}
-        ${sec('Verdict du 21/08', UI.prov('snapshot', F.ddmm(R.gearSnapshot.date)), snap && g.present && g.id != null && snap.itemId === g.id
+        ${sec('Verdict du ' + F.ddmm(R.gearSnapshot.date), UI.prov('snapshot', F.ddmm(R.gearSnapshot.date)), snap && g.present && g.id != null && snap.itemId === g.id
           ? h`<p class="t-call"><span class="ink">${U.str(snap.verdict) || F.DASH}</span>${snap.note ? h` · ${U.str(snap.note)}` : ''}</p>`
-          : h`<p class="t-call ink2">${g.present ? 'Nouvel objet depuis le 21/08, non évalué' : F.DASH}</p>`)}`;
+          : h`<p class="t-call ink2">${g.present ? 'Nouvel objet depuis le ' + F.ddmm(R.gearSnapshot.date) + ', non évalué' : F.DASH}</p>`)}`;
     }
   });
 

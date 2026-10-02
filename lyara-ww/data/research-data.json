@@ -9,21 +9,19 @@
       "region": "eu",
       "race": "Elfe de la nuit",
       "spec": "Marche-vent",
-      "lastKnown": "Au 28/09 (base de l'addon Raider.IO, instantané quotidien de 06:31 UTC, décodé localement) : cote M+ S2 de 3403, sept donjons chronométrés en +16 et Murder Row en +15 ; Gouffre venimeux 8/8 Héroïque (4 à 6 clears) et 1/8 Mythique ; The Tidebound Grotto (repaire de raid à 1 boss, Nymrissa Wavecaller) 1/1 Héroïque. Équipement connu : seulement l'export SimC du 21/08 (≈ 303 d'ilvl, aucun enchant ni gemme, 0/5 tier), très probablement dépassé. L'objet réellement obtenu sur Ula'tek vers le 4/09 reste inconnu."
+      "lastKnown": "Export SimC du 02/10 : ilvl ≈ 327 (arme 2 mains comptée double), 4 pièces Guile of the Monkey King actif (tête, épaules, torse, jambes), Voracious Heart of Ula'tek + Zul'jin's Guillotine Technique, Abyssal Broodfiend's Bardiche et Aqirbane Reliquary au max (334), enchants et gemmes posés, poignets et bottes craftés en qualité 5 (331). Huit pièces sont à 321, le plafond de la piste Héros. Progression connue (base Raider.IO du 28/09) : cote M+ 3403, Gouffre venimeux 8/8 Héroïque et 1/8 Mythique."
     },
     "method": "Recherche du 28/09/2026 menée par plusieurs agents, en deux temps. 1) Recherches web : seuls les résumés et extraits des résultats ont été lus ; aucune page n'a pu être ouverte directement (WebFetch bloqué par le proxy), et le quota de 200 recherches de la session s'est épuisé en cours de route, si bien que les pistes équipement, enchants et contenu reposent en partie sur des résultats déjà collectés plus tôt (5 septembre et 28 septembre). 2) Vérification contradictoire par un second agent, qui a recoupé chaque affirmation avec des données primaires publiques clonées depuis GitHub : données de jeu, liste de priorités et profils par défaut de SimulationCraft (branche midnight, live 12.1.0.69933 avec correctifs au 24/09, PTR 12.1.5.69952), base de l'addon Raider.IO générée le 28/09 (décodée localement pour retrouver Lyarà), addon SavedInstances et client TypeScript non officiel raiderio-api 0.6.1. Le vérificateur a aussi lancé ses propres simulations SimC, mais sur les profils par défaut (≈ 339 d'ilvl), pas sur ton équipement ; leurs chiffres ne sont pas repris ici, seulement leur sens. 3) Complément du 28/09, une fois le quota de recherches épuisé : lecture directe de données publiques sur GitHub, sans passer par des résultats de recherche : AllTheThings (tables de loot, jetons de tier, Catalyseur), RCLootCouncil (emplacements des jetons), modules de boss BigWigs et DBM (noms des capacités, marqueurs Mythique, interruptions et dissipations ; aucune stratégie écrite), textes et code d'interface du client 12.1.0 (grande chambre forte). Ce qui ne repose que sur l'une de ces sources est signalé comme tel. Limites : raider.io, Warcraft Logs et l'Armurerie étaient inaccessibles, donc ton équipement, tes enchants et tes talents actuels sont inconnus ; les données PTR peuvent changer ; plusieurs sources sont des sites de boost ou des agrégateurs ; les statistiques d'usage reflètent surtout le haut du classement ; certaines pages de guides mélangent encore du contenu de la saison 1. Les points contestés sont isolés dans « disputed » et ne sont jamais présentés comme des recommandations. L'ensemble est une recommandation à faire valider par un humain, pas une conclusion définitive."
   },
   "headline": {
-    "title": "3403 de cote, 8/8 HM, 1/8 M : cap sur le 4 pièces, le +17 et le Mythique",
-    "summary": "La base Raider.IO du 28/09 montre un personnage bien plus avancé que l'export du 21/08 : cote M+ S2 de 3403 (tout en +16 sauf Murder Row en +15), Gouffre venimeux 8/8 Héroïque et 1/8 Mythique. Le Marche-vent a reçu deux buffs PvE en septembre (≈ +4 % le 1er, puis auto-attaques, Dual Threat et Rising Sun Kick le 22), qui visent justement son point faible sur boss. Les priorités : vérifier en direct enchants, gemmes et 4 pièces, remplir le coffre chaque semaine, rattraper Murder Row puis viser le +17, et avancer en Mythique maintenant que le raid a été nerfé. 12.1.5 (raid Kith'ix, Venomstones) est attendu vers le 6 octobre, date non officielle. Recommandations à valider par un humain, pas des conclusions définitives.",
+    "title": "4 pièces actif, bijoux et arme BiS : la suite se joue en piste Mythe",
+    "summary": "Depuis le 21/08 ton personnage a changé de catégorie : l'export SimC du 02/10 montre le 4 pièces actif, les deux bijoux et l'arme visés par la recherche au rang max (334), enchants et gemmes en place, ilvl ≈ 327. Ce qui reste : huit pièces bloquées à 321 (plafond Héros, d'après les identifiants de bonus) qui ne montent plus qu'en les remplaçant par du Mythe (raid Mythique, choix de coffre sur la piste Mythe), la cote M+ (3403 au 28/09, viser le +17) et la progression Mythique (1/8 au 28/09). Recommandations à valider par un humain, pas des conclusions définitives.",
     "keyPoints": [
-      "Ton équipement actuel est inconnu : l'export du 21/08 (≈ 303, sans enchants ni gemmes, 0/5 tier) est très probablement dépassé ; le tableau de bord le relit en direct.",
-      "Objectif de saison : le 4 pièces Guile of the Monkey King (jetons Venomcured, Slumbering Coil Curio d'Ula'tek, Catalyseur de Silvermoon ; le profil SimC laisse les mains hors tier), puis Abyssal Broodfiend's Bardiche et Voracious Heart of Ula'tek.",
-      "Enchants DPS en Midnight : arme, anneaux, torse et jambes. Il n'existe pas d'enchant de cape ni de poignets.",
-      "M+ : un +17 chronométré vaut 440 points par donjon ; Murder Row (+15) est ton seul donjon sous +16.",
-      "Arbre héroïque : Shado-Pan en raid mono-cible ; Conduit of the Celestials mérite d'être simulé pour le M+ dès le 4 pièces.",
-      "Ignore les logs et sims des 22–23/09 (bug PvP appliqué en PvE) ainsi que les sims PTR des arbres héroïques.",
-      "12.1.5 (PTR) : la pièce cantrip cuir de Kith'ix est désormais un torse, et les Venomstones n'améliorent qu'arme, bijou ou collier entièrement améliorés."
+      "4 pièces Guile of the Monkey King actif : le bonus dont dépend le spec est acquis (export du 02/10).",
+      "Bijoux, arme et collier BiS de la recherche équipés au rang max (334).",
+      "Huit pièces à 321 = plafond Héros : la prochaine marche passe par des pièces Mythe (318 → 334), pas par des écus Héros.",
+      "Tu n'as plus de trou d'enchant ni de gemme sur les emplacements qui en ont (pas d'enchant de cape ni de poignets en Midnight).",
+      "Cote M+ 3403 et 1/8 Mythique au 28/09 : la marge est maintenant dans les clés +17 et le raid Mythique."
     ]
   },
   "patchTimeline": [
@@ -1930,142 +1928,196 @@
     }
   ],
   "gearSnapshot": {
-    "date": "2026-08-21",
+    "date": "2026-10-02",
+    "source": "export SimC du 02/10 (addon 12.1.0-03, build 69933)",
     "items": [
       {
         "slot": "head",
-        "nameFr": "Semblance du démon abject",
-        "nameEn": "Vilefiend's Guise",
-        "itemId": 251140,
-        "ilvl": 308,
-        "verdict": "correct",
-        "note": "Murder Row. Emplacement de tier : le profil SimC catalyse la tête d'Ula'tek (Gaze of the Coiled Watcher) en tête de tier."
+        "nameFr": "Visage inflexible du roi-singe",
+        "nameEn": null,
+        "itemId": 271519,
+        "ilvl": 334,
+        "verdict": "bon",
+        "note": "Pièce de tier Guile of the Monkey King, piste Mythe au rang max (bonus 12854), enchantée.",
+        "enchants": [
+          8017
+        ],
+        "gems": []
       },
       {
         "slot": "neck",
-        "nameFr": "Joug de l'ours coureur",
-        "nameEn": "Yoke of the Charging Bear",
-        "itemId": 251173,
-        "ilvl": 311,
-        "verdict": "correct",
-        "note": "Noté comme récompense de renom, mais ses bonus ressemblent à ceux des objets de donjon M+ (Den of Nalorakk ?) : non vérifié. Cible : Aqirbane Reliquary."
+        "nameFr": "Reliquaire fléau-des-Aqir",
+        "nameEn": "Aqirbane Reliquary",
+        "itemId": 268265,
+        "ilvl": 334,
+        "verdict": "bon",
+        "note": "La cible BiS de la recherche, au max, avec 2 gemmes.",
+        "enchants": [],
+        "gems": [
+          240983,
+          240908
+        ]
       },
       {
         "slot": "shoulder",
-        "nameFr": "Spallières de venin écumant",
-        "nameEn": "Frothing Venom Spaulders",
-        "itemId": 268246,
-        "ilvl": 298,
-        "verdict": "correct",
-        "note": "Vashnik the Malignant d'après AllTheThings (la note du 21/08 disait « adds du Gouffre venimeux », voir les points contestés). Emplacement de tier, le plus faible des cinq au 21/08."
+        "nameFr": "Pampilles du roi-singe",
+        "nameEn": null,
+        "itemId": 271517,
+        "ilvl": 321,
+        "verdict": "bon",
+        "note": "Pièce de tier Guile of the Monkey King, enchantée. 321 = plafond de la piste Héros : seule une version Mythe la dépasse.",
+        "enchants": [
+          8001
+        ],
+        "gems": []
       },
       {
         "slot": "back",
-        "nameFr": "Cape distinguée de traque-proie",
-        "nameEn": "Preyhunter's Polished Cloak",
-        "itemId": 275525,
-        "ilvl": 292,
-        "verdict": "à remplacer",
-        "note": "Identifiée : modèle de base vert, probablement une récompense de Traque (déduit) ; en jeu, la qualité dépend de la piste d'amélioration. À remplacer par un drop (Silken Voodoo Drape dans le profil SimC). Pas d'enchant de cape en Midnight."
+        "nameFr": "Voile clandestin",
+        "nameEn": null,
+        "itemId": 251132,
+        "ilvl": 321,
+        "verdict": "correct",
+        "note": "Aucun enchant de cape n'existe en Midnight : rien à faire ici à part l'ilvl (321 = plafond Héros).",
+        "enchants": [],
+        "gems": []
       },
       {
         "slot": "chest",
-        "nameFr": "Brigandine de traqueur des brumes",
-        "nameEn": "Miststalker's Brigandine",
-        "itemId": 272239,
-        "ilvl": 305,
-        "verdict": "correct",
-        "note": "Coffre de gouffre Nemesis. Emplacement de tier ; à surveiller en 12.1.5 (cantrip cuir de Kith'ix sur le torse)."
+        "nameFr": "Gi de combat du roi-singe",
+        "nameEn": null,
+        "itemId": 271522,
+        "ilvl": 321,
+        "verdict": "bon",
+        "note": "Pièce de tier Guile of the Monkey King, enchantée. Plafond Héros.",
+        "enchants": [
+          7987
+        ],
+        "gems": []
       },
       {
         "slot": "wrist",
-        "nameFr": "Brassards garde-racines",
-        "nameEn": "Rootwarden Wraps",
-        "itemId": 251183,
-        "ilvl": 302,
-        "verdict": "correct",
-        "note": "Renom. Cible : poignets craftés avec Arcanoweave Lining. Pas d'enchant de poignets en Midnight."
+        "nameFr": "Déflecteurs d'agent de Lune-d'Argent",
+        "nameEn": null,
+        "itemId": 244576,
+        "ilvl": 331,
+        "verdict": "bon",
+        "note": "Artisanat qualité 5 (Critique / Hâte). Aucun enchant de poignets n'existe en Midnight.",
+        "enchants": [],
+        "gems": []
       },
       {
         "slot": "hands",
-        "nameFr": "Poignes de défense électrifiée",
-        "nameEn": "Grips of Electrified Defense",
-        "itemId": 159337,
-        "ilvl": 311,
-        "verdict": "bon",
-        "note": "Temple of Sethraliss (d'après les notes du 21/08). Emplacement de tier, mais le profil SimC garde des gants hors tier."
+        "nameFr": "Poignes de massacre impitoyables",
+        "nameEn": null,
+        "itemId": 268234,
+        "ilvl": 321,
+        "verdict": "correct",
+        "note": "Seul emplacement de tier sans pièce de tier : tu as déjà le 4 pièces, une 5e n'ajoute pas de bonus de set.",
+        "enchants": [],
+        "gems": []
       },
       {
         "slot": "waist",
-        "nameFr": "Ceinture de dinomancien primordial",
-        "nameEn": "Primal Dinomancer's Belt",
-        "itemId": 159301,
-        "ilvl": 302,
-        "verdict": "bon",
-        "note": "Kings' Rest (d'après les notes du 21/08)."
+        "nameFr": "Écharpe du réceptacle lugubre",
+        "nameEn": "Sash of the Forlorn Vessel",
+        "itemId": 268256,
+        "ilvl": 321,
+        "verdict": "correct",
+        "note": "The Coiled Altar. Plafond Héros.",
+        "enchants": [],
+        "gems": []
       },
       {
         "slot": "legs",
-        "nameFr": "Jambières lumsporeuses",
-        "nameEn": "Lightspore Leggings",
-        "itemId": 251198,
-        "ilvl": 311,
-        "verdict": "correct",
-        "note": "The Blinding Vale. Emplacement de tier."
+        "nameFr": "Culotte du roi-singe",
+        "nameEn": null,
+        "itemId": 271518,
+        "ilvl": 321,
+        "verdict": "bon",
+        "note": "Pièce de tier Guile of the Monkey King, enchantée. Plafond Héros.",
+        "enchants": [
+          8159
+        ],
+        "gems": []
       },
       {
         "slot": "feet",
-        "nameFr": "Jambards d'exploration arctique",
-        "nameEn": "Arctic Explorer's Legwraps",
-        "itemId": 251153,
-        "ilvl": 311,
-        "verdict": "correct",
-        "note": "Den of Nalorakk. Cible : bottes craftées avec Arcanoweave Lining."
+        "nameFr": "Chaussures d'agent de Lune-d'Argent",
+        "nameEn": null,
+        "itemId": 244569,
+        "ilvl": 331,
+        "verdict": "bon",
+        "note": "Artisanat qualité 5 (Critique / Maîtrise), enchantées.",
+        "enchants": [
+          7963
+        ],
+        "gems": []
       },
       {
         "slot": "finger1",
-        "nameFr": "Diadème de l'ombre envahissante",
-        "nameEn": "Circlet of Encroaching Shadow",
-        "itemId": 256986,
-        "ilvl": 292,
-        "verdict": "à remplacer",
-        "note": "Anneau vert de leveling (confirmé dans les données d'objets) : remplace-le, sans crests ni enchant coûteux."
+        "nameFr": "Effroyable chevalière d'Atroxus",
+        "nameEn": null,
+        "itemId": 252258,
+        "ilvl": 321,
+        "verdict": "correct",
+        "note": "Enchantée et sertie. Plafond Héros.",
+        "enchants": [
+          7967
+        ],
+        "gems": [
+          240900
+        ]
       },
       {
         "slot": "finger2",
-        "nameFr": "Bague précieuse chapardée",
-        "nameEn": "Pilfered Precious Band",
-        "itemId": 251148,
-        "ilvl": 302,
+        "nameFr": "Chevalière de servitude teigneuse",
+        "nameEn": null,
+        "itemId": 251136,
+        "ilvl": 321,
         "verdict": "correct",
-        "note": "Renom."
+        "note": "Enchantée et sertie. Plafond Héros.",
+        "enchants": [
+          7967
+        ],
+        "gems": [
+          240900
+        ]
       },
       {
         "slot": "trinket1",
-        "nameFr": "Fiole ignoble de venin volatil",
-        "nameEn": "Vile Vial of Volatile Venom",
-        "itemId": 273796,
-        "ilvl": 292,
+        "nameFr": "Cœur avide d'Ula'tek",
+        "nameEn": "Voracious Heart of Ula'tek",
+        "itemId": 270175,
+        "ilvl": 334,
         "verdict": "bon",
-        "note": "Altar of Fangs (Rav'i, non vérifié). Utilisation de 2 min correcte en attendant Voracious Heart ou Zul'jin's Guillotine ; pas de crests dessus."
+        "note": "Le bijou n°1 de la recherche, au max (piste Mythe).",
+        "enchants": [],
+        "gems": []
       },
       {
         "slot": "trinket2",
-        "nameFr": "Tambour de liens renouvelés",
-        "nameEn": "Drum of Renewed Bonds",
-        "itemId": 248583,
-        "ilvl": 295,
-        "verdict": "à remplacer",
-        "note": "Bijou vert de leveling (confirmé dans les données d'objets)."
+        "nameFr": "Coup de la guillotine de Zul'jin",
+        "nameEn": "Zul'jin's Guillotine Technique",
+        "itemId": 270173,
+        "ilvl": 334,
+        "verdict": "bon",
+        "note": "Le bijou n°2 de la recherche, au max.",
+        "enchants": [],
+        "gems": []
       },
       {
         "slot": "mainhand",
-        "nameFr": "Perce-cuir affolé par le venin",
-        "nameEn": "Venom-Cursed Hidepiercer",
-        "itemId": 277806,
-        "ilvl": 308,
-        "verdict": "à remplacer",
-        "note": "Identifiée : arme d'hast à deux mains, modèle de base vert (placeholder). Cible : Abyssal Broodfiend's Bardiche (Ula'tek). À noter : 251149 dans tes sacs (Victor's Flashfrozen Blade) est aussi un deux-mains, pas une arme à une main."
+        "nameFr": "Bardiche de démon des couvées abyssal",
+        "nameEn": "Abyssal Broodfiend's Bardiche",
+        "itemId": 268215,
+        "ilvl": 334,
+        "verdict": "bon",
+        "note": "L'arme BiS de la recherche (Ula'tek), au max, enchantée.",
+        "enchants": [
+          8689
+        ],
+        "gems": []
       }
     ]
   },
@@ -2445,6 +2497,14 @@
       "sources": [
         "s93"
       ]
+    },
+    {
+      "topic": "Plafond des pistes d'amélioration",
+      "versions": [
+        "Héros 305-321 et Mythe 318-334 en 6 rangs (déduit des identifiants de bonus de ton export : 12846 = 321, 12854 = 334)",
+        "Données minées en 8 rangs (Mythe 7/8 = 337/340, probablement via Venomstones en 12.1.5)"
+      ],
+      "resolution": "Ton export colle à la lecture en 6 rangs pour la 12.1 live ; les rangs 7-8 relèvent probablement de 12.1.5. Confiance moyenne."
     }
   ],
   "unknowns": [

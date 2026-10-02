@@ -229,6 +229,8 @@
     snap.items.forEach(it => {
       if (SLOTS.indexOf(it.slot) < 0 || items[it.slot]) return;
       items[it.slot] = { item_id: it.itemId, item_level: it.ilvl, name: str(it.nameFr) || str(it.nameEn) };
+      if (Array.isArray(it.enchants)) items[it.slot].enchants = it.enchants;
+      if (Array.isArray(it.gems)) items[it.slot].gems = it.gems;
     });
     return normalize(Object.keys(items).length ? { gear: { items } } : {}, 'snapshot', { at: U.isISO(snap.date) ? snap.date : null });
   };
@@ -272,7 +274,7 @@
   K.model = {
     normalize, fromSnapshot, trim, label, Reader,
     empty: () => normalize({}, 'none'),
-    /* current character: its cache, else (research player only) the 21/08 snapshot, else empty */
+    /* current character: its cache, else (research player only) the research gear snapshot, else empty */
     initial(cache) {
       if (cache && isObj(cache.profile)) return normalize(cache.profile, 'cached', { at: (cache.at && cache.at.profile) || cache.savedAt, requested: cache.requested, degraded: !!cache.degraded });
       return K.research.isPlayer() ? fromSnapshot() : normalize({}, 'none');
