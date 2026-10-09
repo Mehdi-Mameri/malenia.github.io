@@ -84,7 +84,9 @@ for (const [name, text] of handWritten) {
     for (const [re, msg] of RULES) if (re.test(line)) fail(`${name}:${i + 1} ${msg}\n    ${line.trim().slice(0, 140)}`);
     if (/\.innerHTML\s*=/.test(line) && name !== 'js/10-dom.js') fail(`${name}:${i + 1} innerHTML interdit hors 10-dom.js (utiliser KATA.setHTML)`);
     const urls = line.match(/https?:\/\/[^\s"'`)<>]+/g) || [];
-    for (const u of urls) if (!u.startsWith('https://raider.io')) fail(`${name}:${i + 1} URL non autorisée : ${u}`);
+    // raider.io = data source; Armurerie + WarcraftLogs = plain outbound links of the character card (CSP connect-src stays raider.io only)
+    const OK_URL = ['https://raider.io', 'https://worldofwarcraft.blizzard.com', 'https://www.warcraftlogs.com'];
+    for (const u of urls) if (!OK_URL.some(p => u.startsWith(p))) fail(`${name}:${i + 1} URL non autorisée : ${u}`);
   });
 }
 // icons referenced from JS must exist in the sprite
