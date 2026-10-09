@@ -205,6 +205,7 @@
       const E = K.engine.get(), M = c.M;
       const lk = (M.source === 'snapshot' || M.source === 'none' || K.net.profile.state === 'fail') && K.research.isPlayer();
       return h`<div class="now">
+        <div class="o-fiche">${S_('fiche', () => K.fiche.card(c))}</div>
         <div class="now-l">
           <div class="o-obj">${S_('objective', () => objective(E, c))}</div>
           <div class="o-budget">${S_('budget', () => budget(E, c))}</div>
